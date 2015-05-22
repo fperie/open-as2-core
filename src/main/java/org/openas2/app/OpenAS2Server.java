@@ -1,27 +1,29 @@
 package org.openas2.app;
 
 import java.io.BufferedWriter;
-import java.io.OutputStreamWriter;
 import java.util.List;
 
-import org.apache.commons.logging.Log;
-import org.apache.commons.logging.LogFactory;
 import org.openas2.OpenAS2Exception;
 import org.openas2.Session;
 import org.openas2.XMLSession;
 import org.openas2.cmd.CommandManager;
 import org.openas2.cmd.CommandRegistry;
 import org.openas2.cmd.processor.BaseCommandProcessor;
-
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 /** 
  * original author unknown
  * 
- * in this release added ability to have multiple command processors
+ * in this release added ability to have multiple command processors.
+ * 
  * @author joseph mcverry
- *
  */
-public class OpenAS2Server {
+public class OpenAS2Server 
+{
+	/** Logger for the class. */
+	private static final Logger LOGGER = LoggerFactory.getLogger(OpenAS2Server.class);
+	
 	protected BufferedWriter sysOut;
 
 	
@@ -34,43 +36,41 @@ public class OpenAS2Server {
 		BaseCommandProcessor cmd = null;
 		XMLSession session = null;
 
-		try {
-			Log logger = LogFactory.getLog(OpenAS2Server.class.getSimpleName());
-			
-			write(Session.TITLE + "\r\nStarting Server...\r\n");
+		try 
+		{
+			LOGGER.info(Session.TITLE);
+			LOGGER.info("Starting Server...");
 
 			// create the OpenAS2 Session object
 			// this is used by all other objects to access global configs and functionality
-			write("Loading configuration...\r\n");
+			LOGGER.info("Loading configuration...");
 
 			if (args.length > 0) {
 				session = new XMLSession(args[0]);
 			} else {
-				write("Usage:\r\n");
-				write("java org.openas2.app.OpenAS2Server <configuration file>\r\n");
+				LOGGER.info("Usage:");
+				LOGGER.info("java org.openas2.app.OpenAS2Server <configuration file>");
 				throw new Exception("Missing configuration file");
 			}
 			// create a command processor
 
 			// get a registry of Command objects, and add Commands for the Session
-			write("Registering Session to Command Processor...\r\n");
+			LOGGER.info("Registering Session to Command Processor...");
 
 			CommandRegistry reg = session.getCommandRegistry();
 
 			// start the active processor modules
-			write("Starting Active Modules...\r\n");
+			LOGGER.info("Starting Active Modules...");
 			session.getProcessor().startActiveModules();
 
 			// enter the command processing loop
-			write("OpenAS2 Started\r\n");
+			LOGGER.info("OpenAS2 Started");
 
 			
-			logger.info("- OpenAS2 Started -");
 			CommandManager cmdMgr = session.getCommandManager();
 			List processors = cmdMgr.getProcessors();
 			for (int i = 0; i < processors.size(); i++) {
-				write("Loading Command Processor..." + processors.toString()
-						+ "\r\n");
+				LOGGER.info("Loading Command Processor..." + processors.toString());
 				cmd = (BaseCommandProcessor) processors.get(i);
 				cmd.init();
 				cmd.addCommands(reg);
@@ -84,14 +84,21 @@ public class OpenAS2Server {
 					Thread.sleep(100); 
 				}
 			}
-			logger.info("- OpenAS2 Stopped -");
-		} catch (Exception e) {
-			e.printStackTrace();
-		} catch (Error err) {
-			err.printStackTrace();
-		} finally {
+			LOGGER.info("- OpenAS2 Stopped -");
+		} 
+		catch (Exception e) 
+		{
+			LOGGER.error("Exception occurred during the getting started: ", e);
+		} 
+		catch (Error err) 
+		{
+			LOGGER.error("Error occurred during the getting started: ", err);
+		} 
+		finally 
+		{
 
-			if (session != null) {
+			if (session != null) 
+			{
 				try {
 					session.getProcessor().stopActiveModules();
 				} catch (OpenAS2Exception same) {
@@ -107,22 +114,8 @@ public class OpenAS2Server {
 				}
 			}
 
-			write("OpenAS2 has shut down\r\n");
-
+			LOGGER.info("OpenAS2 has shut down\r\n");
 			System.exit(0);
-		}
-	}
-
-	public void write(String msg) {
-		if (sysOut == null) {
-			sysOut = new BufferedWriter(new OutputStreamWriter(System.out));
-		}
-
-		try {
-			sysOut.write(msg);
-			sysOut.flush();
-		} catch (java.io.IOException e) {
-			e.printStackTrace();
 		}
 	}
 }

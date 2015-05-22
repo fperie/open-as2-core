@@ -12,8 +12,6 @@ import javax.activation.DataHandler;
 import javax.mail.MessagingException;
 import javax.mail.internet.MimeBodyPart;
 
-import org.apache.commons.logging.Log;
-import org.apache.commons.logging.LogFactory;
 import org.openas2.OpenAS2Exception;
 import org.openas2.Session;
 import org.openas2.WrappedException;
@@ -24,9 +22,12 @@ import org.openas2.params.InvalidParameterException;
 import org.openas2.params.MessageParameters;
 import org.openas2.params.ParameterParser;
 import org.openas2.partner.Partnership;
+import org.openas2.processor.resender.DirectoryResenderModule;
 import org.openas2.processor.sender.SenderModule;
 import org.openas2.util.ByteArrayDataSource;
 import org.openas2.util.IOUtilOld;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 public abstract class DirectoryPollingModule extends PollingModule {
     public static final String PARAM_OUTBOX_DIRECTORY = "outboxdir";
@@ -36,9 +37,11 @@ public abstract class DirectoryPollingModule extends PollingModule {
     public static final String PARAM_DELIMITERS = "delimiters";
     public static final String PARAM_DEFAULTS = "defaults";
     public static final String PARAM_MIMETYPE = "mimetype";   
+    /** Logger for the class. */
+    private static final Logger LOGGER = LoggerFactory.getLogger(DirectoryPollingModule.class);
     private Map trackedFiles;
 
-	private Log logger = LogFactory.getLog(DirectoryPollingModule.class.getSimpleName());
+
 
     
     public void init(Session session, Map options) throws OpenAS2Exception {
@@ -142,7 +145,7 @@ public abstract class DirectoryPollingModule extends PollingModule {
 
     protected void processFile(File file) throws OpenAS2Exception {
     	
-        logger.info("processing " + file.getAbsolutePath());
+        LOGGER.info("processing {}", file.getAbsolutePath());
 
         Message msg = createMessage();
         msg.setAttribute(FileAttribute.MA_FILEPATH, file.getAbsolutePath());
@@ -157,7 +160,7 @@ public abstract class DirectoryPollingModule extends PollingModule {
         
         try {
             updateMessage(msg, file);
-            logger.info("file assigned to message " + file.getAbsolutePath() + msg.getLoggingText());
+            LOGGER.info("file assigned to message {}{}", file.getAbsolutePath(), msg.getLoggingText());
 
             if (msg.getData() == null) {
                 throw new InvalidMessageException("No Data");
@@ -180,10 +183,8 @@ public abstract class DirectoryPollingModule extends PollingModule {
 							.getAttribute(FileAttribute.MA_PENDINGFILE));
 					IOUtilOld.copyFile(file, pendingFile);
 
-					logger.info("copied " + file.getAbsolutePath()
-							+ " to pending folder : "
-							+ pendingFile.getAbsolutePath()+ msg.getLoggingText());
-
+					LOGGER.info("copied {} to pending folder : {}{}", file.getAbsolutePath(), 
+						pendingFile.getAbsolutePath(), msg.getLoggingText());
 				} catch (IOException iose) {
 					OpenAS2Exception se = new OpenAS2Exception(
 							"File was successfully sent but not copied to pending folder: "
@@ -203,7 +204,7 @@ public abstract class DirectoryPollingModule extends PollingModule {
                             .getName());
                     sentFile = IOUtilOld.moveFile(file, sentFile, false, true);
 
-                    logger.info("moved " + file.getAbsolutePath() + " to " + sentFile.getAbsolutePath()+ msg.getLoggingText());
+                    LOGGER.info("moved {} to {}{}", file.getAbsolutePath(), sentFile.getAbsolutePath(), msg.getLoggingText());
 
                 } catch (IOException iose) {
                     OpenAS2Exception se = new OpenAS2Exception(
@@ -214,10 +215,10 @@ public abstract class DirectoryPollingModule extends PollingModule {
                 throw new OpenAS2Exception("File was successfully sent but not deleted: " + file);
             }
 
-            logger.info("deleted " + file.getAbsolutePath()+ msg.getLoggingText());
+            LOGGER.info("deleted {}{}", file.getAbsolutePath(), msg.getLoggingText());
 
         } catch (OpenAS2Exception oae) {
-        	logger.info(oae.getLocalizedMessage()+ msg.getLoggingText());
+        	LOGGER.info(oae.getLocalizedMessage() + msg.getLoggingText(), oae);
             oae.addSource(OpenAS2Exception.SOURCE_MESSAGE, msg);
             oae.addSource(OpenAS2Exception.SOURCE_FILE, file);
             oae.terminate();
@@ -256,8 +257,9 @@ public abstract class DirectoryPollingModule extends PollingModule {
             	try {
             	contentType = ParameterParser.parse (contentType, params);
             	}
-            	catch (InvalidParameterException e) {
-            		logger.error("Bad content-type" + contentType+ msg.getLoggingText());
+            	catch (InvalidParameterException e) 
+            	{
+            		LOGGER.error("Bad content-type " + contentType + msg.getLoggingText(), e);
             		contentType = "application/octet-stream";
             	}
             	}

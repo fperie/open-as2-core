@@ -17,11 +17,10 @@ import java.util.Enumeration;
 import java.util.HashMap;
 import java.util.Map;
 
-import org.apache.commons.logging.Log;
-import org.apache.commons.logging.LogFactory;
 import org.openas2.OpenAS2Exception;
 import org.openas2.Session;
 import org.openas2.WrappedException;
+import org.openas2.app.OpenAS2Server;
 import org.openas2.message.Message;
 import org.openas2.message.MessageMDN;
 import org.openas2.params.InvalidParameterException;
@@ -30,6 +29,8 @@ import org.openas2.partner.SecurePartnership;
 import org.openas2.util.AS2UtilOld;
 import org.openas2.util.FileMonitor;
 import org.openas2.util.FileMonitorListener;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 public class PKCS12CertificateFactory extends BaseCertificateFactory implements
         AliasedCertificateFactory, KeyStoreCertificateFactory, StorableCertificateFactory,
@@ -37,11 +38,13 @@ public class PKCS12CertificateFactory extends BaseCertificateFactory implements
     public static final String PARAM_FILENAME = "filename";
     public static final String PARAM_PASSWORD = "password";
     public static final String PARAM_INTERVAL = "interval";
+    
+    /** Logger for the class. */
+	private static final Logger LOGGER = LoggerFactory.getLogger(PKCS12CertificateFactory.class);
+    
     private FileMonitor fileMonitor;
     private KeyStore keyStore;
 
-	private Log logger = LogFactory.getLog(PKCS12CertificateFactory.class.getSimpleName());
-    
     public String getAlias(Partnership partnership, String partnershipType) throws OpenAS2Exception {
         String alias = null;
 
@@ -247,10 +250,13 @@ public class PKCS12CertificateFactory extends BaseCertificateFactory implements
         switch (eventID) {
         case FileMonitorListener.EVENT_MODIFIED:
 
-            try {
+            try 
+            {
                 load();
-                logger.info("- Certificates Reloaded -");
-            } catch (OpenAS2Exception oae) {
+                LOGGER.info("- Certificates Reloaded -");
+            } 
+            catch (OpenAS2Exception oae) 
+            {
                 oae.terminate();
             }
 

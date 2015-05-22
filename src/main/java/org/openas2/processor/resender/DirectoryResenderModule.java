@@ -14,16 +14,17 @@ import java.util.List;
 import java.util.Map;
 import java.util.StringTokenizer;
 
-import org.apache.commons.logging.Log;
-import org.apache.commons.logging.LogFactory;
 import org.openas2.OpenAS2Exception;
 import org.openas2.Session;
 import org.openas2.WrappedException;
 import org.openas2.message.Message;
 import org.openas2.params.InvalidParameterException;
 import org.openas2.processor.sender.SenderModule;
+import org.openas2.processor.storage.MessageFileModule;
 import org.openas2.util.DateUtil;
 import org.openas2.util.IOUtilOld;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 
 public class DirectoryResenderModule extends BaseResenderModule {
@@ -34,9 +35,9 @@ public class DirectoryResenderModule extends BaseResenderModule {
 	// TODO Resend set to 15 minutes. Implement a scaling resend time with eventual permanent failure of transmission    
 	public static final long DEFAULT_RESEND_DELAY = 15 * 60 * 1000; // 15 minutes
 
-	private Log logger = LogFactory.getLog(DirectoryResenderModule.class.getSimpleName());
+	/** Logger for the class. */
+    private static final Logger LOGGER = LoggerFactory.getLogger(DirectoryResenderModule.class);
 
-	
 	public boolean canHandle(String action, Message msg, Map options) {
 		return action.equals(ResenderModule.DO_RESEND);
 	}
@@ -56,7 +57,7 @@ public class DirectoryResenderModule extends BaseResenderModule {
 			oos.writeObject(msg);
 			oos.close();
             
-            logger.info("message put in resend queue"+msg.getLoggingText());
+            LOGGER.info("message put in resend queue {}", msg.getLoggingText());
 		} catch (IOException ioe) {
 			throw new WrappedException(ioe);
 		}
@@ -116,7 +117,7 @@ public class DirectoryResenderModule extends BaseResenderModule {
 	}
 
 	protected void processFile(File file) throws OpenAS2Exception {
-		logger.debug("processing " + file.getAbsolutePath());
+		LOGGER.debug("processing {}", file.getAbsolutePath());
 
 		Message msg = null;
 
@@ -129,7 +130,7 @@ public class DirectoryResenderModule extends BaseResenderModule {
                 ois.close();
 
 				// Transmit the message
-                logger.info("loaded message for resend."+msg.getLoggingText());
+                LOGGER.info("loaded message for resend. {}", msg.getLoggingText());
                 
                 Map options = new HashMap();
                 options.put(SenderModule.SOPT_RETRIES, retries);
@@ -140,7 +141,7 @@ public class DirectoryResenderModule extends BaseResenderModule {
 						file.getAbsolutePath());
 				}
 
-				logger.info("deleted " + file.getAbsolutePath()+msg.getLoggingText());
+				LOGGER.info("deleted {}", file.getAbsolutePath()+msg.getLoggingText());
 			} catch (IOException ioe) {
 				throw new WrappedException(ioe);
 			} catch (ClassNotFoundException cnfe) {

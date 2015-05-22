@@ -8,8 +8,6 @@ import java.util.Enumeration;
 import java.util.Iterator;
 import java.util.Map;
 
-import org.apache.commons.logging.Log;
-import org.apache.commons.logging.LogFactory;
 import org.openas2.DispositionException;
 import org.openas2.OpenAS2Exception;
 import org.openas2.WrappedException;
@@ -20,12 +18,16 @@ import org.openas2.params.InvalidParameterException;
 import org.openas2.params.MessageParameters;
 import org.openas2.params.ParameterParser;
 import org.openas2.processor.receiver.AS2ReceiverModule;
+import org.openas2.processor.sender.AsynchMDNSenderModule;
 import org.openas2.util.DispositionType;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 public class MessageFileModule extends BaseStorageModule {
     public static final String PARAM_HEADER = "header";
     
-	private Log logger = LogFactory.getLog(MessageFileModule.class.getSimpleName());
+    /** Logger for the class. */
+    private static final Logger LOGGER = LoggerFactory.getLogger(MessageFileModule.class);
 
 
     public void handle(String action, Message msg, Map options) throws OpenAS2Exception {
@@ -34,7 +36,7 @@ public class MessageFileModule extends BaseStorageModule {
             File msgFile = getFile(msg, getParameter(PARAM_FILENAME, true), action);
             InputStream in = msg.getData().getInputStream();
             store(msgFile, in);
-            logger.info("stored message to " + msgFile.getAbsolutePath()+msg.getLoggingText());
+            LOGGER.info("stored message to {}", msgFile.getAbsolutePath() + msg.getLoggingText());
         } catch (Exception e) {
             throw new DispositionException(new DispositionType("automatic-action", "MDN-sent-automatically",
                     "processed", "Error", "Error storing transaction"), AS2ReceiverModule.DISP_STORAGE_FAILED, e);
@@ -47,7 +49,7 @@ public class MessageFileModule extends BaseStorageModule {
                 File headerFile = getFile(msg, headerFilename, action);
                 InputStream in = getHeaderStream(msg);
                 store(headerFile, in);
-                logger.info("stored headers to " + headerFile.getAbsolutePath()+msg.getLoggingText());
+                LOGGER.info("stored headers to {}", headerFile.getAbsolutePath()+msg.getLoggingText());
             } catch (IOException ioe) {
                 throw new WrappedException(ioe);
             }
@@ -58,10 +60,10 @@ public class MessageFileModule extends BaseStorageModule {
         return DO_STORE;
     }
 
-/**
- * @deprecated 2007-06-01
- */ 
-    
+    /**
+ 	* @deprecated 2007-06-01
+ 	*/ 
+    @Deprecated
     protected String getFilename(Message msg, String fileParam) throws InvalidParameterException {
 
         return getFilename(msg, fileParam, "");

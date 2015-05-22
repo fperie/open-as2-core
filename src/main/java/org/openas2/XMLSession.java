@@ -9,16 +9,11 @@ import javax.xml.parsers.DocumentBuilder;
 import javax.xml.parsers.DocumentBuilderFactory;
 import javax.xml.parsers.ParserConfigurationException;
 
-import org.apache.commons.logging.Log;
-import org.apache.commons.logging.LogFactory;
-import org.openas2.app.OpenAS2Server;
 import org.openas2.cert.CertificateFactory;
 import org.openas2.cmd.CommandManager;
 import org.openas2.cmd.CommandRegistry;
 import org.openas2.cmd.CommandRegistryFactory;
 import org.openas2.cmd.processor.BaseCommandProcessor;
-import org.openas2.logging.LogManager;
-import org.openas2.logging.Logger;
 import org.openas2.partner.PartnershipFactory;
 import org.openas2.processor.Processor;
 import org.openas2.processor.ProcessorModule;
@@ -104,7 +99,7 @@ public class XMLSession extends BaseSession implements CommandRegistryFactory {
 			} else if (nodeName.equals(EL_COMMANDS)) {
 				loadCommands(rootNode);
 			} else if (nodeName.equals(EL_LOGGERS)) {
-				loadLoggers(rootNode);
+				// do nothing
 			} else if (nodeName.equals("#text")) {
 				// do nothing
 			} else if (nodeName.equals("#comment")) {
@@ -125,34 +120,6 @@ public class XMLSession extends BaseSession implements CommandRegistryFactory {
 		CommandRegistry cmdReg = (CommandRegistry) XMLUtil.getComponent(
 				rootNode, this);
 		setCommandRegistry(cmdReg);
-	}
-
-	protected void loadLoggers(Node rootNode) throws OpenAS2Exception {
-		
-		LogManager manager = LogManager.getLogManager();
-		if (LogManager.isRegistedWithApache())
-			; // continue
-		else {
-			// if using the OpenAS2 loggers the log manager must registered with the jvm argument
-			// -Dorg.apache.commons.logging.Log=org.openas2.logging.Log
-			throw new OpenAS2Exception("the OpenAS2 loggers' log manager must registered with the jvm argument -Dorg.apache.commons.logging.Log=org.openas2.logging.Log");
-		}
-		NodeList loggers = rootNode.getChildNodes();
-		Node logger;
-
-		for (int i = 0; i < loggers.getLength(); i++) {
-			logger = loggers.item(i);
-
-			if (logger.getNodeName().equals("logger")) {
-				loadLogger(manager, logger);
-			}
-		}
-	}
-
-	protected void loadLogger(LogManager manager, Node loggerNode)
-			throws OpenAS2Exception {
-		Logger logger = (Logger) XMLUtil.getComponent(loggerNode, this);
-		manager.addLogger(logger);
 	}
 
 	protected void loadCommandProcessors(Node rootNode) throws OpenAS2Exception {

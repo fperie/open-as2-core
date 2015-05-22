@@ -12,8 +12,6 @@ import javax.activation.DataHandler;
 import javax.mail.internet.ContentType;
 import javax.mail.internet.MimeBodyPart;
 
-import org.apache.commons.logging.Log;
-import org.apache.commons.logging.LogFactory;
 import org.openas2.DispositionException;
 import org.openas2.OpenAS2Exception;
 import org.openas2.WrappedException;
@@ -26,6 +24,7 @@ import org.openas2.message.NetAttribute;
 import org.openas2.partner.AS2Partnership;
 import org.openas2.partner.ASXPartnership;
 import org.openas2.partner.Partnership;
+import org.openas2.processor.resender.DirectoryResenderModule;
 import org.openas2.processor.sender.SenderModule;
 import org.openas2.processor.storage.StorageModule;
 import org.openas2.util.AS2UtilOld;
@@ -35,12 +34,14 @@ import org.openas2.util.HTTPUtil;
 import org.openas2.util.IOUtilOld;
 import org.openas2.util.Profiler;
 import org.openas2.util.ProfilerStub;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 public class AS2ReceiverHandler implements NetModuleHandler {
     private AS2ReceiverModule module;
 
-	private Log logger = LogFactory.getLog(AS2ReceiverHandler.class.getSimpleName());
-
+    /** Logger for the class. */
+    private static final Logger LOGGER = LoggerFactory.getLogger(DirectoryResenderModule.class);
     
     public AS2ReceiverHandler(AS2ReceiverModule module) {
         super();
@@ -56,7 +57,7 @@ public class AS2ReceiverHandler implements NetModuleHandler {
     }
 
     public void handle(NetModule owner, Socket s) {
-        logger.info("incoming connection"+getClientInfo(s));
+        LOGGER.info("incoming connection {}", getClientInfo(s));
 
         AS2Message msg = createMessage(s);
 
@@ -78,7 +79,7 @@ public class AS2ReceiverHandler implements NetModuleHandler {
         Profiler.endProfile(transferStub);
 
         if (data != null) {
-        	logger.info("received " + IOUtilOld.getTransferRate(data.length, transferStub)+getClientInfo(s)+msg.getLoggingText());
+        	LOGGER.info("received {}{}{}", IOUtilOld.getTransferRate(data.length, transferStub),getClientInfo(s),msg.getLoggingText());
 
             // TODO store HTTP request, headers, and data to file in Received folder -> use message-id for filename?
             try {
@@ -137,7 +138,7 @@ public class AS2ReceiverHandler implements NetModuleHandler {
                         HTTPUtil.sendHTTPResponse(out, HttpURLConnection.HTTP_OK, false);
                         out.flush();
                         out.close();
-                        logger.info("sent HTTP OK"+getClientInfo(s)+msg.getLoggingText());
+                        LOGGER.info("sent HTTP OK {}{}",getClientInfo(s),msg.getLoggingText());
                     }
                 } catch (Exception e) {
                     throw new WrappedException("Error creating and returning MDN, message was stilled processed", e);
@@ -176,7 +177,7 @@ public class AS2ReceiverHandler implements NetModuleHandler {
         try {
             if (ch.isEncrypted(msg.getData())) {
                 // Decrypt
-            	logger.debug("decrypting"+msg.getLoggingText());
+            	LOGGER.debug("decrypting {}", msg.getLoggingText());
 
                 X509Certificate receiverCert = certFx.getCertificate(msg, Partnership.PTYPE_RECEIVER);
                 PrivateKey receiverKey = certFx.getPrivateKey(msg, receiverCert);
@@ -190,7 +191,7 @@ public class AS2ReceiverHandler implements NetModuleHandler {
 
         try {
             if (ch.isSigned(msg.getData())) {
-            	logger.debug("verifying signature"+msg.getLoggingText());
+            	LOGGER.debug("verifying signature {}", msg.getLoggingText());
 
                 X509Certificate senderCert = certFx.getCertificate(msg, Partnership.PTYPE_SENDER);
                 msg.setData(AS2UtilOld.getCryptoHelper().verify(msg.getData(), senderCert));
@@ -219,7 +220,7 @@ public class AS2ReceiverHandler implements NetModuleHandler {
                 	out.write("Content-Length: 0\r\n\r\n".getBytes()); 
                 	out.flush();
                 	out.close();
-                	logger.info("setup to send asynch MDN [" + disposition.toString() + "]"+getClientInfo(s)+msg.getLoggingText());
+                	LOGGER.info("setup to send asynch MDN [{}]{}{}", disposition.toString(), getClientInfo(s), msg.getLoggingText());
                     getModule().getSession().getProcessor().handle(SenderModule.DO_SENDMDN, msg, null);
                     return;
                 }
@@ -252,7 +253,7 @@ public class AS2ReceiverHandler implements NetModuleHandler {
 
                 // Save sent MDN  for later examination
 				getModule().getSession().getProcessor().handle(StorageModule.DO_STOREMDN, msg, null);
-                logger.info("sent MDN [" + disposition.toString() + "]"+getClientInfo(s)+msg.getLoggingText());
+                LOGGER.info("sent MDN [{}] {}{}", disposition.toString(), getClientInfo(s), msg.getLoggingText());
             } catch (Exception e) {
                 WrappedException we = new WrappedException("Error sending MDN", e);
                 we.addSource(OpenAS2Exception.SOURCE_MESSAGE, msg);

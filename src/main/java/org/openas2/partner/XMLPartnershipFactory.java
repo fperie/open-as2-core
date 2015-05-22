@@ -19,15 +19,16 @@ import javax.xml.parsers.DocumentBuilder;
 import javax.xml.parsers.DocumentBuilderFactory;
 import javax.xml.parsers.ParserConfigurationException;
 
-import org.apache.commons.logging.Log;
-import org.apache.commons.logging.LogFactory;
 import org.openas2.OpenAS2Exception;
 import org.openas2.Session;
 import org.openas2.WrappedException;
+import org.openas2.cert.PKCS12CertificateFactory;
 import org.openas2.params.InvalidParameterException;
 import org.openas2.util.FileMonitor;
 import org.openas2.util.FileMonitorListener;
 import org.openas2.util.XMLUtil;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.w3c.dom.Document;
 import org.w3c.dom.Element;
 import org.w3c.dom.Node;
@@ -45,10 +46,13 @@ public class XMLPartnershipFactory extends BasePartnershipFactory
     implements RefreshablePartnershipFactory, FileMonitorListener {
     public static final String PARAM_FILENAME = "filename";
     public static final String PARAM_INTERVAL = "interval";
+    
+    /** Logger for the class. */
+    private static final Logger LOGGER = LoggerFactory.getLogger(XMLPartnershipFactory.class);
+
     private FileMonitor fileMonitor;
     private Map partners;
 
-	private Log logger = LogFactory.getLog(XMLPartnershipFactory.class.getSimpleName());
 
     
     public void setFileMonitor(FileMonitor fileMonitor) {
@@ -104,7 +108,7 @@ public class XMLPartnershipFactory extends BasePartnershipFactory
 
                 try {
                     refresh();
-					logger.debug("- Partnerships Reloaded -");
+					LOGGER.debug("- Partnerships Reloaded -");
                 } catch (OpenAS2Exception oae) {
                     oae.terminate();
                 }
@@ -252,7 +256,7 @@ public class XMLPartnershipFactory extends BasePartnershipFactory
     		l++;
     	}
     	
-    	logger.info("backing up "+ fn +" to "+ ((f == null) ? "" : f.getName()));
+    	LOGGER.info("backing up {} to {}", fn, ((f == null) ? "" : f.getName()));
     	
     	File fr = new File(fn);
     	fr.renameTo(f);

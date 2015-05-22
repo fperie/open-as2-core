@@ -20,8 +20,6 @@ import javax.mail.internet.ContentType;
 import javax.mail.internet.InternetHeaders;
 import javax.mail.internet.MimeBodyPart;
 
-import org.apache.commons.logging.Log;
-import org.apache.commons.logging.LogFactory;
 import org.openas2.DispositionException;
 import org.openas2.OpenAS2Exception;
 import org.openas2.WrappedException;
@@ -37,11 +35,15 @@ import org.openas2.util.ByteArrayDataSource;
 import org.openas2.util.DispositionType;
 import org.openas2.util.HTTPUtil;
 import org.openas2.util.IOUtilOld;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
-public class AS2MDNReceiverHandler implements NetModuleHandler {
+public class AS2MDNReceiverHandler implements NetModuleHandler 
+{
+    /** Logger for the class. */
+    private static final Logger LOGGER = LoggerFactory.getLogger(AS2MDNReceiverHandler.class);
+
     private AS2MDNReceiverModule module;
-
-	private Log logger = LogFactory.getLog(AS2MDNReceiverHandler.class.getSimpleName());
 
     
     public AS2MDNReceiverHandler(AS2MDNReceiverModule module) {
@@ -59,7 +61,7 @@ public class AS2MDNReceiverHandler implements NetModuleHandler {
 
     public void handle(NetModule owner, Socket s) {
     	
-    	logger.info("incoming connection"+ " [" + getClientInfo(s) + "]");
+    	LOGGER.info("incoming connection  [{}]", getClientInfo(s));
 
         AS2Message msg = new AS2Message();
         
@@ -72,7 +74,7 @@ public class AS2MDNReceiverHandler implements NetModuleHandler {
             //Asynch MDN 2007-03-12
             //check if the requested URL is defined in attribute "as2_receipt_option"  
             //in one of partnerships, if yes, then process incoming AsyncMDN 
-            logger.info("incoming connection for receiving AsyncMDN"+ " [" + getClientInfo(s) + "]" + msg.getLoggingText());
+            LOGGER.info("incoming connection for receiving AsyncMDN [{}] {}", getClientInfo(s), msg.getLoggingText());
 			ContentType receivedContentType;
                 
             MimeBodyPart receivedPart = new MimeBodyPart(msg.getHeaders(), data); 
@@ -202,32 +204,29 @@ public class AS2MDNReceiverHandler implements NetModuleHandler {
 			String disposition = msg.getMDN().getAttribute(
 					AS2MessageMDN.MDNA_DISPOSITION);
 			
-			logger.info("received MDN [" + disposition + "]" + msg.getLoggingText());
+			LOGGER.info("received MDN [{}] {}", disposition, msg.getLoggingText());
 			// original code just did string compare - returnmic.equals(originalmic).  Sadly this is
 			// not good enough as the mic fields are "base64string, algorith" taken from a rfc822 style
 			// Returned-Content-MIC header and rfc822 headers can contain spaces all over the place.
 			// (not to mention comments!).  Simple fix - delete all spaces.
 			if (!returnmic.replaceAll("\\s+", "").equals(originalmic.replaceAll("\\s+", ""))) {
-			 	logger.info("mic not matched, original mic: " + originalmic
-			 								+ " return mic: " + returnmic + msg.getLoggingText());
+			 	LOGGER.info("mic not matched, original mic: {} return mic: {}{}", originalmic, returnmic, msg.getLoggingText());
 				return false;
 			}
 
 			// delete the pendinginfo & pending file if mic is matched
-			logger.info("mic is matched, mic: " + returnmic + msg.getLoggingText());
+			LOGGER.info("mic is matched, mic: {}{}", returnmic, msg.getLoggingText());
 			File fpendinginfofile = new File(pendinginfofile);
-			logger.info("delete pendinginfo file : " + fpendinginfofile.getName()
-							+ " from pending folder : "
-							+ (String) this.getModule().getSession().getComponent("processor").getParameters().get("pendingmdn")+msg.getLoggingText());
+			LOGGER.info("delete pendinginfo file : {} from pending folder : {}{}", fpendinginfofile.getName(),
+				(String) this.getModule().getSession().getComponent("processor").getParameters().get("pendingmdn"), msg.getLoggingText());
 
 			fpendinginfofile.delete();
 
-			logger.info("delete pending file : " + fpendingfile.getName()
-							+ " from pending folder : "
-							+ fpendingfile.getParent()+msg.getLoggingText());
+			LOGGER.info("delete pending file : {} from pending folder : {}{}", fpendingfile.getName(),
+				fpendingfile.getParent(), msg.getLoggingText());
 			fpendingfile.delete();
 		} catch (Exception e) {
-			logger.error(e.getMessage(), e);
+			LOGGER.error(e.getMessage(), e);
 			return false;
 		}
 		
@@ -290,7 +289,7 @@ public class AS2MDNReceiverHandler implements NetModuleHandler {
     }
     catch (IOException ioe)
     {
-    	logger.error(ioe.getMessage(), ioe);
+    	LOGGER.error(ioe.getMessage(), ioe);
     }
     finally {
     }

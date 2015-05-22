@@ -7,31 +7,6 @@
 	<partnerships classname="org.openas2.partner.XMLPartnershipFactory"
 		filename="%home%\partnerships.xml"/>
 		
-	<loggers>
-		<logger classname="org.openas2.logging.ConsoleLogger"/>
-		
-		<!-- Remove this comment to enable emailing of exceptions
-		<logger classname="org.openas2.logging.EmailLogger"
-			show="terminated"
-			from="openas2"
-			to="your email address"
-			smtpserver="your smtp server"
-			subject="$exception.name$: $exception.message$"
-			bodytemplate="%home%\emailtemplate.txt"/>
-		-->
-		
-		<logger classname="org.openas2.logging.FileLogger"
-			filename="%home%\log-$date.MMddyyyy$.txt"/>			
-		
-		<!-- send the logs on a network port. -->
-		<!-- 
-		<logger classname="org.openas2.logging.SocketLogger"
-		    ipaddr="127.0.0.1"
-			portid="999"/>
-		 -->			
-	</loggers>
-
-
 	<commands classname="org.openas2.cmd.XMLCommandRegistry"
 		filename="%home%\commands.xml"/>
 	

@@ -2,8 +2,6 @@ package org.openas2.processor.receiver;
 
 import java.net.Socket;
 
-import org.apache.commons.logging.Log;
-import org.apache.commons.logging.LogFactory;
 import org.openas2.app.OpenAS2Server;
 import org.openas2.message.NetAttribute;
 import org.openas2.params.MessageParameters;

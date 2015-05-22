@@ -10,8 +10,6 @@ import java.util.Map;
 
 import javax.mail.Header;
 
-import org.apache.commons.logging.Log;
-import org.apache.commons.logging.LogFactory;
 import org.openas2.OpenAS2Exception;
 import org.openas2.Session;
 import org.openas2.WrappedException;
@@ -25,11 +23,14 @@ import org.openas2.util.DispositionType;
 import org.openas2.util.IOUtilOld;
 import org.openas2.util.Profiler;
 import org.openas2.util.ProfilerStub;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 
-public class AsynchMDNSenderModule extends HttpSenderModule{
-   
-	private Log logger = LogFactory.getLog(AsynchMDNSenderModule.class.getSimpleName());
+public class AsynchMDNSenderModule extends HttpSenderModule
+{
+	/** Logger for the class. */
+    private static final Logger LOGGER = LoggerFactory.getLogger(AsynchMDNSenderModule.class);
 
 	public boolean canHandle(String action, Message msg, Map options) {
 	        if (!action.equals(SenderModule.DO_SENDMDN)) {
@@ -45,7 +46,7 @@ public class AsynchMDNSenderModule extends HttpSenderModule{
 			sendAsyncMDN((AS2Message) msg, options);
        
         } finally {
-         		logger.debug("asynch mdn message sent");
+         		LOGGER.debug("asynch mdn message sent");
         }
 
     }
@@ -70,7 +71,7 @@ public class AsynchMDNSenderModule extends HttpSenderModule{
 	    }
 	   private void sendAsyncMDN(AS2Message msg, Map options) throws OpenAS2Exception {
 
-		logger.info("Async MDN submitted"+msg.getLoggingText());
+		LOGGER.info("Async MDN submitted {}", msg.getLoggingText());
 		DispositionType disposition = new DispositionType("automatic-action",
 				"MDN-sent-automatically", "processed");
 
@@ -85,7 +86,7 @@ public class AsynchMDNSenderModule extends HttpSenderModule{
 
 			try {
 
-				logger.info("connected to " + url+msg.getLoggingText());
+				LOGGER.info("connected to {}", url+msg.getLoggingText());
 
 				conn.setRequestProperty("Connection", "close, TE");
 				conn.setRequestProperty("User-Agent", "OpenAS2 AS2Sender");
@@ -111,8 +112,7 @@ public class AsynchMDNSenderModule extends HttpSenderModule{
 
 					int bytes = IOUtilOld.copy(messageIn, messageOut);
 					Profiler.endProfile(transferStub);
-					logger.info("transferred "
-							+ IOUtilOld.getTransferRate(bytes, transferStub)+msg.getLoggingText());
+					LOGGER.info("transferred {}", IOUtilOld.getTransferRate(bytes, transferStub)+msg.getLoggingText());
 				} finally {
 					messageIn.close();
 				}
@@ -124,14 +124,12 @@ public class AsynchMDNSenderModule extends HttpSenderModule{
                         && (conn.getResponseCode() != HttpURLConnection.HTTP_PARTIAL)
                         && (conn.getResponseCode() != HttpURLConnection.HTTP_NO_CONTENT)
                         ) {
-					logger.error("sent AsyncMDN ["
-							+ disposition.toString() + "] Fail "+msg.getLoggingText());
+					LOGGER.error("sent AsyncMDN [{}] Fail {}", disposition.toString(), msg.getLoggingText());
 					throw new HttpResponseException(url.toString(), conn
 							.getResponseCode(), conn.getResponseMessage());
 				}
 
-				logger.info("sent AsyncMDN [" + disposition.toString()
-						+ "] OK "+msg.getLoggingText());
+				LOGGER.info("sent AsyncMDN [{}] OK {}", disposition.toString(), msg.getLoggingText());
 
 				//		    log & store mdn into backup folder. 
 				((Session)options.get("session")).getProcessor().handle(StorageModule.DO_STOREMDN,

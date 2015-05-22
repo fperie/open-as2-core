@@ -3,17 +3,28 @@ package org.openas2;
 import java.util.HashMap;
 import java.util.Map;
 
-import org.apache.commons.logging.Log;
-import org.apache.commons.logging.LogFactory;
 import org.openas2.app.OpenAS2Server;
+import org.openas2.partner.XMLPartnershipFactory;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
  ;
 
 
-public class OpenAS2Exception extends Exception {
-    public static final String SOURCE_MESSAGE = "message";
+public class OpenAS2Exception extends Exception 
+{
+    /**
+	 * Version de sérialisation.
+	 */
+	private static final long serialVersionUID = 1L;
+	
+	public static final String SOURCE_MESSAGE = "message";
     public static final String SOURCE_FILE = "file";
+    
+    /** Logger for the class. */
+    private static final Logger LOGGER = LoggerFactory.getLogger(XMLPartnershipFactory.class);
+    
     private Map sources;
-	private Log logger = LogFactory.getLog(OpenAS2Exception.class.getSimpleName());
+	
 
     public OpenAS2Exception() {
         log(false);
