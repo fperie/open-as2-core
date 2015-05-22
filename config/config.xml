@@ -22,10 +22,13 @@
 		
 		<logger classname="org.openas2.logging.FileLogger"
 			filename="%home%\log-$date.MMddyyyy$.txt"/>			
-			
+		
+		<!-- send the logs on a network port. -->
+		<!-- 
 		<logger classname="org.openas2.logging.SocketLogger"
 		    ipaddr="127.0.0.1"
-			portid="999"/>			
+			portid="999"/>
+		 -->			
 	</loggers>
 
 
@@ -90,7 +93,6 @@
 		
 		<module classname="org.openas2.processor.receiver.AS2MDNReceiverModule"			
 			port="10081"/>
-
 		
 		<module classname="org.openas2.processor.resender.DirectoryResenderModule"
 			resenddir="%home%\resend"
