@@ -1,0 +1,737 @@
+<html>
+
+<head>
+<Title>OpenAS2 Remote Access</title>
+
+
+<style>
+
+table.one
+{
+empty-cells: show
+border-collapse: separate;
+border-spacing: 10px
+}
+
+li.highlite
+{
+  font-size: 12px;
+  font-family: times;
+  font-style: italic;
+  font-weight: 900;
+  text-decoration: underline;
+}
+
+</style>
+
+
+<script language="JavaScript">
+
+var userid;
+var pwd;
+
+var nodeList = new Array();
+
+function getReadyStateHandler(req, responseXmlHandler) {
+
+  // Return an anonymous function that listens to the
+  // XMLHttpRequest instance
+  return function () {
+    // If the request's status is "complete"
+    if (req.readyState == 4) {
+
+      // Check that a successful server response was received
+
+      if (req.status == 200) {
+        //alert(req.responseText);
+        responseXmlHandler(req.responseXML);
+
+      } else {
+
+	        alert("HTTP error: "+req.status);
+      }
+     }
+   }
+}
+
+var waitRequest = '';  // ugly atomic semaphone
+
+function sendRequest(requestedAction, respondingFunction)
+{
+
+
+  if (waitRequest != '')
+    return 0;
+
+  waitRequest = requestedAction; // now we own it
+
+  var xmlreq = false;
+
+  if (window.XMLHttpRequest) {
+    // Create XMLHttpRequest object in non-Microsoft browsers
+    xmlreq = new XMLHttpRequest();
+   } else if (window.ActiveXObject) {
+    // Create XMLHttpRequest via MS ActiveX
+    try {
+      // Try to create XMLHttpRequest in later versions
+      // of Internet Explorer
+      xmlreq = new ActiveXObject("Msxml2.XMLHTTP");
+    } catch (e1) {
+      // Failed to create required ActiveXObject
+      try {
+        // Try version supported by older versions
+        // of Internet Explorer
+        xmlreq = new ActiveXObject("Microsoft.XMLHTTP");
+      } catch (e2) {
+        // Unable to create an XMLHttpRequest with ActiveX
+      }
+    }
+   }
+
+
+
+   var handlerFunction = getReadyStateHandler(xmlreq, respondingFunction);
+   xmlreq.onreadystatechange = handlerFunction;
+
+   // Open an HTTP  connection to the servlet
+   // Third parameter specifies request is asynchronous.
+   lgn = "&userid="+userid+"&pwd="+pwd
+   try{ xmlreq.open("POST", "/OpenAS2/OpenAS2Servlet/"+"?action="+requestedAction+lgn, true); }
+   catch (e)  { alert("xmlreq.open caused " + e) }
+
+    // Specify that the body of the request contains form data
+   xmlreq.setRequestHeader("Content-Type",  "application/x-www-form-urlencoded");
+
+   try{  xmlreq.send(null); }
+   catch (e) { alert("xmlreq.send caused " + e) }
+
+   return 1;
+
+
+}
+
+var currentHighlite = null
+
+function highlite(node)
+{
+   if (currentHighlite != null)
+        currentHighlite.className="";
+   currentHighlite = node;
+   currentHighlite.className="highlite";
+}
+
+var currentShowNode=document.getElementById("container1");
+var controlNode;
+
+function showNode(nodeID)
+{
+  controlNode.replaceChild(nodeList[nodeID], currentShowNode)
+  currentShowNode = nodeList[nodeID]
+
+}
+
+var logButtonSays = "";
+
+function loadData()
+{
+
+   highlite(document.getElementById("logview"));
+   currentShowNode=document.getElementById("container1")
+   controlNode =  currentShowNode.parentNode
+   logNode = document.createElement('div')
+   nodeList["log"] = logNode
+   showNode("log");
+   var tbl = document.createElement('table')
+   logNode.appendChild(tbl);
+   var tr = document.createElement('tr')
+   tbl.appendChild(tr)
+   var td = document.createElement('td')
+   tr.appendChild(td)
+
+   var slb = document.createElement("button");
+   logButtonSays = document.createTextNode("Stop")
+   slb.appendChild(logButtonSays)
+   slb.setAttribute("id", "LogControl")
+   slb.setAttribute("onClick", "logController('LogControl');")
+   td.appendChild(slb);
+
+   slb = document.createElement("button");
+   slb.appendChild(document.createTextNode("Clear"));
+   slb.setAttribute("id", "ClearControl")
+   slb.setAttribute("onClick", "document.getElementById('logText').innerHTML='';");
+   td.appendChild(slb);
+
+   tr = document.createElement('tr')
+   tbl.appendChild(tr)
+   td = document.createElement('td')
+   tr.appendChild(td)
+
+   var textarea = document.createElement("div")
+   textarea.setAttribute("id", "logText");
+   td.appendChild(textarea);
+
+   startLoadCerts();
+   startLoadPartners();
+   startLoadPartnerships();
+ }
+
+
+
+var logging = 1;
+var logTimer;
+
+function updateLog()
+{
+    if (waitRequest != "")
+       {
+         setTimeout("updateLog()",100);
+         return;
+       }
+    if (sendRequest("log", logResponse) == 0)
+         setTimeout("updateLog()",100);
+
+}
+
+
+function logResponse(data)
+{
+
+    waitRequest = '';
+    n = data.childNodes
+    var trn = data.getElementsByTagName("log")[0];
+
+    if (trn == undefined)  // bad data ignore, but don't forget that the timer won't restart.
+      return;
+
+    var attr = trn.attributes
+
+    var inlog = "";
+
+    for (var i = 0; i < attr.length; i++) {
+	       if (attr[i].name == 'resp')
+	         inlog = attr[i].value
+	    }
+
+    if (inlog > '' ) {
+    	logText = document.getElementById('logText').innerHTML;
+        logText+=inlog
+    	document.getElementById('logText').innerHTML=logText;
+    	}
+
+   if (logging == 0) // stop loggin so don't reset timer to get next log
+       return;
+
+    logTimer = setTimeout("updateLog()",10000);  // probaly should put restart time in a cookie
+}
+
+
+function logController(control)
+{
+
+    logText = document.getElementById('logText').innerHTML;
+
+
+   if (logging == 0) // it's off  it must be restarted.
+     {
+      logging=1;
+	  logText+="log restarted";
+      document.getElementById('logText').innerHTML=logText;
+	   var newButtonText = document.createTextNode("Stop")
+	   document.getElementById(control).replaceChild(newButtonText, logButtonSays)
+	   logButtonSays = newButtonText
+      logTimer = setTimeout("updateLog()",0); // this will restart the logging process.
+      return;
+      }
+
+   // turn off loggging, let's tell server to stop logging too
+   logging = 0;
+
+   var newButtonText = document.createTextNode("Start")
+   document.getElementById(control).replaceChild(newButtonText, logButtonSays)
+   logButtonSays = newButtonText
+
+   clearTimeout(logTimer); // kill the logging timer
+
+   sendRequest("log"+logging, logResponse); // servlet will be looking for log0
+
+
+   }
+
+
+
+function startLoadCerts() {
+
+  // setup certificate space
+
+   var dv = document.createElement('div')
+    nodeList['importCert'] = dv
+   	dv.setAttribute('id', 'importCert')
+
+    var p = document.createElement('p')
+    p.appendChild(document.createTextNode('Enter Certificate Name:'))
+    dv.appendChild(p)
+    var inp = document.createElement('input')
+    inp.setAttribute('type', 'text')
+    inp.setAttribute('name', 'certAlias')
+    inp.setAttribute('id', 'certAlias')
+    inp.setAttribute('value', '')
+    p.appendChild(inp)
+
+    p = document.createElement('p')
+    dv.appendChild(p)
+    inp = document.createElement('textarea')
+    inp.setAttribute('rows', '16')
+    inp.setAttribute('cols', '80')
+    inp.setAttribute('name', 'certText')
+    inp.setAttribute('id', 'certText')
+    inp.appendChild(document.createTextNode('<paste X.509 certificate in here>'))
+    p.appendChild(inp)
+
+
+    p = document.createElement('p')
+    dv.appendChild(p)
+    inp = document.createElement('input')
+    inp.setAttribute('type', 'button')
+    inp.setAttribute('name', 'certSub')
+    inp.setAttribute('id', 'certSub')
+    inp.setAttribute('value', 'import certificate')
+    inp.setAttribute('onClick', 'submitNewCert()')
+    p.appendChild(inp)
+
+
+    loadCerts()
+    updateLog()
+}
+
+
+
+
+
+function loadCerts()
+{
+    if (waitRequest != "")
+       {
+         setTimeout("loadCerts()",100)
+         return
+       }
+
+   if (sendRequest("cert list", certResponse) == 0)
+         setTimeout("loadCerts()",100)
+}
+
+
+certCnt = 0
+
+
+function certResponse(data)
+{
+
+
+    waitRequest = ''
+    n = data.childNodes
+    var trn = data.getElementsByTagName("cert")[0]
+
+    if (trn == undefined)  // bad data ignore
+      return
+
+
+    for( var x = 0; trn.childNodes[x]; x++ ){
+       if (trn.childNodes[x].nodeType == 1)
+        loadCertView(trn.childNodes[x].childNodes[0].nodeValue)
+      }
+
+
+}
+
+
+var certCurrent = ""
+var certList = new Array()
+
+function loadCertView(cert)
+{
+    if (waitRequest != "")
+       {
+         f = "loadCertView('"+cert+"')"
+         setTimeout(f,100)
+         return
+       }
+
+   if (sendRequest("cert view "+cert, certViewResponse) == 0)
+      {
+         f = "loadCertView('"+cert+"')"
+         setTimeout(f,100)
+         return;
+      }
+
+
+    var li = document.createElement('LI')
+    var myParent=document.getElementById("certList")
+
+
+    myParent.appendChild(li)
+	li.setAttribute("id", "certTab"+(certCnt+1))
+	li.setAttribute("onClick", "highlite(this); showNode('cert"+cert+"');")
+	var tn = document.createTextNode(cert)
+	li.appendChild(tn)
+
+	certCurrent = 'cert'+cert
+
+
+
+}
+
+
+function certViewResponse(data)
+{
+    var n = data.childNodes
+    var trn = data.getElementsByTagName("cert")[0]
+
+    if (trn == undefined)
+      return
+
+
+
+    var dv = document.createElement('div')
+    dv.setAttribute('id', certCurrent)
+
+    var pretext = trn.childNodes[0].childNodes[0].nodeValue.replace(/%/g, "\n")
+
+    /*var butn = document.createElement('button')
+    butn.setAttribute('onClick', 'deleteCert("'+certCnt+'")')
+    butn.appendChild(document.createTextNode('Delete Certificate'))
+    dv.appendChild(butn)
+    */
+    var ta = document.createElement('textarea')
+    ta.setAttribute('rows', '18')
+    ta.setAttribute('cols', '120')
+    ta.setAttribute('readonly', '1')
+    ta.value = pretext
+
+    dv.appendChild(ta)
+    nodeList[certCurrent] = dv
+
+    waitRequest = ''
+}
+
+
+function startLoadPartners() {
+
+
+    loadPartners()
+}
+
+
+
+
+
+function loadPartners()
+{
+    if (waitRequest != "")
+       {
+         setTimeout("loadPartners()",100)
+         return
+       }
+
+   if (sendRequest("partner list", partnerResponse) == 0)
+         setTimeout("loadPartners()",100)
+}
+
+
+partnerCnt = 0
+
+
+function partnerResponse(data)
+{
+
+
+    waitRequest = ''
+    n = data.childNodes
+    var trn = data.getElementsByTagName("partner")[0]
+
+    if (trn == undefined)  // bad data ignore
+      return
+
+
+    for( var x = 0; trn.childNodes[x]; x++ ){
+       if (trn.childNodes[x].nodeType == 1)
+        loadPartnerView(trn.childNodes[x].childNodes[0].nodeValue)
+      }
+
+
+}
+
+
+var partnerCurrent = ""
+var partnerList = new Array()
+
+function loadPartnerView(partner)
+{
+    if (waitRequest != "")
+       {
+         f = "loadPartnerView('"+partner+"')"
+         setTimeout(f,100)
+         return
+       }
+
+   if (sendRequest("partner view "+partner, partnerViewResponse) == 0)
+      {
+         f = "loadPartnerView('"+partner+"')"
+         setTimeout(f,100)
+         return;
+      }
+
+
+    var li = document.createElement('LI')
+    var myParent=document.getElementById("partnerList")
+
+
+    myParent.appendChild(li)
+	li.setAttribute("id", "partnerTab"+(partnerCnt+1))
+	li.setAttribute("onClick", "highlite(this); showNode('partner"+partner+"');")
+	var tn = document.createTextNode(partner)
+	li.appendChild(tn)
+
+	partnerCurrent = 'partner'+partner
+
+
+
+}
+
+
+function partnerViewResponse(data)
+{
+    var n = data.childNodes
+    var trn = data.getElementsByTagName("partner")[0]
+
+    if (trn == undefined)
+      return
+
+
+
+    var dv = document.createElement('div')
+    dv.setAttribute('id', partnerCurrent)
+
+    var pretext = trn.childNodes[0].childNodes[0].nodeValue.replace(/%/g, "\n")
+
+    /*var butn = document.createElement('button')
+    butn.setAttribute('onClick', 'deletePartner("'+partnerCnt+'")')
+    butn.appendChild(document.createTextNode('Delete Partnerificate'))
+    dv.appendChild(butn)
+    */
+    var ta = document.createElement('textarea')
+    ta.setAttribute('rows', '18')
+    ta.setAttribute('cols', '120')
+    ta.setAttribute('readonly', '1')
+    ta.value = pretext
+
+    dv.appendChild(ta)
+    nodeList[partnerCurrent] = dv
+
+    waitRequest = ''
+}
+
+
+
+function startLoadPartnerships() {
+
+
+    loadPartnerships()
+}
+
+
+
+
+
+function loadPartnerships()
+{
+    if (waitRequest != "")
+       {
+         setTimeout("loadPartnerships()",100)
+         return
+       }
+
+   if (sendRequest("partnership list", partnershipResponse) == 0)
+         setTimeout("loadPartnerships()",100)
+}
+
+
+partnershipCnt = 0
+
+
+function partnershipResponse(data)
+{
+
+
+    waitRequest = ''
+    n = data.childNodes
+    var trn = data.getElementsByTagName("partnership")[0]
+
+    if (trn == undefined)  // bad data ignore
+      return
+
+
+    for( var x = 0; trn.childNodes[x]; x++ ){
+       if (trn.childNodes[x].nodeType == 1)
+        loadPartnershipView(trn.childNodes[x].childNodes[0].nodeValue)
+      }
+
+
+}
+
+
+var partnershipCurrent = ""
+var partnershipList = new Array()
+
+function loadPartnershipView(partnership)
+{
+    if (waitRequest != "")
+       {
+         f = "loadPartnershipView('"+partnership+"')"
+         setTimeout(f,100)
+         return
+       }
+
+   if (sendRequest("partnership view "+partnership, partnershipViewResponse) == 0)
+      {
+         f = "loadPartnershipView('"+partnership+"')"
+         setTimeout(f,100)
+         return;
+      }
+
+
+    var li = document.createElement('LI')
+    var myParent=document.getElementById("partnershipList")
+
+
+    myParent.appendChild(li)
+	li.setAttribute("id", "partnershipTab"+(partnershipCnt+1))
+	li.setAttribute("onClick", "highlite(this); showNode('partnership"+partnership+"');")
+	var tn = document.createTextNode(partnership)
+	li.appendChild(tn)
+
+	partnershipCurrent = 'partnership'+partnership
+
+
+
+}
+
+
+function partnershipViewResponse(data)
+{
+    var n = data.childNodes
+    var trn = data.getElementsByTagName("partnership")[0]
+
+    if (trn == undefined)
+      return
+
+
+
+    var dv = document.createElement('div')
+    dv.setAttribute('id', partnershipCurrent)
+
+    var pretext = trn.childNodes[0].childNodes[0].nodeValue.replace(/%/g, "\n")
+
+    /*var butn = document.createElement('button')
+    butn.setAttribute('onClick', 'deletePartnership("'+partnershipCnt+'")')
+    butn.appendChild(document.createTextNode('Delete Partnershipificate'))
+    dv.appendChild(butn)
+    */
+    var ta = document.createElement('textarea')
+    ta.setAttribute('rows', '18')
+    ta.setAttribute('cols', '120')
+    ta.setAttribute('readonly', '1')
+    ta.value = pretext
+
+    dv.appendChild(ta)
+    nodeList[partnershipCurrent] = dv
+
+    waitRequest = ''
+}
+
+
+
+
+
+
+
+function login() {
+
+ originalHTML = document.getElementById('container1').innerHTML;
+ html = "<p>Enter User Name : "
+ html += "  <input type='text' name='userid' id='userid' value='userID'>";
+ html += "</p>";
+ html += "<p> Enter Password :";
+ html += "<input type='password' name='pwd' id='pwd' value='pWd'>";
+ html += "  <input type='button' value='Login' name='Login' onclick='trylogin()'>";
+ html += "</p>";
+ document.getElementById('container1').innerHTML = html;
+
+}
+
+function trylogin()
+{
+  userid = document.getElementById('userid').value;
+  pwd = document.getElementById('pwd').value;
+  sendRequest("useridpwd", loginResponse);
+}
+
+function loginResponse(data)
+{
+    waitRequest = ''
+    n = data.childNodes
+    var trn = data.getElementsByTagName("useridpwd")[0];
+
+    if (trn == undefined)
+      return;
+
+    var attr = trn.attributes
+    inrsp = "";
+    for (var i = 0; i < attr.length; i++) {
+	       if (attr[i].name == 'resp')
+	         inrsp = attr[i].value
+	    }
+	if (inrsp == 'okay')
+	    loadData();
+	else
+	   alert("that didn't work, try again");
+
+}
+
+</script>
+
+</head>
+
+<body onload='login();'>
+<h1>OpenAS2 Remote Access</h1>
+
+<table  border="1" class="one" width="100%">
+<tr>
+<td width="20%" valign="top" align="left">
+<ul id="tree1">
+
+	<li onClick="highlite(this); showNode('log')" id="logview">Log View
+	</li>
+	<li>Certificates
+		<ul id="certList">
+		   <!--li onClick="showNode('importCert');">Import Certificate</li-->
+		</ul>
+	</li>
+	<li>Partners
+		<ul id="partnerList">
+		   <!--li>Create</li-->
+		</ul>
+	</li>
+	<li>Partnerships
+		<ul id="partnershipList">
+		   <!--li>Create</li-->
+		</ul>
+	</li>
+</ul>
+<td id="container1" width="80%"  valign="top" align="left">
+
+</td>
+</tr>
+</table>
+</body>
+
+</html>
