@@ -7,6 +7,8 @@ import java.util.Map;
 import java.util.Set;
 import java.util.Map.Entry;
 
+import org.apache.commons.lang.ObjectUtils;
+
 
 public class Partnership implements Serializable {
     public static final String PTYPE_SENDER = "sender"; // Sender partner type
@@ -130,12 +132,9 @@ public class Partnership implements Serializable {
             currentValue = currentId.getValue();
             compareValue = compareTo.get(currentId.getKey());
 
-            if ((currentValue != null) && (compareValue == null)) {
-                return false;
-            } else if ((currentValue == null) && (compareValue != null)) {
-                return false;
-            } else if (!currentValue.equals(compareValue)) {
-                return false;
+            if (!ObjectUtils.equals(currentValue, compareValue))
+            {
+            	return false;
             }
         }
 

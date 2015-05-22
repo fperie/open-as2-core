@@ -193,7 +193,7 @@ public class IOUtilOld {
             destFile = IOUtilOld.moveFile(file, destFile, false, true);
         } catch (IOException ioe) {
             InvalidMessageException im = new InvalidMessageException("Failed to move " +
-                    file.getAbsolutePath() + " to error directory " + destFile.getAbsolutePath());
+                    file.getAbsolutePath() + " to error directory " + ((destFile == null) ? "" : destFile.getAbsolutePath()));
             im.initCause(ioe);
             throw im;
         }

@@ -252,7 +252,7 @@ public class XMLPartnershipFactory extends BasePartnershipFactory
     		l++;
     	}
     	
-    	logger.info("backing up "+ fn +" to "+f.getName());
+    	logger.info("backing up "+ fn +" to "+ ((f == null) ? "" : f.getName()));
     	
     	File fr = new File(fn);
     	fr.renameTo(f);

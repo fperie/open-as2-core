@@ -297,9 +297,8 @@ public class AS2MDNReceiverHandler implements NetModuleHandler {
 
     MimeBodyPart part = null;
 	try {
-		part = new MimeBodyPart(mdn.getHeaders(), mdnStream.toByteArray());
+		part = new MimeBodyPart(mdn.getHeaders(), mdnStream == null ? new byte[0] : mdnStream.toByteArray());
 	} catch (MessagingException e) {
-		// TODO Auto-generated catch block
 		e.printStackTrace();
 	}
 
