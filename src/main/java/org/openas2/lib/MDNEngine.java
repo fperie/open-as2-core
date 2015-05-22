@@ -5,7 +5,7 @@ import java.security.cert.Certificate;
 
 import javax.mail.internet.MimeBodyPart;
 
-import org.apache.commons.lang.SystemUtils;
+import org.apache.commons.lang3.SystemUtils;
 import org.openas2.lib.cert.ICertificateChooser;
 import org.openas2.lib.helper.EDIINTHelper;
 import org.openas2.lib.helper.ICryptoHelper;

@@ -4,8 +4,9 @@ import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
+import java.util.Objects;
 
-import org.apache.commons.lang.ObjectUtils;
+import org.apache.commons.lang3.ObjectUtils;
 import org.openas2.BaseComponent;
 import org.openas2.OpenAS2Exception;
 import org.openas2.message.Message;
@@ -121,7 +122,7 @@ public abstract class BasePartnershipFactory extends BaseComponent implements Pa
             searchValue = searchEntry.getValue();
             partnerValue = partnerIds.get(searchKey);
 
-            if (!ObjectUtils.equals(searchValue, partnerValue))
+            if (!Objects.equals(searchValue, partnerValue))
             {
             	return false;
             }

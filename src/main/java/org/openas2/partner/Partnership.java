@@ -4,10 +4,9 @@ import java.io.Serializable;
 import java.util.HashMap;
 import java.util.Iterator;
 import java.util.Map;
+import java.util.Objects;
 import java.util.Set;
 import java.util.Map.Entry;
-
-import org.apache.commons.lang.ObjectUtils;
 
 
 public class Partnership implements Serializable {
@@ -132,7 +131,7 @@ public class Partnership implements Serializable {
             currentValue = currentId.getValue();
             compareValue = compareTo.get(currentId.getKey());
 
-            if (!ObjectUtils.equals(currentValue, compareValue))
+            if (!Objects.equals(currentValue, compareValue))
             {
             	return false;
             }
