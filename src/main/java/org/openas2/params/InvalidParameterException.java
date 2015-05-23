@@ -4,10 +4,19 @@ import org.openas2.OpenAS2Exception;
 
 
 public class InvalidParameterException extends OpenAS2Exception {
-    private Object target;
+    /**
+	 * Version of serialization.
+	 */
+	private static final long serialVersionUID = 1L;
+	
+	private Object target;
     private String key;
     private String value;
 
+    public InvalidParameterException(String msg) {
+        super(msg);
+    }
+    
     public InvalidParameterException(String msg, Object target, String key, String value) {
         super(msg + " - " + toString(key, value));
         this.target = target;
@@ -22,9 +31,7 @@ public class InvalidParameterException extends OpenAS2Exception {
         this.value = value;
     }
 
-    public InvalidParameterException(String msg) {
-        super(msg);
-    }
+   
 
     public void setKey(String string) {
         key = string;

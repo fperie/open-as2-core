@@ -4,8 +4,13 @@ import org.openas2.OpenAS2Exception;
 
 
 public class InvalidMessageException extends OpenAS2Exception {
+	/**
+	 * Version of serialization.
+	 */
+	private static final long serialVersionUID = 1L;
+
 	public InvalidMessageException() {
-		super();
+		this(null);
 	}
 
 	public InvalidMessageException(String msg) {

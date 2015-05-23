@@ -3,20 +3,23 @@ package org.openas2.lib.util;
 import org.dom4j.Element;
 
 public class XMLException extends Exception {
-    private Element element;
+    /**
+	 * Version of serialization.
+	 */
+	private static final long serialVersionUID = 1L;
+
+	private Element element;
 
     public XMLException() {
-        super();
+        this(null, (Throwable)null);
     }
 
     public XMLException(Element element, String message) {
-        super(message);
-        this.element = element;
+        this(element, message, null);
     }
 
     public XMLException(Element element, Throwable cause) {
-        super(cause);
-        this.element = element;
+    	this(element, null, cause);
     }
 
     public XMLException(Element element, String message, Throwable cause) {

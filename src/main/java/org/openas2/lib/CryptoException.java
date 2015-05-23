@@ -1,19 +1,26 @@
 package org.openas2.lib;
 
 public class CryptoException extends OpenAS2Exception {
-    public CryptoException() {
-        super();
+    /**
+	 * Version of serialization.
+	 */
+	private static final long serialVersionUID = 1L;
+
+	public CryptoException() {
+        this(null, (Throwable)null);
     }
 
     public CryptoException(String msg) {
-        super(msg);
+        this(msg, null);
     }
 
+    public CryptoException(Throwable cause) {
+        this(null, cause);
+    }
+    
     public CryptoException(String msg, Throwable cause) {
         super(msg, cause);
     }
 
-    public CryptoException(Throwable cause) {
-        super(cause);
-    }
+    
 }

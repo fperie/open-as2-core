@@ -3,7 +3,6 @@ package org.openas2;
 import java.util.HashMap;
 import java.util.Map;
 
-import org.openas2.app.OpenAS2Server;
 import org.openas2.partner.XMLPartnershipFactory;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -13,7 +12,7 @@ import org.slf4j.LoggerFactory;
 public class OpenAS2Exception extends Exception 
 {
     /**
-	 * Version de sérialisation.
+	 * Version of serialization.
 	 */
 	private static final long serialVersionUID = 1L;
 	

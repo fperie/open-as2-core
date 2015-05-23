@@ -1,21 +1,27 @@
 package org.openas2;
 
 public class WrappedException extends OpenAS2Exception {
-    public WrappedException() {
-        super();
+    /**
+	 * Version of serialization.
+	 */
+	private static final long serialVersionUID = 1L;
+
+	public WrappedException() {
+        this((Throwable)null);
     }
 
     public WrappedException(String msg) {
-        super(msg);
+        this(msg, null);
     }
 
+    public WrappedException(Throwable cause) {
+    	this(null, cause);
+    }
+    
     public WrappedException(String msg, Throwable cause) {
         super(msg, cause);
     }
 
-    public WrappedException(Throwable cause) {
-        super(cause);
-    }
 
     public Exception getSource() {
         return (Exception) getCause();

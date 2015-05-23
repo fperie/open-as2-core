@@ -1,7 +1,12 @@
 package org.openas2;
 
 public class ComponentNotFoundException extends OpenAS2Exception {
-    private String componentName;
+    /**
+	 * Version of serialization.
+	 */
+	private static final long serialVersionUID = 1L;
+	
+	private String componentName;
 
     public ComponentNotFoundException(String componentName) {
         super(componentName);

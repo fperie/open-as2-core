@@ -4,20 +4,27 @@ import org.openas2.lib.OpenAS2Exception;
 
 public class CertificateException extends OpenAS2Exception {
 
-    public CertificateException() {
-        super();
+    /**
+	 * Version of serialization.
+	 */
+	private static final long serialVersionUID = 1L;
+
+	public CertificateException() {
+       this((Throwable)null);
     }
 
     public CertificateException(String msg) {
-        super(msg);
+        this(msg, null);
     }
 
+    public CertificateException(Throwable cause) {
+        this(null, cause);
+    }
+    
     public CertificateException(String msg, Throwable cause) {
         super(msg, cause);
     }
 
-    public CertificateException(Throwable cause) {
-        super(cause);
-    }
+    
 
 }

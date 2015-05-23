@@ -6,7 +6,12 @@ import org.openas2.OpenAS2Exception;
 
 
 public class CertificateNotFoundException extends OpenAS2Exception {
-    private String alias;
+    /**
+	 * Version of serialization. 
+	 */
+	private static final long serialVersionUID = 1L;
+	
+	private String alias;
     private String partnershipType;
 
     public CertificateNotFoundException(String partnershipType, String alias) {
