@@ -2,6 +2,8 @@ package org.openas2;
 
 import java.util.Map;
 
+import javax.annotation.Nonnull;
+
 import org.openas2.cert.CertificateFactory;
 import org.openas2.partner.PartnershipFactory;
 import org.openas2.processor.Processor;
@@ -18,7 +20,8 @@ import org.openas2.processor.Processor;
  * @see org.openas2.partner.PartnerFactory
  * @see org.openas2.processor.Processor 
  */
-public interface Session {
+public interface Session 
+{
     /** Official OpenAS2 release version */
     public static final String VERSION = "0.9";
 
@@ -36,7 +39,8 @@ public interface Session {
      * @see CertificateFactory
      * @see Component
      */
-    public CertificateFactory getCertificateFactory() throws ComponentNotFoundException;
+    @Nonnull
+    CertificateFactory getCertificateFactory() throws ComponentNotFoundException;
 
     /**
      * Registers a component to a specified ID.
@@ -46,7 +50,7 @@ public interface Session {
      *
      * @see Component
      */
-    public void setComponent(String componentID, Component comp);
+    void setComponent(@Nonnull final String componentID, @Nonnull final Component comp);
 
     /**
      * Gets the <code>Component</code> currently registered with an ID
@@ -57,14 +61,16 @@ public interface Session {
      *
      * @throws ComponentNotFound If a component is not registered with the ID
      */
-    public Component getComponent(String componentID) throws ComponentNotFoundException;
+    @Nonnull
+    Component getComponent(@Nonnull final String componentID) throws ComponentNotFoundException;
 
     /**
      * Return a map of component ID's to <code>Component</code> objects.
      *
      * @return all registered components, mapped by ID
      */
-    public Map getComponents();
+    @Nonnull
+    Map<String, Component> getComponents();
 
     /**
      * Short-cut method to retrieve a partner factory.
@@ -76,7 +82,8 @@ public interface Session {
      * @see PartnershipFactory
      * @see Component
      */
-    public PartnershipFactory getPartnershipFactory() throws ComponentNotFoundException;
+    @Nonnull
+    PartnershipFactory getPartnershipFactory() throws ComponentNotFoundException;
 
     /**
      * Short-cut method to retrieve a processor.
@@ -88,5 +95,6 @@ public interface Session {
      * @see Processor
      * @see Component
      */
-    public Processor getProcessor() throws ComponentNotFoundException;
+    @Nonnull
+    Processor getProcessor() throws ComponentNotFoundException;
 }

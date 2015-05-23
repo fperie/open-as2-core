@@ -29,18 +29,27 @@ import org.xml.sax.SAXException;
  * 
  * in this release added command registry methods
  * @author joseph mcverry
- *
  */
-public class XMLSession extends BaseSession implements CommandRegistryFactory {
+public class XMLSession extends BaseSession implements CommandRegistryFactory 
+{
 	public static final String EL_CERTIFICATES = "certificates";
+	
 	public static final String EL_CMDPROCESSOR = "commandProcessors";
+	
 	public static final String EL_PROCESSOR = "processor";
+	
 	public static final String EL_PARTNERSHIPS = "partnerships";
+	
 	public static final String EL_COMMANDS = "commands";
+	
 	public static final String EL_LOGGERS = "loggers";
+	
 	public static final String PARAM_BASE_DIRECTORY = "basedir";
+	
 	private CommandRegistry commandRegistry;
+	
 	private String baseDirectory;
+	
 	private CommandManager cmdManager;
 
 
