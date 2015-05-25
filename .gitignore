@@ -5,6 +5,7 @@ target
 bin
 .classpath
 config/log*
+config/inbox/
 
 # Mobile Tools for Java (J2ME)
 .mtj.tmp/

@@ -9,6 +9,8 @@ import javax.xml.parsers.DocumentBuilder;
 import javax.xml.parsers.DocumentBuilderFactory;
 import javax.xml.parsers.ParserConfigurationException;
 
+import org.apache.commons.io.IOUtils;
+import org.apache.commons.lang3.StringUtils;
 import org.openas2.cert.CertificateFactory;
 import org.openas2.cmd.CommandManager;
 import org.openas2.cmd.CommandRegistry;
@@ -48,29 +50,35 @@ public class XMLSession extends BaseSession implements CommandRegistryFactory
 	
 	private CommandRegistry commandRegistry;
 	
-	private String baseDirectory;
+	private String baseDirectory = ".";
 	
 	private CommandManager cmdManager;
 
+	
+	public XMLSession(String content) throws OpenAS2Exception,
+	ParserConfigurationException, SAXException, IOException 
+	{
+		this(IOUtils.toInputStream(content, "UTF-8"));
+	}
 
 	
 	public XMLSession(InputStream in) throws OpenAS2Exception,
 			ParserConfigurationException, SAXException, IOException {
+		this(in, null);
+	}
+
+	public XMLSession(InputStream in, String baseDirectory) throws OpenAS2Exception,
+		ParserConfigurationException, SAXException, IOException {
 		super();
+
+		if (StringUtils.isNotEmpty(baseDirectory))
+		{
+			this.baseDirectory = baseDirectory;
+		}
+		
 		load(in);
 	}
 
-	public XMLSession(String filename) throws OpenAS2Exception,
-			ParserConfigurationException, SAXException, IOException {
-		File file = new File(filename).getAbsoluteFile();
-		setBaseDirectory(file.getParent());
-		FileInputStream fin = new FileInputStream(file);
-		try {
-			load(fin);
-		} finally {
-			fin.close();
-		}
-	}
 
 	public void setCommandRegistry(CommandRegistry registry) {
 		commandRegistry = registry;

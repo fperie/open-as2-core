@@ -1,8 +1,12 @@
 package org.openas2.app;
 
 import java.io.BufferedWriter;
+import java.io.File;
+import java.io.InputStream;
 import java.util.List;
 
+import org.apache.commons.io.FileUtils;
+import org.apache.commons.lang3.StringUtils;
 import org.openas2.OpenAS2Exception;
 import org.openas2.Session;
 import org.openas2.XMLSession;
@@ -45,13 +49,8 @@ public class OpenAS2Server
 			// this is used by all other objects to access global configs and functionality
 			LOGGER.info("Loading configuration...");
 
-			if (args.length > 0) {
-				session = new XMLSession(args[0]);
-			} else {
-				LOGGER.info("Usage:");
-				LOGGER.info("java org.openas2.app.OpenAS2Server <configuration file>");
-				throw new Exception("Missing configuration file");
-			}
+			session = createSession(args);
+			assert session != null;
 			// create a command processor
 
 			// get a registry of Command objects, and add Commands for the Session
@@ -117,5 +116,61 @@ public class OpenAS2Server
 			LOGGER.info("OpenAS2 has shut down\r\n");
 			System.exit(0);
 		}
+	}
+
+	private XMLSession createSession(String[] args) throws Exception
+	{
+		XMLSession session;
+
+		if (args.length == 0)
+		{
+			errorConfFileNotExists("The parameter with the configuration file is not specified.");
+			return null;
+		}
+		else
+		{
+			String path = args[0];
+			
+			if (StringUtils.isBlank(path))
+			{
+				errorConfFileNotExists("The parameter with the configuration file is blank.");
+			}
+
+			final InputStream is;
+			if (StringUtils.startsWithIgnoreCase(path, "classpath:"))
+			{
+				is = getClass().getResourceAsStream(StringUtils.substring(path, 10));
+				
+				if (is == null)
+				{
+					errorConfFileNotExists("The parameter with the configuration file does not contain a path to an existing file readable...");
+				}
+				session = new XMLSession(is, args.length > 1 ? args[1] : null);
+			}
+			else
+			{
+				File pathFile = new File(path);
+				if (!pathFile.isFile() || !pathFile.exists() || !pathFile.canRead())
+				{
+					errorConfFileNotExists("The parameter with the configuration file does not contain a path to an existing file readable...");
+				}
+				
+				is = FileUtils.openInputStream(pathFile);
+				session = new XMLSession(is, pathFile.getParent());
+			}
+
+			if (is != null )
+			{
+				is.close();
+			}
+		}
+		return session;
+	}
+
+	private void errorConfFileNotExists(String errorMessage) throws Exception {
+		LOGGER.error(errorMessage);
+		LOGGER.info("Usage:");
+		LOGGER.info("java org.openas2.app.OpenAS2Server <configuration file>");
+		throw new Exception("Missing configuration file");
 	}
 }
