@@ -5,6 +5,7 @@ import java.util.Iterator;
 import java.util.Map;
 import java.util.Map.Entry;
 
+import org.apache.commons.lang3.text.StrSubstitutor;
 import org.openas2.Component;
 import org.openas2.OpenAS2Exception;
 import org.openas2.Session;
@@ -14,145 +15,164 @@ import org.w3c.dom.NamedNodeMap;
 import org.w3c.dom.Node;
 import org.w3c.dom.NodeList;
 
+public class XMLUtil
+{
+	public static Component getComponent(Node node, Session session)
+			throws OpenAS2Exception
+	{
+		Node classNameNode = node.getAttributes().getNamedItem("classname");
 
-public class XMLUtil {
-    public static Component getComponent(Node node, Session session)
-        throws OpenAS2Exception {
-        Node classNameNode = node.getAttributes().getNamedItem("classname");
+		if (classNameNode == null)
+		{
+			throw new OpenAS2Exception("Missing classname");
+		}
 
-        if (classNameNode == null) {
-            throw new OpenAS2Exception("Missing classname");
-        }
+		String className = classNameNode.getNodeValue();
 
-        String className = classNameNode.getNodeValue();
-       
-        try {
-            Class objClass = Class.forName(className);
+		try
+		{
+			Class objClass = Class.forName(className);
 
-            if (!Component.class.isAssignableFrom(objClass)) {
-                throw new OpenAS2Exception("Class " + className + " must implement " +
-                    Component.class.getName());
-            }
-            
-            Component obj = (Component) objClass.newInstance();
+			if (!Component.class.isAssignableFrom(objClass))
+			{
+				throw new OpenAS2Exception("Class " + className + " must implement " +
+						Component.class.getName());
+			}
 
-            Map parameters = XMLUtil.mapAttributes(node);
+			Component obj = (Component)objClass.newInstance();
 
-            if (session instanceof XMLSession) {
-                updateDirectories(((XMLSession) session).getBaseDirectory(), parameters);
-            }
+			Map parameters = XMLUtil.mapAttributes(node);
 
-            obj.init(session, parameters);
+			if (session instanceof XMLSession)
+			{
+				updateDirectories(((XMLSession)session).getBaseDirectory(), parameters);
+			}
 
-            return obj;
-        } catch (Exception e) {
-            throw new WrappedException("Error creating component: " + className, e);                                
-        } 
-    }
+			obj.init(session, parameters);
 
-    public static Node findChildNode(Node parent, String childName) {
-        NodeList childNodes = parent.getChildNodes();
-        int childCount = childNodes.getLength();
-        Node child;
+			return obj;
+		}
+		catch (Exception e)
+		{
+			throw new WrappedException("Error creating component: " + className, e);
+		}
+	}
 
-        for (int i = 0; i < childCount; i++) {
-            child = childNodes.item(i);
+	public static Node findChildNode(Node parent, String childName)
+	{
+		NodeList childNodes = parent.getChildNodes();
+		int childCount = childNodes.getLength();
+		Node child;
 
-            if (child.getNodeName().equals(childName)) {
-                return child;
-            }
-        }
+		for (int i = 0; i < childCount; i++)
+		{
+			child = childNodes.item(i);
 
-        return null;
-    }
+			if (child.getNodeName().equals(childName))
+			{
+				return child;
+			}
+		}
 
-    public static Map mapAttributeNodes(NodeList nodes, String nodeName, String nodeKeyName,
-        String nodeValueName) throws OpenAS2Exception {
-        Map attributes = new HashMap();
-        int nodeCount = nodes.getLength();
-        Node attrNode;
-        NamedNodeMap nodeAttributes;
-        Node tmpNode;
-        String attrName;
-        String attrValue;
+		return null;
+	}
 
-        for (int i = 0; i < nodeCount; i++) {
-            attrNode = nodes.item(i);
+	public static Map mapAttributeNodes(NodeList nodes, String nodeName, String nodeKeyName,
+			String nodeValueName) throws OpenAS2Exception
+	{
+		Map attributes = new HashMap();
+		int nodeCount = nodes.getLength();
+		Node attrNode;
+		NamedNodeMap nodeAttributes;
+		Node tmpNode;
+		String attrName;
+		String attrValue;
 
-            if (attrNode.getNodeName().equals(nodeName)) {
-                nodeAttributes = attrNode.getAttributes();
-                tmpNode = nodeAttributes.getNamedItem(nodeKeyName);
+		for (int i = 0; i < nodeCount; i++)
+		{
+			attrNode = nodes.item(i);
 
-                if (tmpNode == null) {
-                    throw new OpenAS2Exception(attrNode.toString() +
-                        " does not have key attribute: " + nodeKeyName);
-                }
+			if (attrNode.getNodeName().equals(nodeName))
+			{
+				nodeAttributes = attrNode.getAttributes();
+				tmpNode = nodeAttributes.getNamedItem(nodeKeyName);
 
-                attrName = tmpNode.getNodeValue();
-                tmpNode = nodeAttributes.getNamedItem(nodeValueName);
+				if (tmpNode == null)
+				{
+					throw new OpenAS2Exception(attrNode.toString() +
+							" does not have key attribute: " + nodeKeyName);
+				}
 
-                if (tmpNode == null) {
-                    throw new OpenAS2Exception(attrNode.toString() +
-                        " does not have value attribute: " + nodeValueName);
-                }
+				attrName = tmpNode.getNodeValue();
+				tmpNode = nodeAttributes.getNamedItem(nodeValueName);
 
-                attrValue = tmpNode.getNodeValue();
-                attributes.put(attrName, attrValue);
-            }
-        }
+				if (tmpNode == null)
+				{
+					throw new OpenAS2Exception(attrNode.toString() +
+							" does not have value attribute: " + nodeValueName);
+				}
 
-        return attributes;
-    }
+				attrValue = tmpNode.getNodeValue();
+				attributes.put(attrName, attrValue);
+			}
+		}
 
-    public static Map mapAttributes(Node node) {
-        Map attrMap = new HashMap();
-        NamedNodeMap attrNodes = node.getAttributes();
-        int attrCount = attrNodes.getLength();
-        Node attribute;
+		return attributes;
+	}
 
-        for (int i = 0; i < attrCount; i++) {
-            attribute = attrNodes.item(i);
-            attrMap.put(attribute.getNodeName().toLowerCase(), attribute.getNodeValue());
-        }
+	public static Map mapAttributes(Node node)
+	{
+		Map attrMap = new HashMap();
+		NamedNodeMap attrNodes = node.getAttributes();
+		int attrCount = attrNodes.getLength();
+		Node attribute;
 
-        return attrMap;
-    }
+		for (int i = 0; i < attrCount; i++)
+		{
+			attribute = attrNodes.item(i);
+			attrMap.put(attribute.getNodeName().toLowerCase(), attribute.getNodeValue());
+		}
 
-    public static Map mapAttributes(Node node, String[] requiredAttributes)
-        throws OpenAS2Exception {
-        Map attributes = mapAttributes(node);
-        String attrName;
+		return attrMap;
+	}
 
-        for (int i = 0; i < requiredAttributes.length; i++) {
-            attrName = requiredAttributes[i];
+	public static Map mapAttributes(Node node, String[] requiredAttributes)
+			throws OpenAS2Exception
+	{
+		Map attributes = mapAttributes(node);
+		String attrName;
 
-            if (attributes.get(attrName) == null) {
-                throw new OpenAS2Exception(node.toString() + " is missing required attribute: " +
-                    attrName);
-            }
-        }
+		for (int i = 0; i < requiredAttributes.length; i++)
+		{
+			attrName = requiredAttributes[i];
 
-        return attributes;
-    }
+			if (attributes.get(attrName) == null)
+			{
+				throw new OpenAS2Exception(node.toString() + " is missing required attribute: " +
+						attrName);
+			}
+		}
 
-    public static void updateDirectories(String baseDirectory, Map attributes)
-        throws OpenAS2Exception {
-        Iterator attrIt = attributes.entrySet().iterator();
-        Map.Entry attrEntry;
-        String value;
+		return attributes;
+	}
 
-        while (attrIt.hasNext()) {
-            attrEntry = (Entry) attrIt.next();
-            value = (String) attrEntry.getValue();
+	public static void updateDirectories(String baseDirectory, Map attributes)
+			throws OpenAS2Exception
+	{
+		Iterator attrIt = attributes.entrySet().iterator();
+		Map.Entry attrEntry;
+		String value;
 
-            if (value.startsWith("%home%")) {
-                if (baseDirectory != null) {
-                    value = baseDirectory + value.substring(6);
-                    attributes.put(attrEntry.getKey(), value);
-                } else {
-                    throw new OpenAS2Exception("Base directory isn't set");
-                }
-            }
-        }
-    }
+		while (attrIt.hasNext())
+		{
+			attrEntry = (Entry)attrIt.next();
+			value = (String)attrEntry.getValue();
+
+			if (value.startsWith("%home%"))
+			{
+				value = baseDirectory + value.substring(6);
+			}
+			attributes.put(attrEntry.getKey(), StrSubstitutor.replaceSystemProperties(value));
+		}
+	}
 }
