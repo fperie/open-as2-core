@@ -1,0 +1,20 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<partnerships>
+  <partner name="fabien" as2_id="fabien" x509_alias="fabien" email="perie.f@mipih.fr" />
+  <partner name="sebastien" as2_id="sebastien" x509_alias="sebastien" email="prevost.s@mipih.fr" />
+  <partnership name="sebastien-fabien">
+    <sender name="sebastien" as2_id="sebastien" x509_alias="sebastien" email="prevost.s@mipih.fr" />
+    <receiver name="fabien" as2_id="fabien" x509_alias="fabien" email="perie.f@mipih.fr" />
+    <attribute name="protocol" value="as2" />
+    <attribute name="subject" value="From sebastien to fabien" />
+    <attribute name="as2_url" value="http://10.194.17.215:10080/" />
+    <attribute name="as2_mdn_to" value="http://10.194.16.127:8080/as2/HttpReceiver" />
+    <attribute name="as2_mdn_options" value="signed-receipt-protocol=optional, pkcs7-signature; signed-receipt-micalg=optional, sha1" />
+    <attribute name="encrypt" value="3des" />
+    <attribute name="sign" value="md5" />
+  </partnership>
+  <partnership name="fabien-sebastien">
+    <sender as2_id="fabien" x509_alias="fabien" />
+    <receiver as2_id="sebastien" x509_alias="sebastien" />
+  </partnership>
+</partnerships>

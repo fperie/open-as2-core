@@ -4,8 +4,27 @@ target
 .project
 bin
 .classpath
-config/log*
-config/inbox/
+config/inital/log*
+config/test/files/log*
+
+config/initial/inbox/
+config/initial/mdn/
+config/initial/OpenAS2A/
+config/initial/OpenAS2B/
+config/initial/pendinginfoMDN3/
+config/initial/pendingMDN3/
+config/initial/resend/
+config/initial/resend/
+config/initial/toAny/
+config/initial/temp/
+
+config/test/files/inbox/
+config/test/files/mdn/
+config/test/files/pendinginfoMDN3/
+config/test/files/pendingMDN3/
+config/test/files/resend/
+config/test/files/toAny/
+config/test/files/temp/
 
 # Mobile Tools for Java (J2ME)
 .mtj.tmp/
