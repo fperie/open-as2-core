@@ -2,21 +2,21 @@
 <configuration>
 	<appender name="console" class="ch.qos.logback.core.ConsoleAppender">
 		<layout class="ch.qos.logback.classic.PatternLayout">
-			<Pattern>
-				%d{yyyy-MM-dd HH:mm:ss} [%thread] %-5level %logger{36} - %msg%n
-			</Pattern>
+			<Pattern>%d{yyyy-MM-dd HH:mm:ss} [%thread] %-5level %logger{36} - %msg%n</Pattern>
 		</layout>
 	</appender>
 
-	<timestamp key="byDate" datePattern="yyyy-MM-dd"/>
-	<appender name="file" class="ch.qos.logback.core.rolling.RollingFileAppender">
-		<file>${openAs2Files}/files/log-${byDate}.log</file>
-		<encoder class="ch.qos.logback.classic.encoder.PatternLayoutEncoder">
-			<Pattern>
-				%d{yyyy-MM-dd HH:mm:ss} - %msg%n
-			</Pattern>
-		</encoder>
-	</appender>
+	 <!--Daily rolling file appender -->
+    <appender name="file" class="ch.qos.logback.core.rolling.RollingFileAppender">
+        <rollingPolicy class="ch.qos.logback.core.rolling.TimeBasedRollingPolicy">
+            <FileNamePattern>config/test/files/log-%d{yyyy-MM-dd_HH'h'_mm}.log</FileNamePattern>
+        </rollingPolicy>
+
+        <encoder>
+            <pattern>%d %-5level %logger{35} - %msg%n</pattern>
+        </encoder>
+    </appender>
+
 
 	<logger name="org.openas2" level="info" />
 
