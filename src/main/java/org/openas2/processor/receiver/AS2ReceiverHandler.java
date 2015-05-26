@@ -27,6 +27,8 @@ import org.openas2.partner.Partnership;
 import org.openas2.processor.resender.DirectoryResenderModule;
 import org.openas2.processor.sender.SenderModule;
 import org.openas2.processor.storage.StorageModule;
+import org.openas2.processor.worker.IAs2Worker;
+import org.openas2.processor.worker.WorkerRegistrer;
 import org.openas2.util.AS2UtilOld;
 import org.openas2.util.ByteArrayDataSource;
 import org.openas2.util.DispositionType;
@@ -120,8 +122,22 @@ public class AS2ReceiverHandler implements NetModuleHandler {
                 decryptAndVerify(msg);
 
                 // Process the received message
+				final String response;
                 try {
                     getModule().getSession().getProcessor().handle(StorageModule.DO_STORE, msg, null);
+
+					final IAs2Worker worker = WorkerRegistrer.getWorker();
+					if (worker == null)
+					{
+						LOGGER.debug("no specific worker, process by default");
+						response = AS2ReceiverModule.DISP_SUCCESS;
+					}
+					else
+					{
+						LOGGER.debug("a specific worker has been found...");
+						response = worker.processMessage(msg);
+					}
+
                 } catch (OpenAS2Exception oae) {
                     throw new DispositionException(new DispositionType("automatic-action", "MDN-sent-automatically",
                             "processed", "Error", "unexpected-processing-error"),
@@ -132,7 +148,7 @@ public class AS2ReceiverHandler implements NetModuleHandler {
                 try {
                     if (msg.isRequestingMDN()) {
                             sendMDN(s, msg, new DispositionType("automatic-action", "MDN-sent-automatically", "processed"),
-                                    AS2ReceiverModule.DISP_SUCCESS);
+								response);
                      } else {
                         BufferedOutputStream out = new BufferedOutputStream(s.getOutputStream());
                         HTTPUtil.sendHTTPResponse(out, HttpURLConnection.HTTP_OK, false);
