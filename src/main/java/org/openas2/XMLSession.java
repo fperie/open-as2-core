@@ -1,9 +1,8 @@
 package org.openas2;
 
-import java.io.File;
-import java.io.FileInputStream;
 import java.io.IOException;
 import java.io.InputStream;
+import java.util.Map;
 
 import javax.xml.parsers.DocumentBuilder;
 import javax.xml.parsers.DocumentBuilderFactory;
@@ -20,6 +19,8 @@ import org.openas2.partner.PartnershipFactory;
 import org.openas2.processor.Processor;
 import org.openas2.processor.ProcessorModule;
 import org.openas2.util.XMLUtil;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.w3c.dom.Document;
 import org.w3c.dom.Element;
 import org.w3c.dom.Node;
@@ -48,6 +49,9 @@ public class XMLSession extends BaseSession implements CommandRegistryFactory
 	
 	public static final String PARAM_BASE_DIRECTORY = "basedir";
 	
+	/** Logger for the class. */
+	private static final Logger LOGGER = LoggerFactory.getLogger(XMLSession.class);
+
 	private CommandRegistry commandRegistry;
 	
 	private String baseDirectory = ".";
@@ -116,7 +120,7 @@ public class XMLSession extends BaseSession implements CommandRegistryFactory
 			} else if (nodeName.equals(EL_COMMANDS)) {
 				loadCommands(rootNode);
 			} else if (nodeName.equals(EL_LOGGERS)) {
-				// do nothing
+				loadAppender(rootNode);
 			} else if (nodeName.equals("#text")) {
 				// do nothing
 			} else if (nodeName.equals("#comment")) {
@@ -168,6 +172,27 @@ public class XMLSession extends BaseSession implements CommandRegistryFactory
 		PartnershipFactory partnerFx = (PartnershipFactory) XMLUtil
 				.getComponent(rootNode, this);
 		setComponent(PartnershipFactory.COMPID_PARTNERSHIP_FACTORY, partnerFx);
+	}
+
+	private void loadAppender(Node node)
+	{
+		NodeList childNodes = node.getChildNodes();
+
+		for (int i = 0; i < childNodes.getLength(); i++)
+		{
+			Node nodeLogger = childNodes.item(i);
+			if (nodeLogger.getNodeName().equals("logger"))
+			{
+				Map mapAttributes = XMLUtil.mapAttributes(nodeLogger);
+
+				if (mapAttributes.containsKey("classname"))
+				{
+					LOGGER.warn(
+							"The appender with the class name: {} will be ignored. Please, use your logback configuration file to custom the logs...",
+							mapAttributes.get("classname"));
+				}
+			}
+		}
 	}
 
 	protected void loadProcessor(Node rootNode) throws OpenAS2Exception {
