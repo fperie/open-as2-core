@@ -3,20 +3,23 @@ package org.openas2.cmd;
 import java.util.ArrayList;
 import java.util.List;
 
+import javax.annotation.Nonnull;
+
 import org.openas2.BaseComponent;
 
 public class BaseCommandRegistry extends BaseComponent implements CommandRegistry {
-	private List commands;
-	    
-	public List getCommands() {
-		if (commands == null) {
-			commands = new ArrayList();
-		}
+	@Nonnull
+	private List<Command> commands = new ArrayList<>();
+
+	@Override
+	@Nonnull
+	public List<Command> getCommands()
+	{
 		return commands;
 	}
 
-	public void setCommands(List commands) {
+	public void setCommands(@Nonnull final List<Command> commands)
+	{
 		this.commands = commands;
 	}
-	
 }

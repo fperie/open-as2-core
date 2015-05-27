@@ -6,22 +6,26 @@ import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.List;
 
+import javax.annotation.Nonnull;
+
 import org.openas2.OpenAS2Exception;
 
 
 public class ProcessorException extends OpenAS2Exception {
+	/** Version of serialization. */
+	private static final long serialVersionUID = 1L;
+
 	private Processor processor;
-	private List causes;
+
+	private List<Exception> causes = new ArrayList<>();
 	
 	public ProcessorException(Processor processor) {
 		super();
 		this.processor = processor;
 	}
 
-	public List getCauses() {
-		if (causes == null) {
-			causes = new ArrayList();
-		}
+	public List<Exception> getCauses()
+	{
 		return causes;
 	}
 
@@ -29,21 +33,26 @@ public class ProcessorException extends OpenAS2Exception {
 		return processor;
 	}
 
-	public void setCauses(List list) {
+	public void setCauses(@Nonnull final List<Exception> list)
+	{
 		causes = list;
 	}
 
 	public void setProcessor(Processor processor) {
 		this.processor = processor;
 	}
+
+	@Override
 	public String getMessage() {
 		StringWriter strWriter = new StringWriter();
 		PrintWriter writer = new PrintWriter(strWriter);
 		writer.print(super.getMessage());
 		
-		Iterator causesIt = getCauses().iterator();
-		while (causesIt.hasNext()) {
-			Exception e = (Exception) causesIt.next();
+		Iterator<Exception> causesIt = getCauses().iterator();
+
+		while (causesIt.hasNext())
+		{
+			Exception e = causesIt.next();
 			writer.println();
 			e.printStackTrace(writer);
 			

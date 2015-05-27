@@ -48,7 +48,7 @@ public class XMLSession extends BaseSession implements CommandRegistryFactory
 	public static final String EL_LOGGERS = "loggers";
 	
 	public static final String PARAM_BASE_DIRECTORY = "basedir";
-	
+
 	/** Logger for the class. */
 	private static final Logger LOGGER = LoggerFactory.getLogger(XMLSession.class);
 

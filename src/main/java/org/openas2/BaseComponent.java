@@ -1,85 +1,100 @@
 package org.openas2;
 
-import java.util.HashMap;
+import java.io.Serializable;
+import java.util.LinkedHashMap;
 import java.util.Map;
 import java.util.StringTokenizer;
 
+import javax.annotation.Nonnull;
+
 import org.openas2.params.InvalidParameterException;
 
+public class BaseComponent implements Component
+{
+	@Nonnull
+	private Map<String, Serializable> parameters = new LinkedHashMap<>();
 
-public class BaseComponent implements Component {
-    private Map parameters;
-    private Session session;
+	private Session session;
 
-    public String getName() {
-        String clippedName = this.getClass().getName();
+	@Override
+	public String getName()
+	{
+		String clippedName = this.getClass().getName();
 
-        // this clips off the package information
-        StringTokenizer classParts = new StringTokenizer(clippedName, ".", false);
+		// this clips off the package information
+		StringTokenizer classParts = new StringTokenizer(clippedName, ".", false);
 
-        while (classParts.hasMoreTokens()) {
-            clippedName = classParts.nextToken();
-        }
+		while (classParts.hasMoreTokens())
+		{
+			clippedName = classParts.nextToken();
+		}
 
-        return clippedName;
-    }
+		return clippedName;
+	}
 
-    public void setParameter(String key, String value) {
-        getParameters().put(key, value);
-    }
+	public void setParameter(@Nonnull final String key, final String value)
+	{
+		getParameters().put(key, value);
+	}
 
-    public void setParameter(String key, int value) {
-        setParameter(key, Integer.toString(value));
-    }
+	public void setParameter(@Nonnull final String key, int value)
+	{
+		getParameters().put(key, value);
+	}
 
-    public String getParameter(String key, boolean required)
-        throws InvalidParameterException {
-        String parameter = (String) getParameters().get(key);
+	public String getParameter(@Nonnull final String key, boolean required) throws InvalidParameterException
+	{
+		String parameter = (String)getParameters().get(key);
 
-        if (required && (parameter == null)) {
-            throw new InvalidParameterException(this, key, null);
-        }
+		if (required && (parameter == null))
+		{
+			throw new InvalidParameterException(this, key, null);
+		}
 
-        return parameter;
-    }
+		return parameter;
+	}
 
-    public String getParameter(String key, String defaultValue)
-        throws InvalidParameterException {
-        String value = getParameter(key, false);
+	public String getParameter(@Nonnull final String key, @Nonnull final String defaultValue)
+	{
+		try
+		{
+			return getParameter(key, false);
+		}
+		catch (InvalidParameterException ipe)
+		{
+			return defaultValue;
+		}
+	}
 
-        if (value == null) {
-            return defaultValue;
-        }
+	public int getParameterInt(@Nonnull final String key, final boolean required) throws InvalidParameterException
+	{
+		String value = getParameter(key, required);
 
-        return value;
-    }
+		if (value != null)
+		{
+			return Integer.parseInt(value);
+		}
 
-    public int getParameterInt(String key, boolean required)
-        throws InvalidParameterException {
-        String value = getParameter(key, required);
+		return 0;
+	}
 
-        if (value != null) {
-            return Integer.parseInt(value);
-        }
+	@Override
+	@Nonnull
+	public Map<String, Serializable> getParameters()
+	{
+		return parameters;
+	}
 
-        return 0;
-    }
+	@Override
+	public Session getSession()
+	{
+		return session;
+	}
 
-    public Map getParameters() {
-        if (parameters == null) {
-            parameters = new HashMap();
-        }
+	public void init(Session session, Map parameters) throws OpenAS2Exception
+	{
+		this.session = session;
+		this.parameters = parameters;
+	}
 
-        return parameters;
-    }
-
-    public Session getSession() {
-        return session;
-    }
-
-    public void init(Session session, Map parameters) throws OpenAS2Exception {
-        this.session = session;
-        this.parameters = parameters;
-    }
-	
 }

@@ -4,7 +4,10 @@ import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.List;
 
-public class CommandResult {
+import javax.annotation.Nonnull;
+
+public class CommandResult
+{
 	public static final String TYPE_OK = "OK";
 	public static final String TYPE_ERROR = "ERROR";
 	public static final String TYPE_WARNING = "WARNING";
@@ -12,8 +15,10 @@ public class CommandResult {
 	public static final String TYPE_COMMAND_NOT_SUPPORTED = "COMMAND NOT SUPPORTED";
 	public static final String TYPE_EXCEPTION = "EXCEPTION";
 	private String type;
-	private List results;
 	
+	@Nonnull
+	private List<Object> results = new ArrayList<>();
+
 	public CommandResult(String type, String msg) {
 		super();
 		this.type = type;
@@ -24,21 +29,21 @@ public class CommandResult {
 		super();
 		this.type = type;
 	}
+
 	public CommandResult(Exception e) {
 		super();
 		this.type = TYPE_EXCEPTION;
 		getResults().add(e);	
 	}
 	
-	public List getResults() {
-		if (results == null) {
-			results = new ArrayList();
-		}
+	@Nonnull
+	public List<Object> getResults()
+	{
 		return results;
 	}
 	
 	public String getResult() {
-		Iterator resultIt = getResults().iterator();
+		Iterator<Object> resultIt = getResults().iterator();
 		StringBuffer results = new StringBuffer();
 		while (resultIt.hasNext()) {
 			results.append(resultIt.next().toString()).append("\r\n");
@@ -46,7 +51,8 @@ public class CommandResult {
 		return results.toString();
 	}
 	
-	public void setResults(List list) {
+	public void setResults(@Nonnull final List<Object> list)
+	{
 		results = list;
 	}
 
@@ -55,11 +61,14 @@ public class CommandResult {
 		return type;
 	}
 
+	@Override
 	public String toString() {
 		StringBuffer buf = new StringBuffer();
 		buf.append(getType()).append(":\r\n");
-		Iterator resultIt = getResults().iterator();
-		while (resultIt.hasNext()) {
+		Iterator<Object> resultIt = getResults().iterator();
+
+		while (resultIt.hasNext())
+		{
 			buf.append(resultIt.next().toString()).append("\r\n");			
 		}
 		return buf.toString();
@@ -67,7 +76,7 @@ public class CommandResult {
 	
 	public String toXML() {
 		StringBuffer buf = new StringBuffer();
-		Iterator resultIt = getResults().iterator();
+		Iterator<Object> resultIt = getResults().iterator();
 		while (resultIt.hasNext()) {
 			buf.append("<result>");
 			buf.append(resultIt.next().toString());			
@@ -79,5 +88,4 @@ public class CommandResult {
 	public void setType(String string) {
 		type = string;
 	}
-
 }

@@ -1,9 +1,14 @@
 package org.openas2.cmd.processor;
 
+import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.Iterator;
+import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
+
+import javax.annotation.Nonnull;
+import javax.annotation.Nullable;
 
 import org.openas2.Component;
 import org.openas2.OpenAS2Exception;
@@ -11,75 +16,92 @@ import org.openas2.Session;
 import org.openas2.cmd.Command;
 import org.openas2.cmd.CommandRegistry;
 
+public abstract class BaseCommandProcessor extends Thread implements CommandProcessor, Component
+{
+	@Override
+	@Nonnull
+	public Map<String, Serializable> getParameters()
+	{
+		return new LinkedHashMap<>();
+	}
 
-public abstract class BaseCommandProcessor extends Thread implements CommandProcessor, Component {
-
-	public Map getParameters() {
-		// TODO Auto-generated method stub
+	@Override
+	public Session getSession()
+	{
 		return null;
 	}
 
-	public Session getSession() {
-		// TODO Auto-generated method stub
-		return null;
+	@Override
+	public void init(Session session, Map parameters) throws OpenAS2Exception
+	{
+
 	}
 
-	public void init(Session session, Map parameters) throws OpenAS2Exception {
-		// TODO Auto-generated method stub
-		
+	@Nonnull
+	private List<Command> commands = new ArrayList<>();
+
+	private boolean terminated;
+
+	public BaseCommandProcessor()
+	{
+		super();
+		terminated = false;
 	}
 
-	private List commands;
-    private boolean terminated;
+	public void setCommands(@Nonnull final List<Command> list)
+	{
+		commands = list;
+	}
 
-    public BaseCommandProcessor() {
-        super();
-        terminated = false;
-    }
+	@Override
+	@Nonnull
+	public List<Command> getCommands()
+	{
+		return commands;
+	}
 
-    public void setCommands(List list) {
-        commands = list;
-    }
-
-    public List getCommands() {
-        if (commands == null) {
-            commands = new ArrayList();
-        }
-
-        return commands;
-    }
-	
-	public Command getCommand(String name) {
+	@Nullable
+	public Command getCommand(String name)
+	{
 		Command currentCmd;
-		Iterator commandIt = getCommands().iterator();
-		while (commandIt.hasNext()) {
-			currentCmd = (Command) commandIt.next();
-			if (currentCmd.getName().equals(name)) {
+		Iterator<Command> commandIt = getCommands().iterator();
+		while (commandIt.hasNext())
+		{
+			currentCmd = commandIt.next();
+			if (currentCmd.getName().equals(name))
+			{
 				return currentCmd;
 			}
 		}
 		return null;
 	}
-	
-    public boolean isTerminated() {
-        return terminated;
-    }
 
-    public void processCommand() throws OpenAS2Exception {
-    	throw new OpenAS2Exception("super class method call, not initialized correctly");
-    }
-    
-    public void addCommands(CommandRegistry reg) {
-        ;
+	@Override
+	public boolean isTerminated()
+	{
+		return terminated;
+	}
 
-        List regCmds = reg.getCommands();
+	@Override
+	public void processCommand() throws OpenAS2Exception
+	{
+		throw new OpenAS2Exception("super class method call, not initialized correctly");
+	}
 
-        if (regCmds.size() > 0) {
-            getCommands().addAll(regCmds);
-        }
-    }
+	@Override
+	public void addCommands(CommandRegistry reg)
+	{
+		List<Command> regCmds = reg.getCommands();
 
-    public void terminate() {
-        terminated = true;
-    }
+		if (regCmds.size() > 0)
+		{
+			getCommands().addAll(regCmds);
+		}
+	}
+
+	@Override
+	public void terminate()
+	{
+		terminated = true;
+	}
 }

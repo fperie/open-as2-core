@@ -7,64 +7,96 @@ import org.openas2.OpenAS2Exception;
 import org.openas2.Session;
 import org.openas2.params.InvalidParameterException;
 
+public abstract class BaseCommand extends BaseComponent implements Command
+{
+	public static final String PARAM_NAME = "name";
 
-public abstract class BaseCommand extends BaseComponent implements Command {
-    public static final String PARAM_NAME = "name";
-    public static final String PARAM_DESCRIPTION = "description";
-    public static final String PARAM_USAGE = "usage";    
-	
-	public void init(Session session, Map parameters) throws OpenAS2Exception {
+	public static final String PARAM_DESCRIPTION = "description";
+
+	public static final String PARAM_USAGE = "usage";
+
+	@Override
+	public void init(Session session, Map parameters) throws OpenAS2Exception
+	{
 		super.init(session, parameters);
-		if (getName() == null) {
+		if (getName() == null)
+		{
 			setName(getDefaultName());
-		};
-		if (getDescription() == null) {
+		}
+		;
+		if (getDescription() == null)
+		{
 			setDescription(getDefaultDescription());
 		}
-		if (getUsage() == null) {
+		if (getUsage() == null)
+		{
 			setUsage(getDefaultUsage());
 		}
 	}
 
-    public String getDescription() {
-        try {
-            return getParameter(PARAM_DESCRIPTION, false);
-        } catch (InvalidParameterException e) {
-            return null;
-        }
-    }
+	@Override
+	public String getDescription()
+	{
+		try
+		{
+			return getParameter(PARAM_DESCRIPTION, false);
+		}
+		catch (InvalidParameterException e)
+		{
+			return null;
+		}
+	}
 
-    public String getName() {
-        try {
+	@Override
+	public String getName()
+	{
+		try
+		{
 			return getParameter(PARAM_NAME, false);
-		} catch (InvalidParameterException e) {
+		}
+		catch (InvalidParameterException e)
+		{
 			return null;
 		}
-    }
+	}
 
-    public String getUsage() {
-		try {
+	@Override
+	public String getUsage()
+	{
+		try
+		{
 			return getParameter(PARAM_USAGE, false);
-		} catch (InvalidParameterException e) {
+		}
+		catch (InvalidParameterException e)
+		{
 			return null;
 		}
-    }
-	
+	}
+
 	public abstract String getDefaultName();
+
 	public abstract String getDefaultDescription();
+
 	public abstract String getDefaultUsage();
-		
-    public abstract CommandResult execute(Object[] params);
 
-    public void setDescription(String desc) {
-        setParameter(PARAM_DESCRIPTION, desc);
-    }
+	@Override
+	public abstract CommandResult execute(Object[] params);
 
-	public void setName(String name) {
-        setParameter(PARAM_NAME, name);
-    }
+	@Override
+	public void setDescription(String desc)
+	{
+		setParameter(PARAM_DESCRIPTION, desc);
+	}
 
-	public void setUsage(String usage) {
-        setParameter(PARAM_USAGE, usage);
-    }
+	@Override
+	public void setName(String name)
+	{
+		setParameter(PARAM_NAME, name);
+	}
+
+	@Override
+	public void setUsage(String usage)
+	{
+		setParameter(PARAM_USAGE, usage);
+	}
 }

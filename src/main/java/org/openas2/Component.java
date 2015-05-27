@@ -1,6 +1,9 @@
 package org.openas2;
 
+import java.io.Serializable;
 import java.util.Map;
+
+import javax.annotation.Nonnull;
 
 
 /**
@@ -24,7 +27,7 @@ public interface Component {
      *
      * @return name of the component
      */
-    public String getName();
+	String getName();
 
     /**
      * Returns the parameters used to initialize this Component, and can also be used
@@ -32,7 +35,8 @@ public interface Component {
      *
      * @return map of parameter name to parameter value
      */
-    public Map getParameters();
+	@Nonnull
+	Map<String, Serializable> getParameters();
 
     /**
      * Returns the Session used to initialize this Component. The
@@ -40,7 +44,7 @@ public interface Component {
      *
      * @return this component's session
      */
-    public Session getSession();
+	Session getSession();
 
     /**
      * After creating a Component object, this method should be called to set any
@@ -57,5 +61,5 @@ public interface Component {
      * @see #getParameter(String key, boolean required)
      * @see Session
      */
-    public void init(Session session, Map parameters) throws OpenAS2Exception;
+	void init(Session session, Map parameters) throws OpenAS2Exception;
 }

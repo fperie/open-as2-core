@@ -1,73 +1,78 @@
 package org.openas2;
 
-import java.util.HashMap;
+import java.util.LinkedHashMap;
 import java.util.Map;
+
+import javax.annotation.Nonnull;
 
 import org.openas2.partner.XMLPartnershipFactory;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
- ;
 
-
-public class OpenAS2Exception extends Exception 
+public class OpenAS2Exception extends Exception
 {
-    /**
+	/**
 	 * Version of serialization.
 	 */
 	private static final long serialVersionUID = 1L;
-	
+
 	public static final String SOURCE_MESSAGE = "message";
-    public static final String SOURCE_FILE = "file";
-    
-    /** Logger for the class. */
-    private static final Logger LOGGER = LoggerFactory.getLogger(XMLPartnershipFactory.class);
-    
-    private Map sources;
-	
 
-    public OpenAS2Exception() {
-        log(false);
-    }
+	public static final String SOURCE_FILE = "file";
 
-    public OpenAS2Exception(String msg) {
-        super(msg);
-    }
+	/** Logger for the class. */
+	private static final Logger LOGGER = LoggerFactory.getLogger(XMLPartnershipFactory.class);
 
-    public OpenAS2Exception(String msg, Throwable cause) {
-        super(msg, cause);
-    }
+	@Nonnull
+	private Map<String, Object> sources = new LinkedHashMap<>();
 
-    public OpenAS2Exception(Throwable cause) {
-        super(cause);
-    }
+	public OpenAS2Exception()
+	{
+		log(false);
+	}
 
-    public Object getSource(String id) {
-        Map sources = getSources();
+	public OpenAS2Exception(String msg)
+	{
+		super(msg);
+	}
 
-        return sources.get(id);
-    }
+	public OpenAS2Exception(String msg, Throwable cause)
+	{
+		super(msg, cause);
+	}
 
-    public void setSources(Map sources) {
-        this.sources = sources;
-    }
+	public OpenAS2Exception(Throwable cause)
+	{
+		super(cause);
+	}
 
-    public Map getSources() {
-        if (sources == null) {
-            sources = new HashMap();
-        }
+	public Object getSource(String id)
+	{
+		return getSources().get(id);
+	}
 
-        return sources;
-    }
+	public void setSources(@Nonnull final Map<String, Object> sources)
+	{
+		this.sources = sources;
+	}
 
-    public void addSource(String id, Object source) {
-        Map sources = getSources();
-        sources.put(id, source);
-    }
+	@Nonnull
+	public Map<String, Object> getSources()
+	{
+		return sources;
+	}
 
-    public void terminate() {
-        log(true);
-    }
+	public void addSource(String id, Object source)
+	{
+		getSources().put(id, source);
+	}
 
-    protected void log(boolean terminated) {
-    }
+	public void terminate()
+	{
+		log(true);
+	}
+
+	protected void log(boolean terminated)
+	{
+	}
 }
