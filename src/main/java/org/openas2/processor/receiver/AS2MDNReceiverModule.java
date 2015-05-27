@@ -1,8 +1,5 @@
 package org.openas2.processor.receiver;
 
-import java.net.Socket;
-
-import org.openas2.app.OpenAS2Server;
 import org.openas2.message.NetAttribute;
 import org.openas2.params.MessageParameters;
 import org.openas2.partner.AS2Partnership;
@@ -41,7 +38,8 @@ public class AS2MDNReceiverModule extends NetModule {
         "There is no guarantee however that the EDI Interchange was syntactically correct, or was received by the EDI application/translator.";
 
     
-     protected NetModuleHandler getHandler() {
+	public NetModuleHandler getHandler()
+	{
         return new AS2MDNReceiverHandler(this);
     }
 

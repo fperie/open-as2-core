@@ -50,7 +50,7 @@ public abstract class NetModule extends BaseReceiverModule {
         getParameter(PARAM_PORT, true);
     }
 
-    protected abstract NetModuleHandler getHandler();
+	public abstract NetModuleHandler getHandler();
 
     protected void handleError(Message msg, OpenAS2Exception oae) {
         oae.addSource(OpenAS2Exception.SOURCE_MESSAGE, msg);

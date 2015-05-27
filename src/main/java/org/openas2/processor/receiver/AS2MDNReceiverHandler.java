@@ -8,6 +8,7 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
 import java.net.HttpURLConnection;
+import java.net.InetAddress;
 import java.net.Socket;
 import java.security.cert.X509Certificate;
 import java.util.Collection;
@@ -27,6 +28,7 @@ import org.openas2.cert.CertificateFactory;
 import org.openas2.message.AS2Message;
 import org.openas2.message.AS2MessageMDN;
 import org.openas2.message.MessageMDN;
+import org.openas2.message.NetAttribute;
 import org.openas2.partner.AS2Partnership;
 import org.openas2.partner.Partnership;
 import org.openas2.processor.storage.StorageModule;
@@ -51,71 +53,110 @@ public class AS2MDNReceiverHandler implements NetModuleHandler
         this.module = module;
     }
 
-    public String getClientInfo(Socket s) {
-        return " " + s.getInetAddress().getHostAddress() + " " + Integer.toString(s.getPort());
-    }
+	public String getClientInfo(InetAddress remoteIp, int remotePort)
+	{
+		return " " + remoteIp.getHostAddress() + " " + remotePort;
+	}
 
     public AS2MDNReceiverModule getModule() {
         return module;
     }
 
-    public void handle(NetModule owner, Socket s) {
-    	
-    	LOGGER.info("incoming connection  [{}]", getClientInfo(s));
+	@Override
+	public void handle(NetModule owner, Socket s)
+	{
+		InputStream inputStream = null;
+		OutputStream outputStream = null;
 
-        AS2Message msg = new AS2Message();
-        
-        byte[] data = null;
+		try
+		{
+			inputStream = s.getInputStream();
+			outputStream = s.getOutputStream();
+		}
+		catch (IOException ioe)
+		{
+			AS2Message msg = createMessage(s.getInetAddress(), s.getPort(), s.getLocalAddress(), s.getLocalPort());
 
+			DispositionType dispositionType = new DispositionType("automatic-action", "failed to send MDN",
+					"processed", "Error", "unexpected-processing-error");
 
-        // Read in the message request, headers, and data
-        try {
-            data = HTTPUtil.readData(s, msg);
-            //Asynch MDN 2007-03-12
-            //check if the requested URL is defined in attribute "as2_receipt_option"  
-            //in one of partnerships, if yes, then process incoming AsyncMDN 
-            LOGGER.info("incoming connection for receiving AsyncMDN [{}] {}", getClientInfo(s), msg.getLoggingText());
-			ContentType receivedContentType;
-                
-            MimeBodyPart receivedPart = new MimeBodyPart(msg.getHeaders(), data); 
-            msg.setData(receivedPart);
-            receivedContentType = new ContentType(receivedPart.getContentType());
-                 
-            receivedContentType = new ContentType(msg.getHeader("Content-Type"));
+			DispositionException dispositionException = new DispositionException(dispositionType,
+					"internal error occured to send MDN", ioe);
 
-            //MimeBodyPart receivedPart = new MimeBodyPart();
-            receivedPart.setDataHandler(new DataHandler(new ByteArrayDataSource(data, receivedContentType
-                        .toString(), null)));
-            receivedPart.setHeader("Content-Type", receivedContentType.toString());
-                
-            msg.setData(receivedPart);
-                
-   			receiveMDN(msg, data, s.getOutputStream(), s);
+			getModule().handleError(msg, dispositionException);
+			return;
+		}
 
-            
-        } catch (Exception e) {
-            NetException ne = new NetException(s.getInetAddress(), s.getPort(), e);
-            ne.terminate();
-        }
-
+		handle(s.getInetAddress(), s.getPort(), s.getLocalAddress(), s.getLocalPort(), inputStream, outputStream);
     }
+
+	@Override
+	public void handle(final InetAddress remoteIp, final int remotePort, final InetAddress localIp,
+			final int localPort, final InputStream inputStream, final OutputStream outputStream)
+	{
+		LOGGER.info("incoming connection  [{}]", getClientInfo(remoteIp, remotePort));
+
+		AS2Message msg = new AS2Message();
+
+		byte[] data = null;
+
+		// Read in the message request, headers, and data
+		try
+		{
+			data = readMessage(inputStream, outputStream, msg);
+
+			// Asynch MDN 2007-03-12
+			// check if the requested URL is defined in attribute "as2_receipt_option"
+			// in one of partnerships, if yes, then process incoming AsyncMDN
+			LOGGER.info("incoming connection for receiving AsyncMDN [{}] {}", getClientInfo(remoteIp, remotePort),
+					msg.getLoggingText());
+			ContentType receivedContentType;
+
+			MimeBodyPart receivedPart = new MimeBodyPart(msg.getHeaders(), data);
+			msg.setData(receivedPart);
+			receivedContentType = new ContentType(receivedPart.getContentType());
+
+			receivedContentType = new ContentType(msg.getHeader("Content-Type"));
+
+			// MimeBodyPart receivedPart = new MimeBodyPart();
+			receivedPart.setDataHandler(new DataHandler(new ByteArrayDataSource(data, receivedContentType
+					.toString(), null)));
+			receivedPart.setHeader("Content-Type", receivedContentType.toString());
+
+			msg.setData(receivedPart);
+
+			receiveMDN(msg, data, outputStream);
+
+		}
+		catch (Exception e)
+		{
+			NetException ne = new NetException(remoteIp, remotePort, e);
+			ne.terminate();
+		}
+	}
+
+	protected byte[] readMessage(final InputStream inputStream, final OutputStream outputStream, AS2Message msg)
+			throws IOException, MessagingException
+	{
+		return HTTPUtil.readData(inputStream, outputStream, msg);
+	}
 
  
  //Asynch MDN 2007-03-12
 /**
  * method for receiving & processing Async MDN sent from receiver.
  */ 
- protected void receiveMDN(AS2Message msg, byte[] data, OutputStream out, Socket s)
+	protected void receiveMDN(AS2Message msg, byte[] data, OutputStream out)
 			throws OpenAS2Exception, IOException {
 		try {
-//			 Create a MessageMDN and copy HTTP headers 
+			// create a MessageMDN and copy HTTP headers
 			MessageMDN mdn = new AS2MessageMDN(msg); 
-//			 copy headers from msg to MDN from msg 
+			// copy headers from msg to MDN from msg
 			mdn.setHeaders(msg.getHeaders()); 
 			MimeBodyPart part = new MimeBodyPart(mdn.getHeaders(), data); 
 			msg.getMDN().setData(part); 
 			 
-//			 get the MDN partnership info 
+			// get the MDN partnership info
 			mdn.getPartnership().setSenderID(AS2Partnership.PID_AS2, mdn.getHeader("AS2-From")); 
 			mdn.getPartnership().setReceiverID(AS2Partnership.PID_AS2, mdn.getHeader("AS2-To")); 
 			getModule().getSession().getPartnershipFactory().updatePartnership(mdn, false); 
@@ -125,21 +166,24 @@ public class AS2MDNReceiverHandler implements NetModuleHandler
 			 
 			AS2UtilOld.parseMDN(msg, senderCert); 
 			 
-//			 in order to name & save the mdn with the original AS2-From + AS2-To + Message id., 
-//			 the 3 msg attributes have to be reset before calling MDNFileModule 
+			// in order to name & save the mdn with the original AS2-From + AS2-To + Message id.,
+			// the 3 msg attributes have to be reset before calling MDNFileModule
 			msg.getPartnership().setReceiverID(AS2Partnership.PID_AS2, mdn.getHeader("AS2-From")); 
 			msg.getPartnership().setSenderID(AS2Partnership.PID_AS2, mdn.getHeader("AS2-To")); 
 			getModule().getSession().getPartnershipFactory().updatePartnership(msg, false); 
 			msg.setMessageID(msg.getMDN().getAttribute(AS2MessageMDN.MDNA_ORIG_MESSAGEID)); 
 			getModule().getSession().getProcessor().handle(StorageModule.DO_STOREMDN, msg, null); 
 			 
-//			 check if the mic (message integrity check) is correct 
-
 			
+			// check if the mic (message integrity check) is correct
 			if (checkAsyncMDN(msg) == true)
+			{
 				HTTPUtil.sendHTTPResponse(out, HttpURLConnection.HTTP_OK, false);
+			}
 			else
+			{
 				HTTPUtil.sendHTTPResponse(out, HttpURLConnection.HTTP_NOT_FOUND, false);
+			}
 
 			String disposition = msg.getMDN().getAttribute(
 					AS2MessageMDN.MDNA_DISPOSITION);
@@ -308,5 +352,17 @@ public class AS2MDNReceiverHandler implements NetModuleHandler
     mdn.getPartnership().setReceiverID(AS2Partnership.PID_AS2, mdn.getHeader("AS2-To"));
     }
     
-    
+	// Create a new message and record the source ip and port
+	protected AS2Message createMessage(InetAddress remoteIp, int remotePort, InetAddress localIp, int localPort)
+	{
+		AS2Message msg = new AS2Message();
+
+		msg.setAttribute(NetAttribute.MA_SOURCE_IP, localIp.toString());
+		msg.setAttribute(NetAttribute.MA_SOURCE_PORT, remotePort + "");
+		msg.setAttribute(NetAttribute.MA_DESTINATION_IP, remoteIp.toString());
+		msg.setAttribute(NetAttribute.MA_DESTINATION_PORT, localPort + "");
+
+		return msg;
+	}
+
  }

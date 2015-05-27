@@ -37,9 +37,9 @@ public class AS2ReceiverModule extends NetModule {
     public static final String DISP_SUCCESS = DP_VERIFIED +
         "There is no guarantee however that the EDI Interchange was syntactically correct, or was received by the EDI application/translator.";
 
-    protected NetModuleHandler getHandler() {
+	@Override
+	public NetModuleHandler getHandler()
+	{
         return new AS2ReceiverHandler(this);
     }
-
- 
 }

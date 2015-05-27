@@ -6,7 +6,6 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
 import java.net.HttpURLConnection;
-import java.net.Socket;
 import java.util.StringTokenizer;
 
 import javax.mail.MessagingException;
@@ -14,341 +13,383 @@ import javax.mail.internet.InternetHeaders;
 
 import org.openas2.message.Message;
 
-public class HTTPUtil {
-    public static final String MA_HTTP_REQ_TYPE = "HTTP_REQUEST_TYPE";
-    public static final String MA_HTTP_REQ_URL = "HTTP_REQUEST_URL";
+public class HTTPUtil
+{
+	public static final String MA_HTTP_REQ_TYPE = "HTTP_REQUEST_TYPE";
 
-    public static String getHTTPResponseMessage(int responseCode) {
-        String msg = "Unknown";
+	public static final String MA_HTTP_REQ_URL = "HTTP_REQUEST_URL";
 
-        switch (responseCode) {
-        case 100:
-            msg = "Continue";
+	public static String getHTTPResponseMessage(int responseCode)
+	{
+		String msg = "Unknown";
 
-            break;
+		switch (responseCode)
+		{
+			case 100:
+				msg = "Continue";
 
-        case 101:
-            msg = "Switching Protocols";
+				break;
 
-            break;
+			case 101:
+				msg = "Switching Protocols";
 
-        case 200:
-            msg = "OK";
+				break;
 
-            break;
+			case 200:
+				msg = "OK";
 
-        case 201:
-            msg = "Created";
+				break;
 
-            break;
+			case 201:
+				msg = "Created";
 
-        case 202:
-            msg = "Accepted";
+				break;
 
-            break;
+			case 202:
+				msg = "Accepted";
 
-        case 203:
-            msg = "Non-Authoritative Information";
+				break;
 
-            break;
+			case 203:
+				msg = "Non-Authoritative Information";
 
-        case 204:
-            msg = "No Content";
+				break;
 
-            break;
+			case 204:
+				msg = "No Content";
 
-        case 205:
-            msg = "Reset Content";
+				break;
 
-            break;
+			case 205:
+				msg = "Reset Content";
 
-        case 206:
-            msg = "Partial Content";
+				break;
 
-            break;
+			case 206:
+				msg = "Partial Content";
 
-        case 300:
-            msg = "Multiple Choices";
+				break;
 
-            break;
+			case 300:
+				msg = "Multiple Choices";
 
-        case 301:
-            msg = "Moved Permanently";
+				break;
 
-            break;
+			case 301:
+				msg = "Moved Permanently";
 
-        case 302:
-            msg = "Found";
+				break;
 
-            break;
+			case 302:
+				msg = "Found";
 
-        case 303:
-            msg = "See Other";
+				break;
 
-            break;
+			case 303:
+				msg = "See Other";
 
-        case 304:
-            msg = "Not Modified";
+				break;
 
-            break;
+			case 304:
+				msg = "Not Modified";
 
-        case 305:
-            msg = "Use Proxy";
+				break;
 
-            break;
+			case 305:
+				msg = "Use Proxy";
 
-        case 307:
-            msg = "Temporary Redirect";
+				break;
 
-            break;
+			case 307:
+				msg = "Temporary Redirect";
 
-        case 400:
-            msg = "Bad Request";
+				break;
 
-            break;
+			case 400:
+				msg = "Bad Request";
 
-        case 401:
-            msg = "Unauthorized";
+				break;
 
-            break;
+			case 401:
+				msg = "Unauthorized";
 
-        case 402:
-            msg = "Payment Required";
+				break;
 
-            break;
+			case 402:
+				msg = "Payment Required";
 
-        case 403:
-            msg = "Forbidden";
+				break;
 
-            break;
+			case 403:
+				msg = "Forbidden";
 
-        case 404:
-            msg = "Not Found";
+				break;
 
-            break;
+			case 404:
+				msg = "Not Found";
 
-        case 405:
-            msg = "Method Not Allowed";
+				break;
 
-            break;
+			case 405:
+				msg = "Method Not Allowed";
 
-        case 406:
-            msg = "Not Acceptable";
+				break;
 
-            break;
+			case 406:
+				msg = "Not Acceptable";
 
-        case 407:
-            msg = "Proxy Authentication Required";
+				break;
 
-            break;
+			case 407:
+				msg = "Proxy Authentication Required";
 
-        case 408:
-            msg = "Request Time-out";
+				break;
 
-            break;
+			case 408:
+				msg = "Request Time-out";
 
-        case 409:
-            msg = "Conflict";
+				break;
 
-            break;
+			case 409:
+				msg = "Conflict";
 
-        case 410:
-            msg = "Gone";
+				break;
 
-            break;
+			case 410:
+				msg = "Gone";
 
-        case 411:
-            msg = "Length Required";
+				break;
 
-            break;
+			case 411:
+				msg = "Length Required";
 
-        case 412:
-            msg = "Precondition Failed";
+				break;
 
-            break;
+			case 412:
+				msg = "Precondition Failed";
 
-        case 413:
-            msg = "Request Entity Too Large";
+				break;
 
-            break;
+			case 413:
+				msg = "Request Entity Too Large";
 
-        case 414:
-            msg = "Request-URI Too Large";
+				break;
 
-            break;
+			case 414:
+				msg = "Request-URI Too Large";
 
-        case 415:
-            msg = "Unsupported Media Type";
+				break;
 
-            break;
+			case 415:
+				msg = "Unsupported Media Type";
 
-        case 416:
-            msg = "Requested range not satisfiable";
+				break;
 
-            break;
+			case 416:
+				msg = "Requested range not satisfiable";
 
-        case 417:
-            msg = "Expectation Failed";
+				break;
 
-            break;
+			case 417:
+				msg = "Expectation Failed";
 
-        case 500:
-            msg = "Internal Server Error";
+				break;
 
-            break;
+			case 500:
+				msg = "Internal Server Error";
 
-        case 501:
-            msg = "Not Implemented";
-
-            break;
-
-        case 502:
-            msg = "Bad Gateway";
-
-            break;
+				break;
 
-        case 503:
-            msg = "Service Unavailable";
-
-            break;
-
-        case 504:
-            msg = "Gateway Time-out";
-
-            break;
-
-        case 505:
-            msg = "HTTP Version not supported";
-
-            break;
-        }
+			case 501:
+				msg = "Not Implemented";
 
-        return msg;
-    }
+				break;
 
-    public static byte[] readData(Socket s, Message msg) throws IOException, MessagingException {
-        byte[] data = null;
-
-        // Get the stream and read in the HTTP request and headers
-        BufferedInputStream in = new BufferedInputStream(s.getInputStream());
-        String[] request = HTTPUtil.readRequest(in);
-        msg.setAttribute(MA_HTTP_REQ_TYPE, request[0]);
-        msg.setAttribute(MA_HTTP_REQ_URL, request[1]);
-        msg.setHeaders(new InternetHeaders(in));
-        DataInputStream dataIn = new DataInputStream(in);
-        // Retrieve the message content
-        if (msg.getHeader("Content-Length") == null) {
-        	String transfer_encoding = msg.getHeader("Transfer-Encoding");
-        	
-        	if (transfer_encoding != null) {
-        		if (transfer_encoding.replaceAll("\\s+", "").equalsIgnoreCase("chunked")) {
-        			int length = 0;
-        			data = null;
-        			for (;;) {
-        				// First get hex chunk length; followed by CRLF
-        				int blocklen = 0;
-        				for (;;) {
-        					int ch = dataIn.readByte ();
-        					if (ch == '\n') {
-        						break;
-        					}
-        					if (ch >= 'a' && ch <= 'f') {
-        						ch -= ('a' - 10);      					 
-        					}
-        					else if (ch >= 'A' && ch <= 'F') {
-        						ch -= ('A' - 10);
-        					}
-        					else if (ch >= '0' && ch <= '9') {
-        						ch -= '0';
-        					}
-        					else {
-        						continue;
-        					}
-        					blocklen = (blocklen * 16) + ch;
-        				}
-        				// Zero length is end of chunks
-        				if (blocklen == 0) break;
-        				// Ok, now read new chunk
-        				int newlen = length + blocklen;
-        				byte [] newdata = new byte [newlen];
-        				if (length > 0)
-        					System.arraycopy(data, 0, newdata, 0, length);
-        				dataIn.readFully (newdata, length, blocklen);
-        				data = newdata;
-        				length = newlen;
-        				// And now the CRLF after the chunk;
-        				while (dataIn.readByte () != '\n');
-        			}
-        			msg.setHeader("Content-Length", new Integer(length).toString());
-        		}
-        		else {
-        			HTTPUtil.sendHTTPResponse(s.getOutputStream(), HttpURLConnection.HTTP_LENGTH_REQUIRED,
-        					false);
-        			throw new IOException("Transfer-Encoding unimplemented: " + transfer_encoding);
-        		}
-        	}
-        	else if (msg.getHeader("Content-Length") == null) { 
-        		HTTPUtil.sendHTTPResponse(s.getOutputStream(), HttpURLConnection.HTTP_LENGTH_REQUIRED,
-                         false);
-            throw new IOException("Content-Length missing");
-        	}
-        }
-        else {
-        	    // Receive the transmission's data
-        	    int contentSize = Integer.parseInt(msg.getHeader("Content-Length"));
-        	    data = new byte[contentSize];
-        	    dataIn.readFully(data);
-        	}
-        return data;
-    }
-
-    public static String[] readRequest(InputStream in) throws IOException {
-        int byteBuf = in.read();
-        StringBuffer strBuf = new StringBuffer();
-
-        while ((byteBuf != -1) && (byteBuf != '\r')) {
-            strBuf.append((char) byteBuf);
-            byteBuf = in.read();
-        }
-
-        if (byteBuf != -1) {
-            in.read(); // read in the \n
-        }
-
-        StringTokenizer tokens = new StringTokenizer(strBuf.toString(), " ");
-        int tokenCount = tokens.countTokens();
-
-        if (tokenCount >= 3) {
-            String[] requestParts = new String[tokenCount];
-
-            for (int i = 0; i < tokenCount; i++) {
-                requestParts[i] = tokens.nextToken();
-            }
-
-            return requestParts;
-        } else if (tokenCount == 2) {
-            String[] requestParts = new String[3];
-            requestParts[0] = tokens.nextToken();
-            requestParts[1] = "/";
-            requestParts[2] = tokens.nextToken();
-            return requestParts;
-        } else {
-            throw new IOException("Invalid HTTP Request");
-        }
-    }
-
-    public static void sendHTTPResponse(OutputStream out, int responseCode, boolean hasData)
-            throws IOException {
-        StringBuffer httpResponse = new StringBuffer();
-        httpResponse.append(Integer.toString(responseCode)).append(" ");
-        httpResponse.append(HTTPUtil.getHTTPResponseMessage(responseCode));
-        httpResponse.append("\r\n");
-        StringBuffer response = new StringBuffer("HTTP/1.1 ");
-        response.append(httpResponse);
-        out.write(response.toString().getBytes());
-        if (!hasData) { // if no data will be sent, write the HTTP code
-            out.write("\r\n".getBytes());
-            out.write(httpResponse.toString().getBytes());
-        }
-    }
+			case 502:
+				msg = "Bad Gateway";
+
+				break;
+
+			case 503:
+				msg = "Service Unavailable";
+
+				break;
+
+			case 504:
+				msg = "Gateway Time-out";
+
+				break;
+
+			case 505:
+				msg = "HTTP Version not supported";
+
+				break;
+		}
+
+		return msg;
+	}
+
+	public static byte[] readData(InputStream inputStream, OutputStream outputStream, Message msg) throws IOException,
+			MessagingException
+	{
+		// Get the stream and read in the HTTP request and headers
+		BufferedInputStream in = new BufferedInputStream(inputStream);
+		String[] request = HTTPUtil.readRequest(in);
+		msg.setAttribute(MA_HTTP_REQ_TYPE, request[0]);
+		msg.setAttribute(MA_HTTP_REQ_URL, request[1]);
+		msg.setHeaders(new InternetHeaders(in));
+
+		return populateData(outputStream, msg, in);
+	}
+
+	public static byte[] populateData(OutputStream outputStream, Message msg, InputStream inputStream)
+			throws IOException
+	{
+		byte[] data = new byte[0];
+
+		DataInputStream dataIn = new DataInputStream(inputStream);
+		// Retrieve the message content
+
+		if (msg.getHeader("Content-Length") == null)
+		{
+			String transferEncoding = msg.getHeader("Transfer-Encoding");
+
+			if (transferEncoding != null)
+			{
+				if (transferEncoding.replaceAll("\\s+", "").equalsIgnoreCase("chunked"))
+				{
+					int length = 0;
+					data = null;
+					for (;;)
+					{
+						// First get hex chunk length; followed by CRLF
+						int blocklen = 0;
+						for (;;)
+						{
+							int ch = dataIn.readByte();
+							if (ch == '\n')
+							{
+								break;
+							}
+							if (ch >= 'a' && ch <= 'f')
+							{
+								ch -= ('a' - 10);
+							}
+							else if (ch >= 'A' && ch <= 'F')
+							{
+								ch -= ('A' - 10);
+							}
+							else if (ch >= '0' && ch <= '9')
+							{
+								ch -= '0';
+							}
+							else
+							{
+								continue;
+							}
+							blocklen = (blocklen * 16) + ch;
+						}
+						// Zero length is end of chunks
+						if (blocklen == 0)
+							break;
+						// Ok, now read new chunk
+						int newlen = length + blocklen;
+						byte[] newdata = new byte[newlen];
+						if (length > 0)
+							System.arraycopy(data, 0, newdata, 0, length);
+						dataIn.readFully(newdata, length, blocklen);
+						data = newdata;
+						length = newlen;
+						// And now the CRLF after the chunk;
+						while (dataIn.readByte() != '\n')
+							;
+					}
+					msg.setHeader("Content-Length", new Integer(length).toString());
+				}
+				else
+				{
+					HTTPUtil.sendHTTPResponse(outputStream, HttpURLConnection.HTTP_LENGTH_REQUIRED,
+							false);
+					throw new IOException("Transfer-Encoding unimplemented: " + transferEncoding);
+				}
+			}
+			else
+			{
+				HTTPUtil.sendHTTPResponse(outputStream, HttpURLConnection.HTTP_LENGTH_REQUIRED,
+						false);
+				throw new IOException("Content-Length missing");
+			}
+		}
+		else
+		{
+			// Receive the transmission's data
+			int contentSize = Integer.parseInt(msg.getHeader("Content-Length"));
+			data = new byte[contentSize];
+			dataIn.readFully(data);
+		}
+		dataIn.close();
+
+		return data;
+	}
+
+	public static String[] readRequest(InputStream in) throws IOException
+	{
+		int byteBuf = in.read();
+		StringBuffer strBuf = new StringBuffer();
+
+		while ((byteBuf != -1) && (byteBuf != '\r'))
+		{
+			strBuf.append((char)byteBuf);
+			byteBuf = in.read();
+		}
+
+		if (byteBuf != -1)
+		{
+			in.read(); // read in the \n
+		}
+
+		StringTokenizer tokens = new StringTokenizer(strBuf.toString(), " ");
+		int tokenCount = tokens.countTokens();
+
+		if (tokenCount >= 3)
+		{
+			String[] requestParts = new String[tokenCount];
+
+			for (int i = 0; i < tokenCount; i++)
+			{
+				requestParts[i] = tokens.nextToken();
+			}
+
+			return requestParts;
+		}
+		else if (tokenCount == 2)
+		{
+			String[] requestParts = new String[3];
+			requestParts[0] = tokens.nextToken();
+			requestParts[1] = "/";
+			requestParts[2] = tokens.nextToken();
+			return requestParts;
+		}
+		else
+		{
+			throw new IOException("Invalid HTTP Request");
+		}
+	}
+
+	public static void sendHTTPResponse(OutputStream out, int responseCode, boolean hasData)
+			throws IOException
+	{
+		StringBuffer httpResponse = new StringBuffer();
+		httpResponse.append(Integer.toString(responseCode)).append(" ");
+		httpResponse.append(HTTPUtil.getHTTPResponseMessage(responseCode));
+		httpResponse.append("\r\n");
+		StringBuffer response = new StringBuffer("HTTP/1.1 ");
+		response.append(httpResponse);
+		out.write(response.toString().getBytes());
+		if (!hasData)
+		{ // if no data will be sent, write the HTTP code
+			out.write("\r\n".getBytes());
+			out.write(httpResponse.toString().getBytes());
+		}
+	}
 }
