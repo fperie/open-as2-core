@@ -31,6 +31,7 @@ import org.bouncycastle.cms.CMSException;
 import org.bouncycastle.cms.RecipientId;
 import org.bouncycastle.cms.RecipientInformation;
 import org.bouncycastle.cms.SignerInformation;
+import org.bouncycastle.cms.jcajce.JceKeyTransRecipientId;
 import org.bouncycastle.jce.provider.BouncyCastleProvider;
 import org.bouncycastle.mail.smime.SMIMEEnveloped;
 import org.bouncycastle.mail.smime.SMIMEEnvelopedGenerator;
@@ -41,7 +42,9 @@ import org.bouncycastle.mail.smime.SMIMEUtil;
 import org.bouncycastle.util.encoders.Base64;
 import org.openas2.lib.util.IOUtil;
 
-public class BCCryptoHelper implements ICryptoHelper {
+public class BCCryptoHelper implements ICryptoHelper
+{
+	@Override
     public boolean isEncrypted(MimeBodyPart part) throws MessagingException {
         ContentType contentType = new ContentType(part.getContentType());
         String baseType = contentType.getBaseType().toLowerCase();
@@ -55,6 +58,7 @@ public class BCCryptoHelper implements ICryptoHelper {
         return false;
     }
 
+	@Override
     public boolean isSigned(MimeBodyPart part) throws MessagingException {
         ContentType contentType = new ContentType(part.getContentType());
         String baseType = contentType.getBaseType().toLowerCase();
@@ -62,6 +66,7 @@ public class BCCryptoHelper implements ICryptoHelper {
         return baseType.equalsIgnoreCase("multipart/signed");
     }
 
+	@Override
     public String calculateMIC(MimeBodyPart part, String digest, boolean includeHeaders)
             throws GeneralSecurityException, MessagingException, IOException {
         String micAlg = convertAlgorithm(digest, true);
@@ -99,6 +104,7 @@ public class BCCryptoHelper implements ICryptoHelper {
         return micResult.toString();
     }
 
+	@Override
     public MimeBodyPart decrypt(MimeBodyPart part, Certificate cert, Key key)
             throws GeneralSecurityException, MessagingException, CMSException, IOException,
             SMIMEException {
@@ -114,7 +120,7 @@ public class BCCryptoHelper implements ICryptoHelper {
         SMIMEEnveloped envelope = new SMIMEEnveloped(part);
 
         // Get the recipient object for decryption
-        RecipientId recId = new RecipientId();
+		RecipientId recId = new JceKeyTransRecipientId(x509Cert);
         recId.setSerialNumber(x509Cert.getSerialNumber());
         recId.setIssuer(x509Cert.getIssuerX500Principal().getEncoded());
 
@@ -130,9 +136,11 @@ public class BCCryptoHelper implements ICryptoHelper {
         return SMIMEUtil.toMimeBodyPart(decryptedData);
     }
 
+	@Override
     public void deinitialize() {
     }
 
+	@Override
     public MimeBodyPart encrypt(MimeBodyPart part, Certificate cert, String algorithm)
             throws GeneralSecurityException, SMIMEException {
         X509Certificate x509Cert = castCertificate(cert);
@@ -149,6 +157,7 @@ public class BCCryptoHelper implements ICryptoHelper {
         return encData;
     }
 
+	@Override
     public void initialize() {
         Security.addProvider(new BouncyCastleProvider());
 
@@ -166,6 +175,7 @@ public class BCCryptoHelper implements ICryptoHelper {
         CommandMap.setDefaultCommandMap(mc);
     }
 
+	@Override
     public MimeBodyPart sign(MimeBodyPart part, Certificate cert, Key key, String digest)
             throws GeneralSecurityException, SMIMEException, MessagingException {
         String signDigest = convertAlgorithm(digest, true);
@@ -186,6 +196,7 @@ public class BCCryptoHelper implements ICryptoHelper {
         return tmpBody;
     }
 
+	@Override
     public MimeBodyPart verify(MimeBodyPart part, Certificate cert)
             throws GeneralSecurityException, IOException, MessagingException, CMSException {
         // Make sure the data is signed
@@ -292,16 +303,19 @@ public class BCCryptoHelper implements ICryptoHelper {
         return bIn;
     }
 
+	@Override
     public KeyStore getKeyStore() throws KeyStoreException, NoSuchProviderException {
         return KeyStore.getInstance("PKCS12", "BC");
     }
 
+	@Override
     public KeyStore loadKeyStore(InputStream in, char[] password) throws Exception {
         KeyStore ks = getKeyStore();
         ks.load(in, password);
         return ks;
     }
 
+	@Override
     public KeyStore loadKeyStore(String filename, char[] password) throws Exception {
         FileInputStream fIn = new FileInputStream(filename);
 
