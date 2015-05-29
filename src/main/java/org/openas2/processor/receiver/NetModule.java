@@ -15,6 +15,7 @@ import org.openas2.message.InvalidMessageException;
 import org.openas2.message.Message;
 import org.openas2.params.CompositeParameters;
 import org.openas2.params.DateParameters;
+import org.openas2.params.InvalidParameterException;
 import org.openas2.params.MessageParameters;
 import org.openas2.util.IOUtilOld;
 
@@ -28,6 +29,7 @@ public abstract class NetModule extends BaseReceiverModule {
     
     private MainThread mainThread;
 
+	@Override
     public void doStart() throws OpenAS2Exception {
         try {
             mainThread = new MainThread(this, getParameter(PARAM_ADDRESS, false),
@@ -38,6 +40,7 @@ public abstract class NetModule extends BaseReceiverModule {
         }
     }
 
+	@Override
     public void doStop() throws OpenAS2Exception {
         if (mainThread != null) {
             mainThread.terminate();
@@ -45,10 +48,16 @@ public abstract class NetModule extends BaseReceiverModule {
         }
     }
 
+	@Override
     public void init(Session session, Map options) throws OpenAS2Exception {
         super.init(session, options);
-        getParameter(PARAM_PORT, true);
+		afterInit();
     }
+
+	protected void afterInit() throws InvalidParameterException
+	{
+		getParameter(PARAM_PORT, true);
+	}
 
 	public abstract NetModuleHandler getHandler();
 
@@ -109,6 +118,7 @@ public abstract class NetModule extends BaseReceiverModule {
             return socket;
         }
 
+		@Override
         public void run() {
             Socket s = getSocket();
 
@@ -169,6 +179,7 @@ public abstract class NetModule extends BaseReceiverModule {
             return terminated;
         }
 
+		@Override
         public void run() {
             while (!isTerminated()) {
                 try {
