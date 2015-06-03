@@ -9,5 +9,9 @@ Some code refactoring has been made to the original source code :
  - use a modern logging api : migration to SLF4J,
  - use the generics in list (java 5)
  - fix the potential null pointer exception
+ - use classpath: and ${} in as2 config file
+ - use the last version (1.46) bcmail api
+ - create a worker interface to execute a custom action to process as2 message,
+ - give the capability to implements it's own stream instead default socket (http request for example)
  - etc...
  
