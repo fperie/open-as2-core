@@ -8,7 +8,8 @@ import java.util.List;
 import java.util.Timer;
 import java.util.TimerTask;
 
-public class FileMonitor {
+public class FileMonitor
+{
     public List listeners;
     private Date lastModified;
     private File file;
@@ -16,90 +17,111 @@ public class FileMonitor {
     private boolean busy;
     private int interval;
 
-    public FileMonitor(File file, int interval) {
+	public FileMonitor(File file, int interval)
+	{
         super();
         this.file = file;
         this.interval = interval;
         start();
     }
 
-    public void setBusy(boolean busy) {
+	public void setBusy(boolean busy)
+	{
         this.busy = busy;
     }
 
-    public boolean isBusy() {
+	public boolean isBusy()
+	{
         return busy;
     }
 
-    public void setFile(File file) {
+	public void setFile(File file)
+	{
         this.file = file;
     }
 
-    public File getFile() {
+	public File getFile()
+	{
         return file;
     }
 
-    public String getFilename() {
-        if (getFile() != null) {
+	public String getFilename()
+	{
+		if (getFile() != null)
+		{
             return getFile().getAbsolutePath();
         }
 
         return null;
     }
 
-    public void setInterval(int interval) {
+	public void setInterval(int interval)
+	{
         this.interval = interval;
         restart();
     }
 
-    public int getInterval() {
+	public int getInterval()
+	{
         return interval;
     }
 
-    public void setLastModified(Date lastModified) {
+	public void setLastModified(Date lastModified)
+	{
         this.lastModified = lastModified;
     }
 
-    public Date getLastModified() {
+	public Date getLastModified()
+	{
         return lastModified;
     }
 
-    public void setListeners(List listeners) {
+	public void setListeners(List listeners)
+	{
         this.listeners = listeners;
     }
 
-    public List getListeners() {
-        if (listeners == null) {
+	public List getListeners()
+	{
+		if (listeners == null)
+		{
             listeners = new ArrayList();
         }
 
         return listeners;
     }
 
-    public void addListener(FileMonitorListener listener) {
+	public void addListener(FileMonitorListener listener)
+	{
         getListeners().add(listener);
     }
 
-    public void restart() {
+	public void restart()
+	{
         stop();
         start();
     }
 
-    public void start() {
+	public void start()
+	{
         timer = getTimer();
         timer.scheduleAtFixedRate(new TimerTick(), 0, getInterval() * 1000);
     }
 
-    public void stop() {
-        if (getTimer() != null) {
+	public void stop()
+	{
+		if (getTimer() != null)
+		{
             getTimer().cancel();
         }
     }
 
-    protected boolean isModified() {
+	protected boolean isModified()
+	{
         Date lastModified = getLastModified();
 
-        if (lastModified != null) {
+		if (lastModified != null)
+		{
             Date currentModified = new Date(getFile().lastModified());
 
             return !currentModified.equals(getLastModified());
@@ -108,40 +130,52 @@ public class FileMonitor {
         return false;
     }
 
-    protected Timer getTimer() {
-        if (timer == null) {
+	protected Timer getTimer()
+	{
+		if (timer == null)
+		{
             timer = new Timer(true);
         }
 
         return timer;
     }
 
-    protected void updateListeners() {
-        if (isModified()) {
+	protected void updateListeners()
+	{
+		if (isModified())
+		{
             updateModified();
             updateListeners(FileMonitorListener.EVENT_MODIFIED);
         }
     }
 
-    protected void updateListeners(int eventID) {
+	protected void updateListeners(int eventID)
+	{
         List listeners = getListeners();
 
-        for (Iterator it = listeners.iterator(); it.hasNext();) {
+		for (Iterator it = listeners.iterator(); it.hasNext();)
+		{
             ((FileMonitorListener) it.next()).handle(this, getFile(), eventID);
         }
     }
 
-    protected void updateModified() {
+	protected void updateModified()
+	{
         setLastModified(new Date(getFile().lastModified()));
     }
 
-    private class TimerTick extends TimerTask {
-        public void run() {
-            if (!isBusy()) {
+	private class TimerTick extends TimerTask
+	{
+		public void run()
+		{
+			if (!isBusy())
+			{
                 setBusy(true);
                 updateListeners();
                 setBusy(false);
-            } else {
+			}
+			else
+			{
                 updateListeners(FileMonitorListener.EVENT_MISSED_TICK);
             }
         }

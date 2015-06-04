@@ -23,7 +23,7 @@ public abstract class BaseCommand extends BaseComponent implements Command
 		{
 			setName(getDefaultName());
 		}
-		;
+
 		if (getDescription() == null)
 		{
 			setDescription(getDefaultDescription());

@@ -12,30 +12,43 @@ import org.openas2.cert.AliasedCertificateFactory;
 import org.openas2.cmd.CommandResult;
 import org.openas2.util.ByteCoder;
 
-public class ImportCertInEncodedStreamCommand extends AliasedCertCommand {
-	public String getDefaultDescription() {
+public class ImportCertInEncodedStreamCommand extends AliasedCertCommand
+{
+	@Override
+	public String getDefaultDescription()
+	{
 		return "Import a certificate into the current certificate store using an encoded byte stream";
 	}
 
-	public String getDefaultName() {
+	@Override
+	public String getDefaultName()
+	{
 		return "importbystream";
 	}
 
-	public String getDefaultUsage() {
+	@Override
+	public String getDefaultUsage()
+	{
 		return "importbybstream <alias> <encodedCertificateStream>";
 	}
 
-	public CommandResult execute(AliasedCertificateFactory certFx,
-			Object[] params) throws OpenAS2Exception {
-		if (params.length != 2) {
+	@Override
+	public CommandResult execute(AliasedCertificateFactory certFx, Object[] params) throws OpenAS2Exception
+	{
+		if (params.length != 2)
+		{
 			return new CommandResult(CommandResult.TYPE_INVALID_PARAM_COUNT,
 					getUsage());
 		}
 
-		synchronized (certFx) {
-			try {
+		synchronized (certFx)
+		{
+			try
+			{
 				return importCert(certFx, params[0].toString(), params[1].toString());
-			} catch (Exception e) {
+			}
+			catch (Exception e)
+			{
 				throw new WrappedException(e);
 			}
 		}
@@ -43,8 +56,8 @@ public class ImportCertInEncodedStreamCommand extends AliasedCertCommand {
 
 	protected CommandResult importCert(AliasedCertificateFactory certFx,
 			String alias, String encodedCert) throws IOException,
-			CertificateException, OpenAS2Exception {
-		
+			CertificateException, OpenAS2Exception
+	{
 		ByteArrayInputStream bais = new ByteArrayInputStream(ByteCoder.decode(encodedCert).getBytes());
 		
 		java.security.cert.CertificateFactory cf = java.security.cert.CertificateFactory
@@ -53,10 +66,12 @@ public class ImportCertInEncodedStreamCommand extends AliasedCertCommand {
 		CommandResult cmdRes = new CommandResult(CommandResult.TYPE_OK,
 				"Certificate(s) imported successfully");
 
-		while (bais.available() > 0) {
+		while (bais.available() > 0)
+		{
 			Certificate cert = cf.generateCertificate(bais);
 
-			if (cert instanceof X509Certificate) {
+			if (cert instanceof X509Certificate)
+			{
 				certFx.addCertificate(alias, (X509Certificate) cert, true);
 				cmdRes.getResults().add(
 						"Imported certificate: " + cert.toString());
@@ -68,6 +83,4 @@ public class ImportCertInEncodedStreamCommand extends AliasedCertCommand {
 		return new CommandResult(CommandResult.TYPE_ERROR,
 				"No valid X509 certificates found");
 	}
-
-
 }

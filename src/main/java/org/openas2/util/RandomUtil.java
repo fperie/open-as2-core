@@ -3,11 +3,14 @@ package org.openas2.util;
 import java.util.Random;
 
 
-public class RandomUtil {
+public class RandomUtil
+{
     private static Random rndGen;
 
-    public static synchronized Random getRandomGenerator() {
-        if (rndGen == null) {
+	public static synchronized Random getRandomGenerator()
+	{
+		if (rndGen == null)
+		{
             rndGen = new Random();
         }
 

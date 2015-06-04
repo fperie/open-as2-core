@@ -2,39 +2,53 @@ package org.openas2.processor.sender;
 
 import org.openas2.OpenAS2Exception;
 
-public class HttpResponseException extends OpenAS2Exception {
-    private String message;
-    private String url;
-    private int code;
+public class HttpResponseException extends OpenAS2Exception
+{
+	/** Version of serialization. */
+	private static final long serialVersionUID = 1L;
 
-    public HttpResponseException(String url, int code, String message) {
-        super("Http Response from " + url + ": " + Integer.toString(code) + " - " + message);
-        this.code = code;
-        this.message = message;
-        this.url = url;
-    }
+	private String message;
 
-    public void setCode(int code) {
-        this.code = code;
-    }
+	private String url;
 
-    public int getCode() {
-        return code;
-    }
+	private int code;
 
-    public void setMessage(String message) {
-        this.message = message;
-    }
+	public HttpResponseException(String url, int code, String message)
+	{
+		super("Http Response from " + url + ": " + Integer.toString(code) + " - " + message);
+		this.code = code;
+		this.message = message;
+		this.url = url;
+	}
 
-    public String getMessage() {
-        return message;
-    }
+	public void setCode(int code)
+	{
+		this.code = code;
+	}
 
-    public void setUrl(String url) {
-        this.url = url;
-    }
+	public int getCode()
+	{
+		return code;
+	}
 
-    public String getUrl() {
-        return url;
-    }
+	public void setMessage(String message)
+	{
+		this.message = message;
+	}
+
+	@Override
+	public String getMessage()
+	{
+		return message;
+	}
+
+	public void setUrl(String url)
+	{
+		this.url = url;
+	}
+
+	public String getUrl()
+	{
+		return url;
+	}
 }

@@ -8,7 +8,8 @@ import org.openas2.OpenAS2Exception;
 import org.openas2.message.Message;
 import org.openas2.message.MessageMDN;
 
-public interface CertificateFactory extends Component {
+public interface CertificateFactory extends Component
+{
 	public static final String COMPID_CERTIFICATE_FACTORY = "certificatefactory";
 	
 	public X509Certificate getCertificate(Message msg, String partnershipType) throws OpenAS2Exception;

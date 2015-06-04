@@ -16,38 +16,53 @@ import org.openas2.cert.AliasedCertificateFactory;
 import org.openas2.cmd.CommandResult;
 import org.openas2.util.AS2UtilOld;
 
-public class ImportCertCommand extends AliasedCertCommand {
-	public String getDefaultDescription() {
+public class ImportCertCommand extends AliasedCertCommand
+{
+	@Override
+	public String getDefaultDescription()
+	{
 		return "Import a certificate into the current certificate store";
 	}
 
-	public String getDefaultName() {
+	@Override
+	public String getDefaultName()
+	{
 		return "import";
 	}
 
-	public String getDefaultUsage() {
+	@Override
+	public String getDefaultUsage()
+	{
 		return "import <alias> <filename> [<password>]";
 	}
 
+	@Override
 	public CommandResult execute(AliasedCertificateFactory certFx,
-			Object[] params) throws OpenAS2Exception {
-		if (params.length < 2) {
+			Object[] params) throws OpenAS2Exception
+	{
+		if (params.length < 2)
+		{
 			return new CommandResult(CommandResult.TYPE_INVALID_PARAM_COUNT,
 					getUsage());
 		}
 
-		synchronized (certFx) {
+		synchronized (certFx)
+		{
 			String alias = params[0].toString();
 			String filename = params[1].toString();
 			String password = null;
 
-			if (params.length > 2) {
+			if (params.length > 2)
+			{
 				password = params[2].toString();
 			}
 
-			try {
-				if (filename.endsWith(".p12")) {
-					if (password == null) {
+			try
+			{
+				if (filename.endsWith(".p12"))
+				{
+					if (password == null)
+					{
 						return new CommandResult(
 								CommandResult.TYPE_INVALID_PARAM_COUNT,
 								getUsage()
@@ -57,7 +72,9 @@ public class ImportCertCommand extends AliasedCertCommand {
 					return importPrivateKey(certFx, alias, filename, password);
 				}
 				return importCert(certFx, alias, filename);
-			} catch (Exception e) {
+			}
+			catch (Exception e)
+			{
 				throw new WrappedException(e);
 			}
 		}

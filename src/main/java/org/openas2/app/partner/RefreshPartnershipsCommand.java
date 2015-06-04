@@ -11,39 +11,51 @@ import org.openas2.partner.RefreshablePartnershipFactory;
  * 
  *
  */
-public class RefreshPartnershipsCommand extends BaseCommand {
-	public String getDefaultDescription() {
+public class RefreshPartnershipsCommand extends BaseCommand
+{
+	@Override
+	public String getDefaultDescription()
+	{
 		return "Refresh the current partnerships from storage";
 	}
 
-	public String getDefaultName() {
+	@Override
+	public String getDefaultName()
+	{
 		return "refresh";
 	}
 
-	public String getDefaultUsage() {
+	@Override
+	public String getDefaultUsage()
+	{
 		return "refresh";
 	}
 
-	public CommandResult execute(Object[] params) {
-		try {
+	@Override
+	public CommandResult execute(Object[] params)
+	{
+		try
+		{
 			PartnershipFactory partnerFx = getSession().getPartnershipFactory();
 
-			synchronized (partnerFx) {
-
-				if (partnerFx instanceof RefreshablePartnershipFactory) {
+			synchronized (partnerFx)
+			{
+				if (partnerFx instanceof RefreshablePartnershipFactory)
+				{
 					((RefreshablePartnershipFactory) partnerFx).refresh();
-
 					return new CommandResult(CommandResult.TYPE_OK,
 							"Refreshed partnerships");
 				}
+
 				return new CommandResult(
 						CommandResult.TYPE_COMMAND_NOT_SUPPORTED,
 						"Not supported by current certificate store");
 			}
 
-		} catch (OpenAS2Exception oae) {
+		}
+		catch (OpenAS2Exception oae)
+		{
 			oae.terminate();
-
 			return new CommandResult(oae);
 		}
 	}

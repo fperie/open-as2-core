@@ -6,78 +6,107 @@ import java.io.StringWriter;
 import org.openas2.OpenAS2Exception;
 import org.openas2.WrappedException;
 
-public class ExceptionParameters extends ParameterParser {
-    public static final String KEY_NAME = "name";
-    public static final String KEY_MESSAGE = "message";
-    public static final String KEY_TRACE = "trace";
-    public static final String KEY_TERMINATED = "terminated";
-    private OpenAS2Exception target;
-    private boolean terminated;
+public class ExceptionParameters extends ParameterParser
+{
+	public static final String KEY_NAME = "name";
 
-    public ExceptionParameters(OpenAS2Exception target, boolean terminated) {
-        super();
-        this.target = target;
-        this.terminated = terminated;
-    }
+	public static final String KEY_MESSAGE = "message";
 
-    public void setParameter(String key, String value) throws InvalidParameterException {
-        if (key == null) {
-            throw new InvalidParameterException("Invalid key", this, key, value);
-        }
+	public static final String KEY_TRACE = "trace";
 
-        if (key.equals(KEY_NAME) || key.equals(KEY_MESSAGE) || key.equals(KEY_TRACE) || key.equals(KEY_TERMINATED)) {
-            throw new InvalidParameterException("Parameter is read-only", this, key, value);
-        }
-        throw new InvalidParameterException("Invalid key", this, key, value);
-    }
+	public static final String KEY_TERMINATED = "terminated";
 
-    public String getParameter(String key) throws InvalidParameterException {
-        if (key == null) {
-            throw new InvalidParameterException("Invalid key", this, key, null);
-        }
+	private OpenAS2Exception target;
 
-        OpenAS2Exception target = getTarget();
-        Exception unwrappedTarget;
+	private boolean terminated;
 
-        if (target instanceof WrappedException) {
-            unwrappedTarget = ((WrappedException) target).getSource();
+	public ExceptionParameters(OpenAS2Exception target, boolean terminated)
+	{
+		super();
+		this.target = target;
+		this.terminated = terminated;
+	}
 
-            if (unwrappedTarget == null) {
-                unwrappedTarget = target;
-            }
-        } else {
-            unwrappedTarget = target;
-        }
+	public void setParameter(String key, String value) throws InvalidParameterException
+	{
+		if (key == null)
+		{
+			throw new InvalidParameterException("Invalid key", this, key, value);
+		}
 
-        if (key.equals(KEY_NAME)) {
-            return unwrappedTarget.getClass().getName();
-        } else if (key.equals(KEY_MESSAGE)) {
-            return unwrappedTarget.getMessage();
-        } else if (key.equals(KEY_TRACE)) {
-            StringWriter sw = new StringWriter();
-            PrintWriter pw = new PrintWriter(sw);
-            target.printStackTrace(pw);
+		if (key.equals(KEY_NAME) || key.equals(KEY_MESSAGE) || key.equals(KEY_TRACE) || key.equals(KEY_TERMINATED))
+		{
+			throw new InvalidParameterException("Parameter is read-only", this, key, value);
+		}
+		throw new InvalidParameterException("Invalid key", this, key, value);
+	}
 
-            return sw.toString();
-        } else if (key.equals(KEY_TERMINATED)) {
-            if (isTerminated()) {
-                return "terminated";
-            }
-            return "";
-        } else {
-            throw new InvalidParameterException("Invalid key", this, key, null);
-        }
-    }
+	public String getParameter(String key) throws InvalidParameterException
+	{
+		if (key == null)
+		{
+			throw new InvalidParameterException("Invalid key", this, key, null);
+		}
 
-    public void setTarget(OpenAS2Exception target) {
-        this.target = target;
-    }
+		OpenAS2Exception target = getTarget();
+		Exception unwrappedTarget;
 
-    public OpenAS2Exception getTarget() {
-        return target;
-    }
+		if (target instanceof WrappedException)
+		{
+			unwrappedTarget = ((WrappedException)target).getSource();
 
-    public boolean isTerminated() {
-        return terminated;
-    }
+			if (unwrappedTarget == null)
+			{
+				unwrappedTarget = target;
+			}
+		}
+		else
+		{
+			unwrappedTarget = target;
+		}
+
+		if (key.equals(KEY_NAME))
+		{
+			return unwrappedTarget.getClass().getName();
+		}
+		else if (key.equals(KEY_MESSAGE))
+		{
+			return unwrappedTarget.getMessage();
+		}
+		else if (key.equals(KEY_TRACE))
+		{
+			StringWriter sw = new StringWriter();
+			PrintWriter pw = new PrintWriter(sw);
+			target.printStackTrace(pw);
+
+			return sw.toString();
+		}
+		else if (key.equals(KEY_TERMINATED))
+		{
+			if (isTerminated())
+			{
+				return "terminated";
+			}
+			return "";
+		}
+		else
+		{
+			throw new InvalidParameterException("Invalid key", this, key, null);
+		}
+	}
+
+	public void setTarget(OpenAS2Exception target)
+	{
+		this.target = target;
+	}
+
+	public OpenAS2Exception getTarget()
+	{
+		return target;
+	}
+
+	public boolean isTerminated()
+	{
+		return terminated;
+	}
 }

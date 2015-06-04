@@ -18,34 +18,49 @@ import org.w3c.dom.Element;
  * @author joseph mcverry
  * 
  */
-public class AddPartnerCommand extends AliasedPartnershipsCommand {
-	public String getDefaultDescription() {
+public class AddPartnerCommand extends AliasedPartnershipsCommand
+{
+	@Override
+	public String getDefaultDescription()
+	{
 		return "Add a new partner to partnership store.";
 	}
 
-	public String getDefaultName() {
+	@Override
+	public String getDefaultName()
+	{
 		return "add";
 	}
 
-	public String getDefaultUsage() {
+	@Override
+	public String getDefaultUsage()
+	{
 		return "add name <attribute 1=value 1> <attribute 2=value 2> ... <attribute n=value n>";
 	}
 
+	@Override
 	public CommandResult execute(PartnershipFactory partFx, Object[] params)
-			throws OpenAS2Exception {
-		if (params.length < 1) {
+			throws OpenAS2Exception
+	{
+		if (params.length < 1)
+		{
 			return new CommandResult(CommandResult.TYPE_INVALID_PARAM_COUNT,
 					getUsage());
 		}
 
-		synchronized (partFx) {
-
+		synchronized (partFx)
+		{
 			DocumentBuilder db = null;
-			try {
+			try
+			{
 				db = DocumentBuilderFactory.newInstance().newDocumentBuilder();
-			} catch (ParserConfigurationException e) {
+			}
+			catch (ParserConfigurationException e)
+			{
 				throw new OpenAS2Exception(e);
-			} catch (FactoryConfigurationError e) {
+			}
+			catch (FactoryConfigurationError e)
+			{
 				throw new OpenAS2Exception(e);
 			}
 
@@ -54,22 +69,29 @@ public class AddPartnerCommand extends AliasedPartnershipsCommand {
 			Element root = doc.createElement("partner");
 			doc.appendChild(root);
 
-			for (int i = 0; i < params.length; i++) {
+			for (int i = 0; i < params.length; i++)
+			{
 				String param = (String) params[i];
 				int pos = param.indexOf('=');
-				if (i == 0) {
+				if (i == 0)
+				{
 					root.setAttribute("name", param);
-				} else if (pos == 0) {
+				}
+				else if (pos == 0)
+				{
 					return new CommandResult(CommandResult.TYPE_ERROR,
 							"incoming parameter missing name");
-				} else if (pos > 0) {
+				}
+				else if (pos > 0)
+				{
 					root.setAttribute(param.substring(0, pos), param
 							.substring(pos + 1));
-
-				} else
+				}
+				else
+				{
 					return new CommandResult(CommandResult.TYPE_ERROR,
 							"incoming parameter missing value");
-
+				}
 			}
 
 			((XMLPartnershipFactory) partFx).loadPartner(partFx.getPartners(),
@@ -77,6 +99,5 @@ public class AddPartnerCommand extends AliasedPartnershipsCommand {
 
 			return new CommandResult(CommandResult.TYPE_OK);
 		}
-
 	}
 }

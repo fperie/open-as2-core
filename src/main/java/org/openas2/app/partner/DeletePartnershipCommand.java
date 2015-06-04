@@ -12,34 +12,47 @@ import org.openas2.partner.PartnershipFactory;
  * @author joseph mcverry
  *
  */
-public class DeletePartnershipCommand extends AliasedPartnershipsCommand {
-	public String getDefaultDescription() {
+public class DeletePartnershipCommand extends AliasedPartnershipsCommand
+{
+	@Override
+	public String getDefaultDescription()
+	{
 		return "Delete the partnership associated with an name.";
 	}
 
-	public String getDefaultName() {
+	@Override
+	public String getDefaultName()
+	{
 		return "delete";
 	}
 
-	public String getDefaultUsage() {
+	@Override
+	public String getDefaultUsage()
+	{
 		return "delete <name>";
 	}
 
+	@Override
 	public CommandResult execute(PartnershipFactory partFx, Object[] params)
-			throws OpenAS2Exception {
-		if (params.length < 1) {
+			throws OpenAS2Exception
+	{
+		if (params.length < 1)
+		{
 			return new CommandResult(CommandResult.TYPE_INVALID_PARAM_COUNT,
 					getUsage());
 		}
 
-		synchronized (partFx) {
+		synchronized (partFx)
+		{
 
 			String name = params[0].toString();
 			Iterator parts = partFx.getPartnerships().iterator();
 
-			while (parts.hasNext()) {
+			while (parts.hasNext())
+			{
 				Partnership part = (Partnership) parts.next();
-				if (part.getName().equals(name)) {
+				if (part.getName().equals(name))
+				{
 					partFx.getPartnerships().remove(part);
 					return new CommandResult(CommandResult.TYPE_OK, "deleted "
 							+ name);

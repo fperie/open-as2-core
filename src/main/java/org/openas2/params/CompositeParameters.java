@@ -1,99 +1,121 @@
 package org.openas2.params;
 
-
 import java.util.HashMap;
 import java.util.Map;
 import java.util.StringTokenizer;
 
+public class CompositeParameters extends ParameterParser
+{
+	private Map parameterParsers;
 
-public class CompositeParameters extends ParameterParser {
-    private Map parameterParsers;
-    private boolean ignoreMissingParsers;
+	private boolean ignoreMissingParsers;
 
-    public CompositeParameters(boolean ignoreMissingParsers) {
-        super();
-        this.ignoreMissingParsers = ignoreMissingParsers;
-    }
+	public CompositeParameters(boolean ignoreMissingParsers)
+	{
+		super();
+		this.ignoreMissingParsers = ignoreMissingParsers;
+	}
 
-    public CompositeParameters(boolean ignoreMissingParsers, Map parameterParsers) {
-        super();
-        this.ignoreMissingParsers = ignoreMissingParsers;
-        getParameterParsers().putAll(parameterParsers);
-    }
-    
-    public CompositeParameters add(String key, ParameterParser param) {
-    	getParameterParsers().put(key, param);
-    	return this;
-    }
+	public CompositeParameters(boolean ignoreMissingParsers, Map parameterParsers)
+	{
+		super();
+		this.ignoreMissingParsers = ignoreMissingParsers;
+		getParameterParsers().putAll(parameterParsers);
+	}
 
-    public void setIgnoreMissingParsers(boolean ignoreMissingParsers) {
-        this.ignoreMissingParsers = ignoreMissingParsers;
-    }
+	public CompositeParameters add(String key, ParameterParser param)
+	{
+		getParameterParsers().put(key, param);
+		return this;
+	}
 
-    public boolean getIgnoreMissingParsers() {
-        return ignoreMissingParsers;
-    }
+	public void setIgnoreMissingParsers(boolean ignoreMissingParsers)
+	{
+		this.ignoreMissingParsers = ignoreMissingParsers;
+	}
 
-    public void setParameter(String key, String value)
-        throws InvalidParameterException {
-        StringTokenizer keyParts = new StringTokenizer(key, ".", false);
+	public boolean getIgnoreMissingParsers()
+	{
+		return ignoreMissingParsers;
+	}
 
-        keyParts.nextToken();
-        ParameterParser parser = (ParameterParser) getParameterParsers().get(keyParts);
+	public void setParameter(String key, String value)
+			throws InvalidParameterException
+	{
+		StringTokenizer keyParts = new StringTokenizer(key, ".", false);
 
-        if (parser != null) {
-            if (!keyParts.hasMoreTokens()) {
-                throw new InvalidParameterException("Invalid key format", this, key, null);
-            }
+		keyParts.nextToken();
+		ParameterParser parser = (ParameterParser)getParameterParsers().get(keyParts);
 
-            StringBuffer keyBuf = new StringBuffer(keyParts.nextToken());
+		if (parser != null)
+		{
+			if (!keyParts.hasMoreTokens())
+			{
+				throw new InvalidParameterException("Invalid key format", this, key, null);
+			}
 
-            while (keyParts.hasMoreTokens()) {
-                keyBuf.append(".");
-                keyBuf.append(keyParts.nextToken());
-            }
+			StringBuffer keyBuf = new StringBuffer(keyParts.nextToken());
 
-            parser.setParameter(keyBuf.toString(), value);
-        } else if (!getIgnoreMissingParsers()) {
-            throw new InvalidParameterException("Invalid area in key", this, key, value);
-        }
-    }
+			while (keyParts.hasMoreTokens())
+			{
+				keyBuf.append(".");
+				keyBuf.append(keyParts.nextToken());
+			}
 
-    public String getParameter(String key) throws InvalidParameterException {
-        StringTokenizer keyParts = new StringTokenizer(key, ".", false);
+			parser.setParameter(keyBuf.toString(), value);
+		}
+		else if (!getIgnoreMissingParsers())
+		{
+			throw new InvalidParameterException("Invalid area in key", this, key, value);
+		}
+	}
 
-        String parserID = keyParts.nextToken();
-        ParameterParser parser = (ParameterParser) getParameterParsers().get(parserID);
+	public String getParameter(String key) throws InvalidParameterException
+	{
+		StringTokenizer keyParts = new StringTokenizer(key, ".", false);
 
-        if (parser != null) {
-            if (!keyParts.hasMoreTokens()) {
-                throw new InvalidParameterException("Invalid key format", this, key, null);
-            }
+		String parserID = keyParts.nextToken();
+		ParameterParser parser = (ParameterParser)getParameterParsers().get(parserID);
 
-            StringBuffer keyBuf = new StringBuffer(keyParts.nextToken());
+		if (parser != null)
+		{
+			if (!keyParts.hasMoreTokens())
+			{
+				throw new InvalidParameterException("Invalid key format", this, key, null);
+			}
 
-            while (keyParts.hasMoreTokens()) {
-                keyBuf.append(".");
-                keyBuf.append(keyParts.nextToken());
-            }
+			StringBuffer keyBuf = new StringBuffer(keyParts.nextToken());
 
-            return parser.getParameter(keyBuf.toString());
-        } else if (!getIgnoreMissingParsers()) {
-            throw new InvalidParameterException("Invalid area in key", this, key, null);
-        } else {
-            return "";
-        }
-    }
+			while (keyParts.hasMoreTokens())
+			{
+				keyBuf.append(".");
+				keyBuf.append(keyParts.nextToken());
+			}
 
-    public void setParameterParsers(Map parameterParsers) {
-        this.parameterParsers = parameterParsers;
-    }
+			return parser.getParameter(keyBuf.toString());
+		}
+		else if (!getIgnoreMissingParsers())
+		{
+			throw new InvalidParameterException("Invalid area in key", this, key, null);
+		}
+		else
+		{
+			return "";
+		}
+	}
 
-    protected Map getParameterParsers() {
-        if (parameterParsers == null) {
-            parameterParsers = new HashMap();
-        }
+	public void setParameterParsers(Map parameterParsers)
+	{
+		this.parameterParsers = parameterParsers;
+	}
 
-        return parameterParsers;
-    }
+	protected Map getParameterParsers()
+	{
+		if (parameterParsers == null)
+		{
+			parameterParsers = new HashMap();
+		}
+
+		return parameterParsers;
+	}
 }

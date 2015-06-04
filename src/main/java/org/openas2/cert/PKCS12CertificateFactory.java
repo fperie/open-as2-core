@@ -20,7 +20,6 @@ import java.util.Map;
 import org.openas2.OpenAS2Exception;
 import org.openas2.Session;
 import org.openas2.WrappedException;
-import org.openas2.app.OpenAS2Server;
 import org.openas2.message.Message;
 import org.openas2.message.MessageMDN;
 import org.openas2.params.InvalidParameterException;
@@ -34,7 +33,8 @@ import org.slf4j.LoggerFactory;
 
 public class PKCS12CertificateFactory extends BaseCertificateFactory implements
         AliasedCertificateFactory, KeyStoreCertificateFactory, StorableCertificateFactory,
-        FileMonitorListener {
+		FileMonitorListener
+{
     public static final String PARAM_FILENAME = "filename";
     public static final String PARAM_PASSWORD = "password";
     public static final String PARAM_INTERVAL = "interval";
@@ -45,91 +45,119 @@ public class PKCS12CertificateFactory extends BaseCertificateFactory implements
     private FileMonitor fileMonitor;
     private KeyStore keyStore;
 
-    public String getAlias(Partnership partnership, String partnershipType) throws OpenAS2Exception {
+	public String getAlias(Partnership partnership, String partnershipType) throws OpenAS2Exception
+	{
         String alias = null;
 
-        if (partnershipType == Partnership.PTYPE_RECEIVER) {
+		if (partnershipType == Partnership.PTYPE_RECEIVER)
+		{
             alias = partnership.getReceiverID(SecurePartnership.PID_X509_ALIAS);
-        } else if (partnershipType == Partnership.PTYPE_SENDER) {
+		}
+		else if (partnershipType == Partnership.PTYPE_SENDER)
+		{
             alias = partnership.getSenderID(SecurePartnership.PID_X509_ALIAS);
         }
 
-        if (alias == null) {
+		if (alias == null)
+		{
             throw new CertificateNotFoundException(partnershipType, null);
         }
 
         return alias;
     }
 
-    public X509Certificate getCertificate(String alias) throws OpenAS2Exception {
-        try {
+	public X509Certificate getCertificate(String alias) throws OpenAS2Exception
+	{
+		try
+		{
             KeyStore ks = getKeyStore();
             X509Certificate cert = (X509Certificate) ks.getCertificate(alias);
 
-            if (cert == null) {
+			if (cert == null)
+			{
                 throw new CertificateNotFoundException(null, alias);
             }
 
             return cert;
-        } catch (KeyStoreException kse) {
+		}
+		catch (KeyStoreException kse)
+		{
             throw new WrappedException(kse);
         }
     }
 
     public X509Certificate getCertificate(Message msg, String partnershipType)
-            throws OpenAS2Exception {
-        try {
+			throws OpenAS2Exception
+	{
+		try
+		{
             return getCertificate(getAlias(msg.getPartnership(), partnershipType));
-        } catch (CertificateNotFoundException cnfe) {
+		}
+		catch (CertificateNotFoundException cnfe)
+		{
             cnfe.setPartnershipType(partnershipType);
             throw cnfe;
         }
     }
 
     public X509Certificate getCertificate(MessageMDN mdn, String partnershipType)
-            throws OpenAS2Exception {
-        try {
+			throws OpenAS2Exception
+	{
+		try
+		{
             return getCertificate(getAlias(mdn.getPartnership(), partnershipType));
-        } catch (CertificateNotFoundException cnfe) {
+		}
+		catch (CertificateNotFoundException cnfe)
+		{
             cnfe.setPartnershipType(partnershipType);
             throw cnfe;
         }
     }
 
-    public Map getCertificates() throws OpenAS2Exception {
+	public Map getCertificates() throws OpenAS2Exception
+	{
         KeyStore ks = getKeyStore();
 
-        try {
+		try
+		{
             Map certs = new HashMap();
             String certAlias;
 
             Enumeration e = ks.aliases();
 
-            while (e.hasMoreElements()) {
+			while (e.hasMoreElements())
+			{
                 certAlias = (String) e.nextElement();
                 certs.put(certAlias, ks.getCertificate(certAlias));
             }
 
             return certs;
-        } catch (GeneralSecurityException gse) {
+		}
+		catch (GeneralSecurityException gse)
+		{
             throw new WrappedException(gse);
         }
     }
 
-    public void setFileMonitor(FileMonitor fileMonitor) {
+	public void setFileMonitor(FileMonitor fileMonitor)
+	{
         this.fileMonitor = fileMonitor;
     }
 
-    public FileMonitor getFileMonitor() throws InvalidParameterException {
+	public FileMonitor getFileMonitor() throws InvalidParameterException
+	{
         boolean createMonitor = ((fileMonitor == null) && (getParameter(PARAM_INTERVAL, false) != null));
 
-        if (!createMonitor && fileMonitor != null) {
+		if (!createMonitor && fileMonitor != null)
+		{
             String filename = fileMonitor.getFilename();
             createMonitor = ((filename != null) && !filename.equals(getFilename()));
         }
 
-        if (createMonitor) {
-            if (fileMonitor != null) {
+		if (createMonitor)
+		{
+			if (fileMonitor != null)
+			{
                 fileMonitor.stop();
             }
 
@@ -142,82 +170,104 @@ public class PKCS12CertificateFactory extends BaseCertificateFactory implements
         return fileMonitor;
     }
 
-    public void setFilename(String filename) {
+	public void setFilename(String filename)
+	{
         getParameters().put(PARAM_FILENAME, filename);
     }
 
-    public String getFilename() throws InvalidParameterException {
+	public String getFilename() throws InvalidParameterException
+	{
         return getParameter(PARAM_FILENAME, true);
     }
 
-    public void setKeyStore(KeyStore keyStore) {
+	public void setKeyStore(KeyStore keyStore)
+	{
         this.keyStore = keyStore;
     }
 
-    public KeyStore getKeyStore() {
+	public KeyStore getKeyStore()
+	{
         return keyStore;
     }
 
-    public void setPassword(char[] password) {
+	public void setPassword(char[] password)
+	{
         getParameters().put(PARAM_PASSWORD, new String(password));
     }
 
-    public char[] getPassword() throws InvalidParameterException {
+	public char[] getPassword() throws InvalidParameterException
+	{
         return getParameter(PARAM_PASSWORD, true).toCharArray();
     }
 
-    public PrivateKey getPrivateKey(X509Certificate cert) throws OpenAS2Exception {
+	public PrivateKey getPrivateKey(X509Certificate cert) throws OpenAS2Exception
+	{
         KeyStore ks = getKeyStore();
         String alias = null;
 
-        try {
+		try
+		{
             alias = ks.getCertificateAlias(cert);
 
-            if (alias == null) {
+			if (alias == null)
+			{
                 throw new KeyNotFoundException(cert, null);
             }
 
             PrivateKey key = (PrivateKey) ks.getKey(alias, getPassword());
 
-            if (key == null) {
+			if (key == null)
+			{
                 throw new KeyNotFoundException(cert, null);
             }
 
             return key;
-        } catch (GeneralSecurityException e) {
+		}
+		catch (GeneralSecurityException e)
+		{
             throw new KeyNotFoundException(cert, alias, e);
         }
     }
 
-    public PrivateKey getPrivateKey(Message msg, X509Certificate cert) throws OpenAS2Exception {
+	public PrivateKey getPrivateKey(Message msg, X509Certificate cert) throws OpenAS2Exception
+	{
         return getPrivateKey(cert);
     }
 
-    public PrivateKey getPrivateKey(MessageMDN mdn, X509Certificate cert) throws OpenAS2Exception {
+	public PrivateKey getPrivateKey(MessageMDN mdn, X509Certificate cert) throws OpenAS2Exception
+	{
         return getPrivateKey(cert);
     }
 
     public void addCertificate(String alias, X509Certificate cert, boolean overwrite)
-            throws OpenAS2Exception {
+			throws OpenAS2Exception
+	{
         KeyStore ks = getKeyStore();
 
-        try {
-            if (ks.containsAlias(alias) && !overwrite) {
+		try
+		{
+			if (ks.containsAlias(alias) && !overwrite)
+			{
                 throw new CertificateExistsException(alias);
             }
 
             ks.setCertificateEntry(alias, cert);
             save(getFilename(), getPassword());
-        } catch (GeneralSecurityException gse) {
+		}
+		catch (GeneralSecurityException gse)
+		{
             throw new WrappedException(gse);
         }
     }
 
-    public void addPrivateKey(String alias, Key key, String password) throws OpenAS2Exception {
+	public void addPrivateKey(String alias, Key key, String password) throws OpenAS2Exception
+	{
         KeyStore ks = getKeyStore();
 
-        try {
-            if (!ks.containsAlias(alias)) {
+		try
+		{
+			if (!ks.containsAlias(alias))
+			{
                 throw new CertificateNotFoundException(null, alias);
             }
 
@@ -225,30 +275,39 @@ public class PKCS12CertificateFactory extends BaseCertificateFactory implements
             ks.setKeyEntry(alias, key, password.toCharArray(), certChain);
 
             save(getFilename(), getPassword());
-        } catch (GeneralSecurityException gse) {
+		}
+		catch (GeneralSecurityException gse)
+		{
             throw new WrappedException(gse);
         }
     }
 
-    public void clearCertificates() throws OpenAS2Exception {
+	public void clearCertificates() throws OpenAS2Exception
+	{
         KeyStore ks = getKeyStore();
 
-        try {
+		try
+		{
             Enumeration aliases = ks.aliases();
 
-            while (aliases.hasMoreElements()) {
+			while (aliases.hasMoreElements())
+			{
                 ks.deleteEntry((String) aliases.nextElement());
             }
 
             save(getFilename(), getPassword());
-        } catch (GeneralSecurityException gse) {
+		}
+		catch (GeneralSecurityException gse)
+		{
             throw new WrappedException(gse);
         }
     }
 
-    public void handle(FileMonitor monitor, File file, int eventID) {
-        switch (eventID) {
-        case FileMonitorListener.EVENT_MODIFIED:
+	public void handle(FileMonitor monitor, File file, int eventID)
+	{
+		switch (eventID)
+		{
+			case FileMonitorListener.EVENT_MODIFIED:
 
             try 
             {
@@ -264,103 +323,140 @@ public class PKCS12CertificateFactory extends BaseCertificateFactory implements
         }
     }
 
-    public void init(Session session, Map options) throws OpenAS2Exception {
+	public void init(Session session, Map options) throws OpenAS2Exception
+	{
         super.init(session, options);
 
-        try {
+		try
+		{
             this.keyStore = AS2UtilOld.getCryptoHelper().getKeyStore();
-        } catch (Exception e) {
+		}
+		catch (Exception e)
+		{
             throw new WrappedException(e);
         }
 
         load(getFilename(), getPassword());
     }
 
-    public void load(String filename, char[] password) throws OpenAS2Exception {
-        try {
+	public void load(String filename, char[] password) throws OpenAS2Exception
+	{
+		try
+		{
             FileInputStream fIn = new FileInputStream(filename);
 
             load(fIn, password);
 
             fIn.close();
-        } catch (IOException ioe) {
+		}
+		catch (IOException ioe)
+		{
             throw new WrappedException(ioe);
         }
     }
 
-    public void load(InputStream in, char[] password) throws OpenAS2Exception {
-        try {
+	public void load(InputStream in, char[] password) throws OpenAS2Exception
+	{
+		try
+		{
             KeyStore ks = getKeyStore();
 
-            synchronized (ks) {
+			synchronized (ks)
+			{
                 ks.load(in, password);
             }
 
             getFileMonitor();
-        } catch (IOException ioe) {
+		}
+		catch (IOException ioe)
+		{
             throw new WrappedException(ioe);
-        } catch (GeneralSecurityException gse) {
+		}
+		catch (GeneralSecurityException gse)
+		{
             throw new WrappedException(gse);
         }
     }
 
-    public void load() throws OpenAS2Exception {
+	public void load() throws OpenAS2Exception
+	{
         load(getFilename(), getPassword());
     }
 
-    public void removeCertificate(X509Certificate cert) throws OpenAS2Exception {
+	public void removeCertificate(X509Certificate cert) throws OpenAS2Exception
+	{
         KeyStore ks = getKeyStore();
 
-        try {
+		try
+		{
             String alias = ks.getCertificateAlias(cert);
 
-            if (alias == null) {
+			if (alias == null)
+			{
                 throw new CertificateNotFoundException(cert);
             }
 
             removeCertificate(alias);
-        } catch (GeneralSecurityException gse) {
+		}
+		catch (GeneralSecurityException gse)
+		{
             throw new WrappedException(gse);
         }
     }
 
-    public void removeCertificate(String alias) throws OpenAS2Exception {
+	public void removeCertificate(String alias) throws OpenAS2Exception
+	{
         KeyStore ks = getKeyStore();
 
-        try {
-            if (ks.getCertificate(alias) == null) {
+		try
+		{
+			if (ks.getCertificate(alias) == null)
+			{
                 throw new CertificateNotFoundException(null, alias);
             }
 
             ks.deleteEntry(alias);
             save(getFilename(), getPassword());
-        } catch (GeneralSecurityException gse) {
+		}
+		catch (GeneralSecurityException gse)
+		{
             throw new WrappedException(gse);
         }
     }
 
-    public void save() throws OpenAS2Exception {
+	public void save() throws OpenAS2Exception
+	{
         save(getFilename(), getPassword());
     }
 
-    public void save(String filename, char[] password) throws OpenAS2Exception {
-        try {
+	public void save(String filename, char[] password) throws OpenAS2Exception
+	{
+		try
+		{
             FileOutputStream fOut = new FileOutputStream(filename, false);
 
             save(fOut, password);
 
             fOut.close();
-        } catch (IOException ioe) {
+		}
+		catch (IOException ioe)
+		{
             throw new WrappedException(ioe);
         }
     }
 
-    public void save(OutputStream out, char[] password) throws OpenAS2Exception {
-        try {
+	public void save(OutputStream out, char[] password) throws OpenAS2Exception
+	{
+		try
+		{
             getKeyStore().store(out, password);
-        } catch (IOException ioe) {
+		}
+		catch (IOException ioe)
+		{
             throw new WrappedException(ioe);
-        } catch (GeneralSecurityException gse) {
+		}
+		catch (GeneralSecurityException gse)
+		{
             throw new WrappedException(gse);
         }
     }

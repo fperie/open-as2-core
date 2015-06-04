@@ -5,8 +5,8 @@ import java.io.OutputStream;
 import java.net.InetAddress;
 import java.net.Socket;
 
-
-public interface NetModuleHandler {
+public interface NetModuleHandler
+{
 	void handle(NetModule owner, Socket s);
 
 	void handle(final InetAddress remoteIp, final int remotePort, final InetAddress localIp,

@@ -6,21 +6,25 @@ import org.openas2.cert.CertificateFactory;
 import org.openas2.cmd.BaseCommand;
 import org.openas2.cmd.CommandResult;
 
-public abstract class AliasedCertCommand extends BaseCommand {
+public abstract class AliasedCertCommand extends BaseCommand
+{
+	public CommandResult execute(Object[] params)
+	{
 
-    public CommandResult execute(Object[] params) {
-
-        try {
+		try
+		{
             CertificateFactory certFx = getSession().getCertificateFactory();
 
-            if (certFx instanceof AliasedCertificateFactory) {
+			if (certFx instanceof AliasedCertificateFactory)
+			{
                 return execute((AliasedCertificateFactory) certFx, params);
             }
             return new CommandResult(CommandResult.TYPE_COMMAND_NOT_SUPPORTED,
                     "Not supported by current certificate store");
-        } catch (OpenAS2Exception oae) {
+		}
+		catch (OpenAS2Exception oae)
+		{
             oae.terminate();
-
             return new CommandResult(oae);
         }
     }

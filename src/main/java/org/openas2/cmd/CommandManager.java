@@ -11,31 +11,39 @@ import org.openas2.cmd.processor.BaseCommandProcessor;
  * @author joseph mcverry
  *
  */
-public class CommandManager {
+public class CommandManager
+{
 	private static CommandManager defaultManager;
+
 	private List processors;
 
-	public static CommandManager getCmdManager() {
-		if (defaultManager == null) {
+	public static CommandManager getCmdManager()
+	{
+		if (defaultManager == null)
+		{
 			defaultManager = new CommandManager();
 		}
 
 		return defaultManager;
 	}
 
-	public void setProcessors(List listeners) {
+	public void setProcessors(List listeners)
+	{
 		this.processors = listeners;
 	}
 
-	public List getProcessors() {
-		if (processors == null) {
+	public List getProcessors()
+	{
+		if (processors == null)
+		{
 			processors = new ArrayList();
 		}
 
 		return processors;
 	}
 
-	public void addProcessor(BaseCommandProcessor processor) {
+	public void addProcessor(BaseCommandProcessor processor)
+	{
 		List processors = getProcessors();
 		processors.add(processor);
 	}

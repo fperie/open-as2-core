@@ -8,83 +8,99 @@ import java.io.InputStreamReader;
 import java.io.OutputStream;
 import java.io.PrintStream;
 
-public class IOUtil {
-    public static final String MSG_WAIT_FOR_KEYPRESS = "Waiting for keypress...";
-    public static final String MSG_PROMPT = "> ";
+public class IOUtil
+{
+	public static final String MSG_WAIT_FOR_KEYPRESS = "Waiting for keypress...";
 
-    public static int copy(InputStream in, OutputStream out) throws IOException {
-        int totalCount = 0;
-        byte[] buf = new byte[4096];
-        int count = 0;
+	public static final String MSG_PROMPT = "> ";
 
-        while (count >= 0) {
-            count = in.read(buf);
-            totalCount += count;
+	public static int copy(InputStream in, OutputStream out) throws IOException
+	{
+		int totalCount = 0;
+		byte[] buf = new byte[4096];
+		int count = 0;
 
-            if (count > 0) {
-                out.write(buf, 0, count);
-            }
-        }
+		while (count >= 0)
+		{
+			count = in.read(buf);
+			totalCount += count;
 
-        return totalCount;
-    }
+			if (count > 0)
+			{
+				out.write(buf, 0, count);
+			}
+		}
 
-    public static byte[] toBytes(InputStream in) throws IOException {
-        ByteArrayOutputStream baos = new ByteArrayOutputStream();
-        copy(in, baos);
+		return totalCount;
+	}
 
-        return baos.toByteArray();
-    }
+	public static byte[] toBytes(InputStream in) throws IOException
+	{
+		ByteArrayOutputStream baos = new ByteArrayOutputStream();
+		copy(in, baos);
 
-    public static void waitForKeypress(String message, PrintStream out, InputStream in)
-            throws IOException {
-        out.println();
-        if (message == null) {
-            message = MSG_WAIT_FOR_KEYPRESS;
-        }
-        out.println(message);
+		return baos.toByteArray();
+	}
 
-        in.read();
-        int num = in.available();
-        for (int i = 0; i < num; i++) {
-            in.read();
-        }
-    }
+	public static void waitForKeypress(String message, PrintStream out, InputStream in)
+			throws IOException
+	{
+		out.println();
+		if (message == null)
+		{
+			message = MSG_WAIT_FOR_KEYPRESS;
+		}
+		out.println(message);
 
-    public static void waitForKeypress(String message) throws IOException {
-        waitForKeypress(message, System.out, System.in);
-    }
+		in.read();
+		int num = in.available();
+		for (int i = 0; i < num; i++)
+		{
+			in.read();
+		}
+	}
 
-    public static String prompt(String message, String defaultValue, PrintStream out, InputStream in)
-            throws IOException {
-        // show the prompt
-        if (message == null) {
-            message = MSG_PROMPT;
-        }
-        out.print(message);
+	public static void waitForKeypress(String message) throws IOException
+	{
+		waitForKeypress(message, System.out, System.in);
+	}
 
-        // read user input
-        String answer = new BufferedReader(new InputStreamReader(in)).readLine();
+	public static String prompt(String message, String defaultValue, PrintStream out, InputStream in)
+			throws IOException
+	{
+		// show the prompt
+		if (message == null)
+		{
+			message = MSG_PROMPT;
+		}
+		out.print(message);
 
-        // return the user input, or the default value if no user input was
-        // given
-        if (answer != null && !answer.toString().equals("")) {
-            return answer.toString();
-        }
-        return defaultValue;
-    }
+		// read user input
+		String answer = new BufferedReader(new InputStreamReader(in)).readLine();
 
-    public static String prompt(String message, String defaultValue) throws IOException {
-        return prompt(message, defaultValue, System.out, System.in);
-    }
+		// return the user input, or the default value if no user input was
+		// given
+		if (answer != null && !answer.toString().equals(""))
+		{
+			return answer.toString();
+		}
+		return defaultValue;
+	}
 
-    public static int prompt(String message, int defaultValue, PrintStream out, InputStream in)
-            throws IOException {
-        String value = prompt(message, Integer.toString(defaultValue), out, in);
-        return Integer.parseInt(value);
-    }
+	public static String prompt(String message, String defaultValue) throws IOException
+	{
+		return prompt(message, defaultValue, System.out, System.in);
+	}
 
-    public static int prompt(String message, int defaultValue) throws IOException {
-        return prompt(message, defaultValue, System.out, System.in);
-    }
+	public static int prompt(String message, int defaultValue, PrintStream out, InputStream in)
+			throws IOException
+	{
+		String value = prompt(message, Integer.toString(defaultValue), out, in);
+		return Integer.parseInt(value);
+	}
+
+	public static int prompt(String message, int defaultValue) throws IOException
+	{
+		return prompt(message, defaultValue, System.out, System.in);
+	}
 }

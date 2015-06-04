@@ -22,14 +22,14 @@ import org.openas2.params.InvalidParameterException;
 import org.openas2.params.MessageParameters;
 import org.openas2.params.ParameterParser;
 import org.openas2.partner.Partnership;
-import org.openas2.processor.resender.DirectoryResenderModule;
 import org.openas2.processor.sender.SenderModule;
 import org.openas2.util.ByteArrayDataSource;
 import org.openas2.util.IOUtilOld;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-public abstract class DirectoryPollingModule extends PollingModule {
+public abstract class DirectoryPollingModule extends PollingModule
+{
     public static final String PARAM_OUTBOX_DIRECTORY = "outboxdir";
     public static final String PARAM_ERROR_DIRECTORY = "errordir";
     public static final String PARAM_SENT_DIRECTORY = "sentdir";
@@ -44,44 +44,56 @@ public abstract class DirectoryPollingModule extends PollingModule {
 
 
     
-    public void init(Session session, Map options) throws OpenAS2Exception {
+	public void init(Session session, Map options) throws OpenAS2Exception
+	{
         super.init(session, options);
         getParameter(PARAM_OUTBOX_DIRECTORY, true);
         getParameter(PARAM_ERROR_DIRECTORY, true);
     }
 
-    public void poll() {
-        try {
+	public void poll()
+	{
+		try
+		{
             // scan the directory for new files
             scanDirectory(getParameter(PARAM_OUTBOX_DIRECTORY, true));
 
             // update tracking info. if a file is ready, process it
             updateTracking();
-        } catch (OpenAS2Exception oae) {
+		}
+		catch (OpenAS2Exception oae)
+		{
             oae.terminate();
             forceStop(oae);
-        } catch (Exception e) {
+		}
+		catch (Exception e)
+		{
             new WrappedException(e).terminate();
             forceStop(e);
         }
     }
 
-    protected void scanDirectory(String directory) throws IOException, InvalidParameterException {
+	protected void scanDirectory(String directory) throws IOException, InvalidParameterException
+	{
         File dir = IOUtilOld.getDirectoryFile(directory);
 
         // get a list of entries in the directory
         File[] files = dir.listFiles();
-        if (files == null) {
+		if (files == null)
+		{
             throw new InvalidParameterException("Error getting list of files in directory", this,
                     PARAM_OUTBOX_DIRECTORY, dir.getAbsolutePath());
         }
 
         // iterator through each entry, and start tracking new files
-        if (files.length > 0) {
-            for (int i = 0; i < files.length; i++) {
+		if (files.length > 0)
+		{
+			for (int i = 0; i < files.length; i++)
+			{
                 File currentFile = files[i];
 
-                if (checkFile(currentFile)) {
+				if (checkFile(currentFile))
+				{
                     // start watching the file's size if it's not already being watched
                     trackFile(currentFile);
                 }
@@ -89,51 +101,68 @@ public abstract class DirectoryPollingModule extends PollingModule {
         }
     }
 
-    protected boolean checkFile(File file) {
-        if (file.exists() && file.isFile()) {
-            try {
+	protected boolean checkFile(File file)
+	{
+		if (file.exists() && file.isFile())
+		{
+			try
+			{
                 // check for a write-lock on file, will skip file if it's write locked
                 FileOutputStream fOut = new FileOutputStream(file, true);
                 fOut.close();
                 return true;
-            } catch (IOException ioe) {
+			}
+			catch (IOException ioe)
+			{
                 // a sharing violation occurred, ignore the file for now
+				LOGGER.error("a sharing violation occurred, the file will be ignore", ioe);
             }
         }
         return false;
     }
 
-    protected void trackFile(File file) {
+	protected void trackFile(File file)
+	{
         Map trackedFiles = getTrackedFiles();
         String filePath = file.getAbsolutePath();
-        if (trackedFiles.get(filePath) == null) {
+		if (trackedFiles.get(filePath) == null)
+		{
             trackedFiles.put(filePath, new Long(file.length()));
         }
     }
 
-    protected void updateTracking() throws OpenAS2Exception {
+	protected void updateTracking() throws OpenAS2Exception
+	{
         // clone the trackedFiles map, iterator through the clone and modify the original to avoid iterator exceptions
         // is there a better way to do this?
         Map trackedFiles = getTrackedFiles();
         Map trackedFilesClone = new HashMap(trackedFiles);
 
-        for (Iterator it = trackedFilesClone.entrySet().iterator(); it.hasNext();) {
+		for (Iterator it = trackedFilesClone.entrySet().iterator(); it.hasNext();)
+		{
             // get the file and it's stored length
             Map.Entry fileEntry = (Entry) it.next();
             File file = new File((String) fileEntry.getKey());
             long fileLength = ((Long) fileEntry.getValue()).longValue();
 
             // if the file no longer exists, remove it from the tracker
-            if (!checkFile(file)) {
+			if (!checkFile(file))
+			{
                 trackedFiles.remove(fileEntry.getKey());
-            } else {
+			}
+			else
+			{
                 // if the file length has changed, update the tracker
                 long newLength = file.length();
-                if (newLength != fileLength) {
+				if (newLength != fileLength)
+				{
                     trackedFiles.put(fileEntry.getKey(), new Long(newLength));
-                } else {
+				}
+				else
+				{
                     // if the file length has stayed the same, process the file and stop tracking it
-                    try {
+					try
+					{
                         processFile(file);
                     } finally {
                         trackedFiles.remove(fileEntry.getKey());
@@ -143,8 +172,8 @@ public abstract class DirectoryPollingModule extends PollingModule {
         }
     }
 
-    protected void processFile(File file) throws OpenAS2Exception {
-    	
+	protected void processFile(File file) throws OpenAS2Exception
+	{
         LOGGER.info("processing {}", file.getAbsolutePath());
 
         Message msg = createMessage();
@@ -158,11 +187,13 @@ public abstract class DirectoryPollingModule extends PollingModule {
         */ 
         msg.setAttribute(FileAttribute.MA_PENDINGFILE, file.getName());
         
-        try {
+		try
+		{
             updateMessage(msg, file);
             LOGGER.info("file assigned to message {}{}", file.getAbsolutePath(), msg.getLoggingText());
 
-            if (msg.getData() == null) {
+			if (msg.getData() == null)
+			{
                 throw new InvalidMessageException("No Data");
             }
 
@@ -175,9 +206,11 @@ public abstract class DirectoryPollingModule extends PollingModule {
             	make another HTTP call to post AsyncMDN
             	*/ 
             if (msg.getAttribute(FileAttribute.MA_STATUS) != null
-					&& msg.getAttribute(FileAttribute.MA_STATUS).equals(FileAttribute.MA_PENDING)) {
+					&& msg.getAttribute(FileAttribute.MA_STATUS).equals(FileAttribute.MA_PENDING))
+			{
 				File pendingFile = null;
-				try {
+				try
+				{
 					pendingFile = new File(msg.getPartnership().getAttribute(
 							FileAttribute.MA_PENDING), msg
 							.getAttribute(FileAttribute.MA_PENDINGFILE));
@@ -185,7 +218,9 @@ public abstract class DirectoryPollingModule extends PollingModule {
 
 					LOGGER.info("copied {} to pending folder : {}{}", file.getAbsolutePath(), 
 						pendingFile.getAbsolutePath(), msg.getLoggingText());
-				} catch (IOException iose) {
+				}
+				catch (IOException iose)
+				{
 					OpenAS2Exception se = new OpenAS2Exception(
 							"File was successfully sent but not copied to pending folder: "
 									+ pendingFile);
@@ -196,65 +231,79 @@ public abstract class DirectoryPollingModule extends PollingModule {
             // If the Sent Directory option is set, move the transmitted file to
 			// the sent directory
             
-            if (getParameter(PARAM_SENT_DIRECTORY, false) != null) {
+			if (getParameter(PARAM_SENT_DIRECTORY, false) != null)
+			{
                 File sentFile = null;
 
-                try {
+				try
+				{
                     sentFile = new File(IOUtilOld.getDirectoryFile(getParameter(PARAM_SENT_DIRECTORY, true)), file
                             .getName());
                     sentFile = IOUtilOld.moveFile(file, sentFile, false, true);
 
                     LOGGER.info("moved {} to {}{}", file.getAbsolutePath(), sentFile.getAbsolutePath(), msg.getLoggingText());
 
-                } catch (IOException iose) {
+				}
+				catch (IOException iose)
+				{
                     OpenAS2Exception se = new OpenAS2Exception(
                             "File was successfully sent but not moved to sent folder: " + sentFile);
                     se.initCause(iose);
                 }
-            } else if (!file.delete()) { // Delete the file if a sent directory isn't set
+			}
+			else if (!file.delete())
+			{
+				// Delete the file if a sent directory isn't set
                 throw new OpenAS2Exception("File was successfully sent but not deleted: " + file);
             }
 
             LOGGER.info("deleted {}{}", file.getAbsolutePath(), msg.getLoggingText());
 
-        } catch (OpenAS2Exception oae) {
+		}
+		catch (OpenAS2Exception oae)
+		{
         	LOGGER.info(oae.getLocalizedMessage() + msg.getLoggingText(), oae);
             oae.addSource(OpenAS2Exception.SOURCE_MESSAGE, msg);
             oae.addSource(OpenAS2Exception.SOURCE_FILE, file);
             oae.terminate();
             IOUtilOld.handleError(file, getParameter(PARAM_ERROR_DIRECTORY, true));
         }
-        
-
     }
 
     protected abstract Message createMessage();
 
-    public void updateMessage(Message msg, File file) throws OpenAS2Exception {
+	public void updateMessage(Message msg, File file) throws OpenAS2Exception
+	{
         MessageParameters params = new MessageParameters(msg);
 
         String defaults = getParameter(PARAM_DEFAULTS, false);
 
-        if (defaults != null) {
+		if (defaults != null)
+		{
             params.setParameters(defaults);
         }
 
         String filename = file.getName();
         String format = getParameter(PARAM_FORMAT, false);
 
-        if (format != null) {
+		if (format != null)
+		{
             String delimiters = getParameter(PARAM_DELIMITERS, ".-");
             params.setParameters(format, delimiters, filename);
         }
 
-        try {
+		try
+		{
             byte[] data = IOUtilOld.getFileBytes(file);
             String contentType = getParameter(PARAM_MIMETYPE, false);
-            if (contentType == null) {
+			if (contentType == null)
+			{
                 contentType = "application/octet-stream";
             }
-            else {
-            	try {
+			else
+			{
+				try
+				{
             	contentType = ParameterParser.parse (contentType, params);
             	}
             	catch (InvalidParameterException e) 
@@ -268,10 +317,13 @@ public abstract class DirectoryPollingModule extends PollingModule {
             body.setDataHandler(new DataHandler(byteSource));
             String encodeType = msg.getPartnership().getAttribute(Partnership.PA_CONTENT_TRANSFER_ENCODING);
             if (encodeType != null)
+			{
             	body.setHeader("Content-Transfer-Encoding", encodeType);
+			}
             else
+			{
             	body.setHeader("Content-Transfer-Encoding", "8bit"); // default is 8bit
-            
+			}
             
 //          below statement is not filename related, just want to make it  
 //          consist with the parameter "mimetype="application/EDI-X12"" 
@@ -282,28 +334,30 @@ public abstract class DirectoryPollingModule extends PollingModule {
 //          add below statement will tell the receiver to save the filename 
 //          as the one sent by sender. 2007-06-01
             String sendFileName = getParameter("sendfilename", false);
-            if (sendFileName != null && sendFileName.equals("true")) {
+			if (sendFileName != null && sendFileName.equals("true"))
+			{
             	body.setHeader("Content-Disposition", "Attachment; filename=\""+ 
             	msg.getAttribute(FileAttribute.MA_FILENAME) +"\"");
             	msg.setContentDisposition("Attachment; filename=\""+ 
             	msg.getAttribute(FileAttribute.MA_FILENAME) +"\"");
             }
-          
 
             msg.setData(body);
-        } catch (MessagingException me) {
+		}
+		catch (MessagingException | IOException me)
+		{
             throw new WrappedException(me);
-        } catch (IOException ioe) {
-            throw new WrappedException(ioe);
-        }
+		}
 
         // update the message's partnership with any stored information
         getSession().getPartnershipFactory().updatePartnership(msg, true);
         msg.updateMessageID();
     }
 
-    public Map getTrackedFiles() {
-        if (trackedFiles == null) {
+	public Map getTrackedFiles()
+	{
+		if (trackedFiles == null)
+		{
             trackedFiles = new HashMap();
         }
         return trackedFiles;

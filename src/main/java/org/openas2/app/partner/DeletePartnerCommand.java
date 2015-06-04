@@ -12,53 +12,68 @@ import org.openas2.partner.PartnershipFactory;
  * @author joseph mcverry
  *
  */
-public class DeletePartnerCommand extends AliasedPartnershipsCommand {
-	public String getDefaultDescription() {
+public class DeletePartnerCommand extends AliasedPartnershipsCommand
+{
+	@Override
+	public String getDefaultDescription()
+	{
 		return "Delete the partnership associated with an name.";
 	}
 
-	public String getDefaultName() {
+	@Override
+	public String getDefaultName()
+	{
 		return "delete";
 	}
 
-	public String getDefaultUsage() {
+	@Override
+	public String getDefaultUsage()
+	{
 		return "delete <name>";
 	}
 
+	@Override
 	public CommandResult execute(PartnershipFactory partFx, Object[] params)
-			throws OpenAS2Exception {
-		if (params.length < 1) {
+			throws OpenAS2Exception
+	{
+		if (params.length < 1)
+		{
 			return new CommandResult(CommandResult.TYPE_INVALID_PARAM_COUNT,
 					getUsage());
 		}
 
-		synchronized (partFx) {
-
+		synchronized (partFx)
+		{
 			String name = params[0].toString();
 			Iterator parts = partFx.getPartners().keySet().iterator();
-
 			boolean found = false;
 
-			while (parts.hasNext()) {
+			while (parts.hasNext())
+			{
 				String partName = parts.next().toString();
-				if (partName.equals(name)) {
+				if (partName.equals(name))
+				{
 					found = true;
 				}
 			}
 
 			if (found == false)
+			{
 				return new CommandResult(CommandResult.TYPE_ERROR,
 						"Unknown partner name");
+			}
 
 			Iterator partnerships = partFx.getPartnerships().iterator();
 			boolean partnershipFound = false;
-			while (partnerships.hasNext() && partnershipFound == false) {
+			while (partnerships.hasNext() && partnershipFound == false)
+			{
 				Partnership part = (Partnership) partnerships.next();
 				partnershipFound = part.getReceiverIDs().containsValue(name)
 						|| part.getSenderIDs().containsValue(name);
 			}
 
-			if (partnershipFound) {
+			if (partnershipFound)
+			{
 				return new CommandResult(CommandResult.TYPE_ERROR,
 						"Can not delete partner; it is tied to some partnerships");
 			}

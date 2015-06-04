@@ -18,13 +18,14 @@ public abstract class BaseStorageModule extends BaseProcessorModule implements S
     public static final String PARAM_PROTOCOL = "protocol";
     public static final String PARAM_TEMPDIR = "tempdir";
 
+	@Override
     public boolean canHandle(String action, Message msg, Map options) {
         try {
             if (!action.equals(getModuleAction())) {
                 return false;
             }
 
-            String modProtocol = getParameter(PARAM_PROTOCOL, false);
+			String modProtocol = getParameter(PARAM_PROTOCOL, false);
             String msgProtocol = msg.getProtocol();
 
             if (modProtocol != null) {
@@ -41,6 +42,7 @@ public abstract class BaseStorageModule extends BaseProcessorModule implements S
         }
     }
 
+	@Override
     public void init(Session session, Map options) throws OpenAS2Exception {
         super.init(session, options);
         getParameter(PARAM_FILENAME, true);

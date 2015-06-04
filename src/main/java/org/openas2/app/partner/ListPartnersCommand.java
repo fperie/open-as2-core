@@ -13,34 +13,45 @@ import org.openas2.partner.PartnershipFactory;
  * @author joseph mcverry
  * 
  */
-public class ListPartnersCommand extends AliasedPartnershipsCommand {
-	public String getDefaultDescription() {
+public class ListPartnersCommand extends AliasedPartnershipsCommand
+{
+	@Override
+	public String getDefaultDescription()
+	{
 		return "List all partners in the current partnership store";
 	}
 
-	public String getDefaultName() {
+	@Override
+	public String getDefaultName()
+	{
 		return "list";
 	}
 
-	public String getDefaultUsage() {
+	@Override
+	public String getDefaultUsage()
+	{
 		return "list";
 	}
 
+	@Override
 	public CommandResult execute(PartnershipFactory partFx, Object[] params)
-			throws OpenAS2Exception {
+			throws OpenAS2Exception
+	{
 
-		synchronized (partFx) {
-
+		synchronized (partFx)
+		{
 			Map partners = partFx.getPartners();
 			Iterator partIt = partners.keySet().iterator();
 
 			CommandResult cmdRes = new CommandResult(CommandResult.TYPE_OK);
 
-			while (partIt.hasNext()) {
+			while (partIt.hasNext())
+			{
 				cmdRes.getResults().add(partIt.next().toString());
 			}
 
-			if (cmdRes.getResults().size() == 0) {
+			if (cmdRes.getResults().size() == 0)
+			{
 				cmdRes.getResults().add("No partner definitions available");
 			}
 

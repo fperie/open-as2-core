@@ -11,235 +11,292 @@ import javax.mail.internet.MimeMultipart;
 
 import org.openas2.lib.util.MimeUtil;
 
-public class MDNData {
-    // report multipart content type
-    public static final String REPORT_SUBTYPE = "report; report-type=disposition-notification";
-    public static final String REPORT_TYPE = "multipart/" + REPORT_SUBTYPE;
-    // text part content header
-    public static final String TEXT_TYPE = "text/plain";
-    public static final String TEXT_CHARSET = "us-ascii";
-    public static final String TEXT_ENCODING = "7bit";
-    // disposition content header
-    public static final String DISPOSITION_TYPE = "message/disposition-notification";
-    public static final String DISPOSITION_CHARSET = "us-ascii";
-    public static final String DISPOSITION_ENCODING = "7bit";
+public class MDNData
+{
+	// report multipart content type
+	public static final String REPORT_SUBTYPE = "report; report-type=disposition-notification";
 
-    private EDIINTMessageMDN owner;
-    private boolean dirty;
-    private String disposition;
-    private String finalRecipient;
-    private String originalMessageID;
-    private String originalRecipient;
-    private String receivedContentMIC;
-    private String reportingUA;
-    private String text;
+	public static final String REPORT_TYPE = "multipart/" + REPORT_SUBTYPE;
 
-    public MDNData(EDIINTMessageMDN owner) {
-        super();
-        this.owner = owner;
-    }
+	// text part content header
+	public static final String TEXT_TYPE = "text/plain";
 
-    public void update(MimeBodyPart data) throws MessagingException {
-        // make sure all old cache values are cleared
-        clearCache();
+	public static final String TEXT_CHARSET = "us-ascii";
 
-        if (data != null) {
-            // verify the content type is multipart/report
-            ContentType reportType = new ContentType(data.getContentType());
+	public static final String TEXT_ENCODING = "7bit";
 
-            if (reportType.getBaseType().equalsIgnoreCase("multipart/report")) {
-                // convert the body part to a multipart
-                MimeMultipart reportPart = MimeUtil.createMimeMultipart(data);
+	// disposition content header
+	public static final String DISPOSITION_TYPE = "message/disposition-notification";
 
-                // loop through each body part in the multipart/report and
-                // extract
-                // cache values
-                int partCount = reportPart.getCount();
-                MimeBodyPart currentPart;
+	public static final String DISPOSITION_CHARSET = "us-ascii";
 
-                for (int i = 0; i < partCount; i++) {
-                    // get the next body part and check it's content type
-                    currentPart = (MimeBodyPart) reportPart.getBodyPart(i);
+	public static final String DISPOSITION_ENCODING = "7bit";
 
-                    if (currentPart.isMimeType(TEXT_TYPE)) {
-                        // found the MDN's text body part, save the value to
-                        // cache
-                        try {
-                            setText(currentPart.getContent().toString());
-                        } catch (IOException ioe) {
-                            throw new MessagingException("Error getting text content: " + ioe.getMessage());
-                        }
-                    } else if (currentPart.isMimeType(DISPOSITION_TYPE)) {
-                        try {
-                            // found the MDN's disposition body part, parse it
-                            // and
-                            // save values to cache
-                            InternetHeaders disposition = new InternetHeaders(currentPart.getInputStream());
-                            setReportingUA(disposition.getHeader("Reporting-UA", ", "));
-                            setOriginalRecipient(disposition.getHeader("Original-Recipient", ", "));
-                            setFinalRecipient(disposition.getHeader("Final-Recipient", ", "));
-                            setOriginalMessageID(disposition.getHeader("Original-Message-ID", ", "));
-                            setDisposition(disposition.getHeader("Disposition", ", "));
-                            setReceivedContentMIC(disposition.getHeader("Received-Content-MIC", ", "));
-                        } catch (IOException ioe) {
-                            throw new MessagingException("Error parsing disposition notification: " + ioe.getMessage());
-                        }
-                    }
-                }
-            }
-        }        
-    }
+	private EDIINTMessageMDN owner;
 
-    public MimeBodyPart getData() throws MessagingException {
-        try {
-            // create the main report multipart
-            MimeMultipart reportParts = createReportPart();
+	private boolean dirty;
 
-            // create the disposition notification part and add it to the report
-            MimeBodyPart dispositionPart = createDispositionPart();
-            reportParts.addBodyPart(dispositionPart);
+	private String disposition;
 
-            // create the text part and add it to the report
-            MimeBodyPart textPart = createTextPart();
-            reportParts.addBodyPart(textPart);
+	private String finalRecipient;
 
-            // convert reportParts to a MimeBodyPart and save it
-            MimeBodyPart reportPart = MimeUtil.createMimeBodyPart(reportParts);
-            
-            return reportPart;
-        } catch (IOException ioe) {
-            throw new MessagingException("Error creating data: " + ioe.getMessage());
-        }
-    }
+	private String originalMessageID;
 
-    public EDIINTMessageMDN getOwner() {
-        return owner;
-    }
+	private String originalRecipient;
 
-    public boolean isDirty() {
-        return dirty;
-    }
+	private String receivedContentMIC;
 
-    public void setDirty(boolean dirty) {
-        this.dirty = dirty;
-        if (dirty) {
-            getOwner().setContentType(REPORT_TYPE);
-        }
-    }
-    
-    public void setDisposition(String disposition) {
-        this.disposition = disposition;
-        setDirty(true);
-    }
+	private String reportingUA;
 
-    public String getDisposition() {
-        return this.disposition;
-    }
+	private String text;
 
-    public void setFinalRecipient(String recipient) {
-        this.finalRecipient = recipient;
-        setDirty(true);
-    }
+	public MDNData(EDIINTMessageMDN owner)
+	{
+		super();
+		this.owner = owner;
+	}
 
-    public String getFinalRecipient() {
-        return this.finalRecipient;
-    }
+	public void update(MimeBodyPart data) throws MessagingException
+	{
+		// make sure all old cache values are cleared
+		clearCache();
 
-    public void setOriginalMessageID(String messageID) {
-        this.originalMessageID = messageID;
-        setDirty(true);
-    }
+		if (data != null)
+		{
+			// verify the content type is multipart/report
+			ContentType reportType = new ContentType(data.getContentType());
 
-    public String getOriginalMessageID() {
-        return this.originalMessageID;
-    }
+			if (reportType.getBaseType().equalsIgnoreCase("multipart/report"))
+			{
+				// convert the body part to a multipart
+				MimeMultipart reportPart = MimeUtil.createMimeMultipart(data);
 
-    public void setOriginalRecipient(String recipient) {
-        this.originalRecipient = recipient;
-        setDirty(true);
-    }
+				// loop through each body part in the multipart/report and
+				// extract
+				// cache values
+				int partCount = reportPart.getCount();
+				MimeBodyPart currentPart;
 
-    public String getOriginalRecipient() {
-        return this.originalRecipient;
-    }
+				for (int i = 0; i < partCount; i++)
+				{
+					// get the next body part and check it's content type
+					currentPart = (MimeBodyPart)reportPart.getBodyPart(i);
 
-    public void setReceivedContentMIC(String mic) {
-        this.receivedContentMIC = mic;
-        setDirty(true);
-    }
+					if (currentPart.isMimeType(TEXT_TYPE))
+					{
+						// found the MDN's text body part, save the value to
+						// cache
+						try
+						{
+							setText(currentPart.getContent().toString());
+						}
+						catch (IOException ioe)
+						{
+							throw new MessagingException("Error getting text content: " + ioe.getMessage());
+						}
+					}
+					else if (currentPart.isMimeType(DISPOSITION_TYPE))
+					{
+						try
+						{
+							// found the MDN's disposition body part, parse it
+							// and
+							// save values to cache
+							InternetHeaders disposition = new InternetHeaders(currentPart.getInputStream());
+							setReportingUA(disposition.getHeader("Reporting-UA", ", "));
+							setOriginalRecipient(disposition.getHeader("Original-Recipient", ", "));
+							setFinalRecipient(disposition.getHeader("Final-Recipient", ", "));
+							setOriginalMessageID(disposition.getHeader("Original-Message-ID", ", "));
+							setDisposition(disposition.getHeader("Disposition", ", "));
+							setReceivedContentMIC(disposition.getHeader("Received-Content-MIC", ", "));
+						}
+						catch (IOException ioe)
+						{
+							throw new MessagingException("Error parsing disposition notification: " + ioe.getMessage());
+						}
+					}
+				}
+			}
+		}
+	}
 
-    public String getReceivedContentMIC() {
-        return this.receivedContentMIC;
-    }
+	public MimeBodyPart getData() throws MessagingException
+	{
+		try
+		{
+			// create the main report multipart
+			MimeMultipart reportParts = createReportPart();
 
-    public void setReportingUA(String reportingUA) {
-        this.reportingUA = reportingUA;
-        setDirty(true);
-    }
+			// create the disposition notification part and add it to the report
+			MimeBodyPart dispositionPart = createDispositionPart();
+			reportParts.addBodyPart(dispositionPart);
 
-    public String getReportingUA() {
-        return this.reportingUA;
-    }
+			// create the text part and add it to the report
+			MimeBodyPart textPart = createTextPart();
+			reportParts.addBodyPart(textPart);
 
-    public void setText(String text) {
-        this.text = text;
-        setDirty(true);
-    }
+			// convert reportParts to a MimeBodyPart and save it
+			MimeBodyPart reportPart = MimeUtil.createMimeBodyPart(reportParts);
 
-    public String getText() {
-        return this.text;
-    }
+			return reportPart;
+		}
+		catch (IOException ioe)
+		{
+			throw new MessagingException("Error creating data: " + ioe.getMessage());
+		}
+	}
 
-    protected void clearCache() {
-        this.disposition = null;
-        this.finalRecipient = null;
-        this.originalMessageID = null;
-        this.originalRecipient = null;
-        this.receivedContentMIC = null;
-        this.reportingUA = null;
-        this.text = null;
-    }
+	public EDIINTMessageMDN getOwner()
+	{
+		return owner;
+	}
 
-    protected MimeBodyPart createDispositionPart() throws IOException, MessagingException {
-        MimeBodyPart dispositionPart = new MimeBodyPart();
+	public boolean isDirty()
+	{
+		return dirty;
+	}
 
-        InternetHeaders dispValues = new InternetHeaders();
-        dispValues.setHeader("Reporting-UA", getReportingUA());
-        dispValues.setHeader("Original-Recipient", getOriginalRecipient());
-        dispValues.setHeader("Final-Recipient", getFinalRecipient());
-        dispValues.setHeader("Original-Message-ID", getOriginalMessageID());
-        dispValues.setHeader("Disposition", getDisposition());
-        dispValues.setHeader("Received-Content-MIC", getReceivedContentMIC());
+	public void setDirty(boolean dirty)
+	{
+		this.dirty = dirty;
+		if (dirty)
+		{
+			getOwner().setContentType(REPORT_TYPE);
+		}
+	}
 
-        Enumeration dispEnum = dispValues.getAllHeaderLines();
-        StringBuffer dispData = new StringBuffer();
+	public void setDisposition(String disposition)
+	{
+		this.disposition = disposition;
+		setDirty(true);
+	}
 
-        while (dispEnum.hasMoreElements()) {
-            dispData.append((String) dispEnum.nextElement()).append("\r\n");
-        }
+	public String getDisposition()
+	{
+		return this.disposition;
+	}
 
-        dispData.append("\r\n");
+	public void setFinalRecipient(String recipient)
+	{
+		this.finalRecipient = recipient;
+		setDirty(true);
+	}
 
-        String dispText = dispData.toString();
-        dispositionPart.setContent(dispText, DISPOSITION_TYPE);
-        dispositionPart.setHeader("Content-Type", DISPOSITION_TYPE);
+	public String getFinalRecipient()
+	{
+		return this.finalRecipient;
+	}
 
-        return dispositionPart;
-    }
+	public void setOriginalMessageID(String messageID)
+	{
+		this.originalMessageID = messageID;
+		setDirty(true);
+	}
 
-    protected MimeMultipart createReportPart() throws MessagingException {
-        MimeMultipart reportParts = new MimeMultipart();
-        reportParts.setSubType(REPORT_SUBTYPE);
+	public String getOriginalMessageID()
+	{
+		return this.originalMessageID;
+	}
 
-        return reportParts;
-    }
+	public void setOriginalRecipient(String recipient)
+	{
+		this.originalRecipient = recipient;
+		setDirty(true);
+	}
 
-    protected MimeBodyPart createTextPart() throws IOException, MessagingException {
-        MimeBodyPart textPart = new MimeBodyPart();        
-        String text = getText() + "\r\n";
-        textPart.setContent(text, TEXT_TYPE);
-        textPart.setHeader("Content-Type", TEXT_TYPE);        
+	public String getOriginalRecipient()
+	{
+		return this.originalRecipient;
+	}
 
-        return textPart;
-    }
+	public void setReceivedContentMIC(String mic)
+	{
+		this.receivedContentMIC = mic;
+		setDirty(true);
+	}
+
+	public String getReceivedContentMIC()
+	{
+		return this.receivedContentMIC;
+	}
+
+	public void setReportingUA(String reportingUA)
+	{
+		this.reportingUA = reportingUA;
+		setDirty(true);
+	}
+
+	public String getReportingUA()
+	{
+		return this.reportingUA;
+	}
+
+	public void setText(String text)
+	{
+		this.text = text;
+		setDirty(true);
+	}
+
+	public String getText()
+	{
+		return this.text;
+	}
+
+	protected void clearCache()
+	{
+		this.disposition = null;
+		this.finalRecipient = null;
+		this.originalMessageID = null;
+		this.originalRecipient = null;
+		this.receivedContentMIC = null;
+		this.reportingUA = null;
+		this.text = null;
+	}
+
+	protected MimeBodyPart createDispositionPart() throws IOException, MessagingException
+	{
+		MimeBodyPart dispositionPart = new MimeBodyPart();
+
+		InternetHeaders dispValues = new InternetHeaders();
+		dispValues.setHeader("Reporting-UA", getReportingUA());
+		dispValues.setHeader("Original-Recipient", getOriginalRecipient());
+		dispValues.setHeader("Final-Recipient", getFinalRecipient());
+		dispValues.setHeader("Original-Message-ID", getOriginalMessageID());
+		dispValues.setHeader("Disposition", getDisposition());
+		dispValues.setHeader("Received-Content-MIC", getReceivedContentMIC());
+
+		Enumeration dispEnum = dispValues.getAllHeaderLines();
+		StringBuffer dispData = new StringBuffer();
+
+		while (dispEnum.hasMoreElements())
+		{
+			dispData.append((String)dispEnum.nextElement()).append("\r\n");
+		}
+
+		dispData.append("\r\n");
+
+		String dispText = dispData.toString();
+		dispositionPart.setContent(dispText, DISPOSITION_TYPE);
+		dispositionPart.setHeader("Content-Type", DISPOSITION_TYPE);
+
+		return dispositionPart;
+	}
+
+	protected MimeMultipart createReportPart() throws MessagingException
+	{
+		MimeMultipart reportParts = new MimeMultipart();
+		reportParts.setSubType(REPORT_SUBTYPE);
+
+		return reportParts;
+	}
+
+	protected MimeBodyPart createTextPart() throws IOException, MessagingException
+	{
+		MimeBodyPart textPart = new MimeBodyPart();
+		String text = getText() + "\r\n";
+		textPart.setContent(text, TEXT_TYPE);
+		textPart.setHeader("Content-Type", TEXT_TYPE);
+
+		return textPart;
+	}
 }

@@ -9,57 +9,67 @@ import java.io.OutputStream;
 import javax.activation.DataSource;
 
 
-public class ByteArrayDataSource implements DataSource {
+public class ByteArrayDataSource implements DataSource
+{
     String contentType;
     String name;
     byte[] bytes;
 
-    public ByteArrayDataSource(byte[] bytes, String contentType, String name) {
+	public ByteArrayDataSource(byte[] bytes, String contentType, String name)
+	{
         this.bytes = bytes;
 
-        if (contentType == null) {
+		if (contentType == null)
+		{
             this.contentType = "application/octet-stream";
-        } else {
+		}
+		else
+		{
             this.contentType = contentType;
         }
 
         this.name = name;
     }
 
-    public void setBytes(byte[] bytes) {
+	public void setBytes(byte[] bytes)
+	{
         this.bytes = bytes;
     }
 
-    public byte[] getBytes() {
+	public byte[] getBytes()
+	{
         return bytes;
     }
 
-    public void setContentType(String contentType) {
+	public void setContentType(String contentType)
+	{
         this.contentType = contentType;
     }
 
-    public String getContentType() {
+	public String getContentType()
+	{
         return contentType;
     }
 
-    public InputStream getInputStream() {
+	public InputStream getInputStream()
+	{
         // remove the final CR/LF
         int len = bytes.length;
-        /*if (len > 1 && new String(bytes, len-2, 2).equals("\r\n")) {
-        	len -= 2;
-        }*/
         return new ByteArrayInputStream(bytes, 0, len);
     }
 
-    public void setName(String name) {
+	public void setName(String name)
+	{
         this.name = name;
     }
 
-    public String getName() {
+	public String getName()
+	{
         return name;
     }
 
-    public OutputStream getOutputStream() throws IOException {
+	public OutputStream getOutputStream() throws IOException
+	{
         throw new FileNotFoundException();
     }
 }

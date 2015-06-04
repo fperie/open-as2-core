@@ -5,19 +5,27 @@ import org.openas2.cmd.BaseCommand;
 import org.openas2.cmd.CommandResult;
 import org.openas2.partner.PartnershipFactory;
 
-public abstract class AliasedPartnershipsCommand extends BaseCommand {
+public abstract class AliasedPartnershipsCommand extends BaseCommand
+{
 
-	public CommandResult execute(Object[] params) {
+	@Override
+	public CommandResult execute(Object[] params)
+	{
 
-		try {
+		try
+		{
 			PartnershipFactory partFx = getSession().getPartnershipFactory();
 
-			if (partFx instanceof PartnershipFactory) {
+			if (partFx instanceof PartnershipFactory)
+			{
 				return execute((PartnershipFactory) partFx, params);
 			}
+
 			return new CommandResult(CommandResult.TYPE_COMMAND_NOT_SUPPORTED,
 					"Not supported by current partnership store");
-		} catch (OpenAS2Exception oae) {
+		}
+		catch (OpenAS2Exception oae)
+		{
 			oae.terminate();
 
 			return new CommandResult(oae);

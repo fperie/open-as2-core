@@ -5,11 +5,13 @@ import java.util.Map;
 import org.openas2.OpenAS2Exception;
 import org.openas2.message.Message;
 
-
-public abstract class BaseActiveModule extends BaseProcessorModule implements ActiveModule {
+public abstract class BaseActiveModule extends BaseProcessorModule implements ActiveModule
+{
 	private boolean running;
 
-	public boolean isRunning() {
+	@Override
+	public boolean isRunning()
+	{
 		return running;
 	}
 
@@ -17,47 +19,65 @@ public abstract class BaseActiveModule extends BaseProcessorModule implements Ac
 
 	public abstract void doStop() throws OpenAS2Exception;
 
-	public boolean canHandle(String action, Message msg, Map options) {
+	@Override
+	public boolean canHandle(String action, Message msg, Map options)
+	{
 		return false;
 	}
 
-	public void forceStop(Exception cause) {
-		try {
+	public void forceStop(Exception cause)
+	{
+		try
+		{
 			throw new ForcedStopException(cause);
-		} catch (ForcedStopException fse) {
+		}
+		catch (ForcedStopException fse)
+		{
 			fse.terminate();
 		}
 
-		try {
+		try
+		{
 			stop();
-		} catch (OpenAS2Exception oae) {
+		}
+		catch (OpenAS2Exception oae)
+		{
 			oae.terminate();
 		}
 	}
 
+	@Override
 	public void handle(String action, Message msg, Map options)
-		throws OpenAS2Exception {
+			throws OpenAS2Exception
+	{
 		throw new UnsupportedException("Active modules don't handle anything by default");
 	}
 
-	public void start() throws OpenAS2Exception {
+	@Override
+	public void start() throws OpenAS2Exception
+	{
 		setRunning(true);
 		doStart();
 	}
 
-	public void stop() throws OpenAS2Exception {
+	@Override
+	public void stop() throws OpenAS2Exception
+	{
 		setRunning(false);
 		doStop();
 	}
 
-	public String toString() {
+	@Override
+	public String toString()
+	{
 		StringBuffer buf = new StringBuffer();
 		buf.append(getClass().getName() + ": " + getParameters());
 
 		return buf.toString();
 	}
 
-	private void setRunning(boolean running) {
+	private void setRunning(boolean running)
+	{
 		this.running = running;
 	}
 }

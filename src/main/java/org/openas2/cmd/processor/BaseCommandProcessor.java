@@ -93,7 +93,7 @@ public abstract class BaseCommandProcessor extends Thread implements CommandProc
 	{
 		List<Command> regCmds = reg.getCommands();
 
-		if (regCmds.size() > 0)
+		if (!regCmds.isEmpty())
 		{
 			getCommands().addAll(regCmds);
 		}

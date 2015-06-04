@@ -17,34 +17,50 @@ import org.w3c.dom.Element;
  * @author joseph mcverry
  *
  */
-public class AddPartnershipCommand extends AliasedPartnershipsCommand {
-	public String getDefaultDescription() {
+public class AddPartnershipCommand extends AliasedPartnershipsCommand
+{
+
+	@Override
+	public String getDefaultDescription()
+	{
 		return "Add a new partnership definition to partnership store.";
 	}
 
-	public String getDefaultName() {
+	@Override
+	public String getDefaultName()
+	{
 		return "add";
 	}
 
-	public String getDefaultUsage() {
+	@Override
+	public String getDefaultUsage()
+	{
 		return "add name senderId receiverId <attribute 1=value 1> <attribute 2=value 2> ... <attribute n=value n>";
 	}
 
+	@Override
 	public CommandResult execute(PartnershipFactory partFx, Object[] params)
-			throws OpenAS2Exception {
-		if (params.length < 3) {
+			throws OpenAS2Exception
+	{
+		if (params.length < 3)
+		{
 			return new CommandResult(CommandResult.TYPE_INVALID_PARAM_COUNT,
 					getUsage());
 		}
 
-		synchronized (partFx) {
-
+		synchronized (partFx)
+		{
 			DocumentBuilder db = null;
-			try {
+			try
+			{
 				db = DocumentBuilderFactory.newInstance().newDocumentBuilder();
-			} catch (ParserConfigurationException e) {
+			}
+			catch (ParserConfigurationException e)
+			{
 				throw new OpenAS2Exception(e);
-			} catch (FactoryConfigurationError e) {
+			}
+			catch (FactoryConfigurationError e)
+			{
 				throw new OpenAS2Exception(e);
 			}
 
@@ -53,32 +69,44 @@ public class AddPartnershipCommand extends AliasedPartnershipsCommand {
 			Element root = doc.createElement("partnership");
 			doc.appendChild(root);
 
-			for (int i = 0; i < params.length; i++) {
+			for (int i = 0; i < params.length; i++)
+			{
 				String param = (String) params[i];
 				int pos = param.indexOf('=');
-				if (i == 0) {
+				if (i == 0)
+				{
 					root.setAttribute("name", param);
-				} else if (i == 1) {
+				}
+				else if (i == 1)
+				{
 					Element elem = doc.createElement("sender");
 					elem.setAttribute("name", param);
 					root.appendChild(elem);
-				} else if (i == 2) {
+				}
+				else if (i == 2)
+				{
 					Element elem = doc.createElement("receiver");
 					elem.setAttribute("name", param);
 					root.appendChild(elem);
-				} else if (pos == 0) {
+				}
+				else if (pos == 0)
+				{
 					return new CommandResult(CommandResult.TYPE_ERROR,
 							"incoming parameter missing name");
-				} else if (pos > 0) {
+				}
+				else if (pos > 0)
+				{
 					Element elem = doc.createElement("attribute");
 					elem.setAttribute("name", param.substring(0, pos));
 					elem.setAttribute("value", param.substring(pos + 1));
 					root.appendChild(elem);
 
-				} else
+				}
+				else
+				{
 					return new CommandResult(CommandResult.TYPE_ERROR,
 							"incoming parameter missing value");
-
+				}
 			}
 
 			((XMLPartnershipFactory) partFx).loadPartnership(partFx

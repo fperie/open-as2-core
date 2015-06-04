@@ -7,29 +7,34 @@ import java.util.List;
 
 import javax.mail.internet.ContentType;
 
+public class DataHistory implements Serializable
+{
+	private List items;
 
-public class DataHistory implements Serializable {
-    private List items;
+	public List getItems()
+	{
+		if (items == null)
+		{
+			items = new ArrayList();
+		}
 
-    public List getItems() {
-        if (items == null) {
-            items = new ArrayList();
-        }
+		return items;
+	}
 
-        return items;
-    }
+	boolean contains(ContentType type)
+	{
+		Iterator itemIt = getItems().iterator();
 
-    boolean contains(ContentType type) {
-        Iterator itemIt = getItems().iterator();
+		while (itemIt.hasNext())
+		{
+			DataHistoryItem item = (DataHistoryItem)itemIt.next();
 
-        while (itemIt.hasNext()) {
-            DataHistoryItem item = (DataHistoryItem) itemIt.next();
+			if ((item.getContentType() != null) && item.getContentType().match(type))
+			{
+				return true;
+			}
+		}
 
-            if ((item.getContentType() != null) && item.getContentType().match(type)) {
-                return true;
-            }
-        }
-
-        return false;
-    }
+		return false;
+	}
 }

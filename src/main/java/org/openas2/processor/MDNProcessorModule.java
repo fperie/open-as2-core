@@ -6,10 +6,10 @@ import org.openas2.Component;
 import org.openas2.OpenAS2Exception;
 import org.openas2.message.MessageMDN;
 
+public interface MDNProcessorModule extends Component
+{
 
-public interface MDNProcessorModule extends Component {
-		
-    public boolean canHandle(String action, MessageMDN msg, Map options);
+	public boolean canHandle(String action, MessageMDN msg, Map options);
 
-    public void handle(String action, MessageMDN msg, Map options) throws OpenAS2Exception;
+	public void handle(String action, MessageMDN msg, Map options) throws OpenAS2Exception;
 }

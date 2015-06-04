@@ -5,7 +5,8 @@ import org.openas2.params.MessageParameters;
 import org.openas2.partner.AS2Partnership;
 
 
-public class AS2ReceiverModule extends NetModule {
+public class AS2ReceiverModule extends NetModule
+{
     //	Macros for responses
     public static final String MSG_SENDER = "$" + MessageParameters.KEY_SENDER + "." +
         AS2Partnership.PID_AS2 + "$";
@@ -35,7 +36,8 @@ public class AS2ReceiverModule extends NetModule {
     public static final String DISP_STORAGE_FAILED = DP_VERIFIED +
         " An error occured while storing the data to the file system.";
     public static final String DISP_SUCCESS = DP_VERIFIED +
-        "There is no guarantee however that the EDI Interchange was syntactically correct, or was received by the EDI application/translator.";
+			"There is no guarantee however that the EDI Interchange was syntactically correct,"
+			+ " or was received by the EDI application/translator.";
 
 	@Override
 	public NetModuleHandler getHandler()

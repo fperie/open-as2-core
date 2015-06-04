@@ -5,109 +5,140 @@ import java.util.Map;
 
 import org.openas2.lib.util.GeneralUtil;
 
-public class BasicPartnership implements IPartnership {
-    private IPartner sender;
-    private IPartner receiver;
-    private Map attributes;
+public class BasicPartnership implements IPartnership
+{
+	private IPartner sender;
 
-    public BasicPartnership() {
-        super();
-    }
+	private IPartner receiver;
 
-    public IPartner getReceiver() {
-        return receiver;
-    }
+	private Map attributes;
 
-    public void setReceiver(IPartner receiver) {
-        this.receiver = receiver;
-    }
+	public BasicPartnership()
+	{
+		super();
+	}
 
-    public IPartner getSender() {
-        return sender;
-    }
+	public IPartner getReceiver()
+	{
+		return receiver;
+	}
 
-    public void setSender(IPartner sender) {
-        this.sender = sender;
-    }
+	public void setReceiver(IPartner receiver)
+	{
+		this.receiver = receiver;
+	}
 
-    public Map getAttributes() {
-        if (attributes == null) {
-            attributes = new HashMap();
-        }
-        return attributes;
-    }
+	public IPartner getSender()
+	{
+		return sender;
+	}
 
-    public String getAttribute(String name) {
-        return (String) getAttributes().get(name);
-    }
+	public void setSender(IPartner sender)
+	{
+		this.sender = sender;
+	}
 
-    public void setAttribute(String name, String value) {
-        getAttributes().put(name, value);
-    }
+	public Map getAttributes()
+	{
+		if (attributes == null)
+		{
+			attributes = new HashMap();
+		}
+		return attributes;
+	}
 
-    public String getEncryptionAlgorithm() {
-        return getAttribute(IPartnership.ATTRIBUTE_ENCRYPTION_ALGORITHM);
-    }
+	public String getAttribute(String name)
+	{
+		return (String)getAttributes().get(name);
+	}
 
-    public void setEncryptionAlgorithm(String encryptionAlgorithm) {
-        setAttribute(IPartnership.ATTRIBUTE_ENCRYPTION_ALGORITHM, encryptionAlgorithm);
-    }
+	public void setAttribute(String name, String value)
+	{
+		getAttributes().put(name, value);
+	}
 
-    public String getSignatureAlgorithm() {
-        return getAttribute(IPartnership.ATTRIBUTE_SIGNATURE_ALGORITHM);
-    }
+	public String getEncryptionAlgorithm()
+	{
+		return getAttribute(IPartnership.ATTRIBUTE_ENCRYPTION_ALGORITHM);
+	}
 
-    public void setSignatureAlgorithm(String signatureAlgorithm) {
-        setAttribute(IPartnership.ATTRIBUTE_SIGNATURE_ALGORITHM, signatureAlgorithm);
-    }
+	public void setEncryptionAlgorithm(String encryptionAlgorithm)
+	{
+		setAttribute(IPartnership.ATTRIBUTE_ENCRYPTION_ALGORITHM, encryptionAlgorithm);
+	}
 
-    public String getSource() {
-        return getAttribute(IPartnership.ATTRIBUTE_SOURCE);
-    }
+	public String getSignatureAlgorithm()
+	{
+		return getAttribute(IPartnership.ATTRIBUTE_SIGNATURE_ALGORITHM);
+	}
 
-    public void setSource(String source) {
-        setAttribute(IPartnership.ATTRIBUTE_SOURCE, source);
-    }
+	public void setSignatureAlgorithm(String signatureAlgorithm)
+	{
+		setAttribute(IPartnership.ATTRIBUTE_SIGNATURE_ALGORITHM, signatureAlgorithm);
+	}
 
-    public String getDestination() {
-        return getAttribute(IPartnership.ATTRIBUTE_DESTINATION);
-    }
+	public String getSource()
+	{
+		return getAttribute(IPartnership.ATTRIBUTE_SOURCE);
+	}
 
-    public void setDestination(String destination) {
-        setAttribute(IPartnership.ATTRIBUTE_DESTINATION, destination);
-    }
+	public void setSource(String source)
+	{
+		setAttribute(IPartnership.ATTRIBUTE_SOURCE, source);
+	}
 
-    public String getSubject() {
-        return getAttribute(IPartnership.ATTRIBUTE_SUBJECT);
-    }
+	public String getDestination()
+	{
+		return getAttribute(IPartnership.ATTRIBUTE_DESTINATION);
+	}
 
-    public void setSubject(String subject) {
-        setAttribute(IPartnership.ATTRIBUTE_SUBJECT, subject);
-    }
+	public void setDestination(String destination)
+	{
+		setAttribute(IPartnership.ATTRIBUTE_DESTINATION, destination);
+	}
 
-    public String getMdnOptions() {
-        return getAttribute(IPartnership.ATTRIBUTE_MDN_OPTIONS);
-    }
+	public String getSubject()
+	{
+		return getAttribute(IPartnership.ATTRIBUTE_SUBJECT);
+	}
 
-    public void setMdnOptions(String mdnOptions) {
-        setAttribute(IPartnership.ATTRIBUTE_MDN_OPTIONS, mdnOptions);
-    }
+	public void setSubject(String subject)
+	{
+		setAttribute(IPartnership.ATTRIBUTE_SUBJECT, subject);
+	}
 
-    public String toString() {
-        StringBuffer buf = new StringBuffer();
-        buf.append("Sender: ");
-        if (getSender() != null) {
-            buf.append(getSender().toString());
-        } else {
-            buf.append("<none>");
-        }
-        buf.append("  ");
-        if (getReceiver() != null) {
-            buf.append("Receiver: ").append(getReceiver().toString());
-        } else {
-            buf.append("<none>");
-        }
-        buf.append("  Attributes: ").append(GeneralUtil.convert(getAttributes(), "=", ", "));
-        return buf.toString();
-    }
+	public String getMdnOptions()
+	{
+		return getAttribute(IPartnership.ATTRIBUTE_MDN_OPTIONS);
+	}
+
+	public void setMdnOptions(String mdnOptions)
+	{
+		setAttribute(IPartnership.ATTRIBUTE_MDN_OPTIONS, mdnOptions);
+	}
+
+	public String toString()
+	{
+		StringBuffer buf = new StringBuffer();
+		buf.append("Sender: ");
+		if (getSender() != null)
+		{
+			buf.append(getSender().toString());
+		}
+		else
+		{
+			buf.append("<none>");
+		}
+		buf.append("  ");
+		if (getReceiver() != null)
+		{
+			buf.append("Receiver: ").append(getReceiver().toString());
+		}
+		else
+		{
+			buf.append("<none>");
+		}
+		buf.append("  Attributes: ").append(GeneralUtil.convert(getAttributes(), "=", ", "));
+		return buf.toString();
+	}
 }

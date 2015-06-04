@@ -7,7 +7,8 @@ import javax.annotation.Nonnull;
 
 import org.openas2.BaseComponent;
 
-public class BaseCommandRegistry extends BaseComponent implements CommandRegistry {
+public class BaseCommandRegistry extends BaseComponent implements CommandRegistry
+{
 	@Nonnull
 	private List<Command> commands = new ArrayList<>();
 

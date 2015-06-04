@@ -7,26 +7,32 @@ import java.util.HashMap;
 import java.util.Map;
 
 
-public class DateUtil {
+public class DateUtil
+{
     private static final Map formatters = new HashMap();
         
-    public static synchronized String formatDate(String format, Date value) {
+	public static synchronized String formatDate(String format, Date value)
+	{
         SimpleDateFormat df = getDateFormat(format);
         return df.format(value);
     }
     
-    public static synchronized String formatDate(String format) {
+	public static synchronized String formatDate(String format)
+	{
         return formatDate(format, new Date());
     }
     
-    public static synchronized Date parseDate(String format, String value) throws ParseException {
+	public static synchronized Date parseDate(String format, String value) throws ParseException
+	{
         SimpleDateFormat df = getDateFormat(format);
         return df.parse(value);
     }
 
-    private static SimpleDateFormat getDateFormat(String format) {
+	private static SimpleDateFormat getDateFormat(String format)
+	{
         SimpleDateFormat df = (SimpleDateFormat) formatters.get(format);
-        if (df == null) {
+		if (df == null)
+		{
             df = new SimpleDateFormat(format);
             formatters.put(format, df);
         }

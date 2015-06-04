@@ -7,7 +7,9 @@ import java.util.Map;
 import org.openas2.OpenAS2Exception;
 
 
-public interface AliasedCertificateFactory extends CertificateFactory {
+public interface AliasedCertificateFactory extends CertificateFactory 
+{
+
     public X509Certificate getCertificate(String alias)
         throws OpenAS2Exception;
 

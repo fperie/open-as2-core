@@ -8,86 +8,109 @@ import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 
-public class GeneralUtil {
+public class GeneralUtil
+{
 
-    public static String convert(Object[] array, String delimiter) {
-        StringBuffer buffer = new StringBuffer();
-        for (int i = 0; i < array.length; i++) {
-            if (buffer.length() > 0) {
-                buffer.append(delimiter);
-            }
-            buffer.append(array[i].toString());
-        }
+	public static String convert(Object[] array, String delimiter)
+	{
+		StringBuffer buffer = new StringBuffer();
+		for (int i = 0; i < array.length; i++)
+		{
+			if (buffer.length() > 0)
+			{
+				buffer.append(delimiter);
+			}
+			buffer.append(array[i].toString());
+		}
 
-        return buffer.toString();
-    }
-
-    public static boolean contains(String[] array, String value) {
-        for (int i = 0; i < array.length; i++) {
-            if (array[i] == null) {
-                if (value == null) {
-                    return true;
-                }
-            } else if (value != null && array[i].equals(value)) {
-                return true;
-            }
-        }
-        return false;
-    }
-
-    public static String[] convert(Enumeration en) {
-        List list = Collections.list(en);        
-        return convert(list);
-    }
-    
-    public static String[] convert(List list) {
-	    String[] values = new String[0];
-		return (String[]) list.toArray(values);
+		return buffer.toString();
 	}
-    
-    public static String convert(List list, String delimiter) {
-        return convert(list.toArray(), delimiter);
-    }
-    
-    public static String[] convertKeys(Map map) {
-        String[] keys = new String[0];
-        return (String[]) map.keySet().toArray(keys);
-    }
-    
-    public static String convert(Map map, String valueDelimiter, String pairDelimiter) {
+
+	public static boolean contains(String[] array, String value)
+	{
+		for (int i = 0; i < array.length; i++)
+		{
+			if (array[i] == null)
+			{
+				if (value == null)
+				{
+					return true;
+				}
+			}
+			else if (value != null && array[i].equals(value))
+			{
+				return true;
+			}
+		}
+		return false;
+	}
+
+	public static String[] convert(Enumeration en)
+	{
+		List list = Collections.list(en);
+		return convert(list);
+	}
+
+	public static String[] convert(List list)
+	{
+		String[] values = new String[0];
+		return (String[])list.toArray(values);
+	}
+
+	public static String convert(List list, String delimiter)
+	{
+		return convert(list.toArray(), delimiter);
+	}
+
+	public static String[] convertKeys(Map map)
+	{
+		String[] keys = new String[0];
+		return (String[])map.keySet().toArray(keys);
+	}
+
+	public static String convert(Map map, String valueDelimiter, String pairDelimiter)
+	{
 		StringBuffer strBuf = new StringBuffer();
 		Iterator it = map.entrySet().iterator();
 		Map.Entry entry;
-		while (it.hasNext()) {
-			entry = (Map.Entry) it.next();
+		while (it.hasNext())
+		{
+			entry = (Map.Entry)it.next();
 			strBuf.append(entry.getKey().toString()).append(valueDelimiter);
 			strBuf.append(entry.getValue().toString());
-			if (it.hasNext()) {
-			    strBuf.append(pairDelimiter);
+			if (it.hasNext())
+			{
+				strBuf.append(pairDelimiter);
 			}
 		}
 		return strBuf.toString();
 	}
-    
-    public static String convertTrace(Exception e) {
-        StringWriter writer = new StringWriter();
-        e.printStackTrace(new PrintWriter(writer));
-        return writer.toString();
-    }
 
-    public static Object getKey(Map map, Object value) {
-        Iterator it = map.entrySet().iterator();
-        Map.Entry entry;
-        Object currentValue;
-        while (it.hasNext()) {
-            entry = (Map.Entry) it.next();
-            currentValue = entry.getValue();
-            if (currentValue == null && value == null) {
-                return entry.getKey();
-            } else if (currentValue != null && currentValue.equals(value)) {
-                return entry.getKey();
-            }
-        }
-        return null;
-    }
+	public static String convertTrace(Exception e)
+	{
+		StringWriter writer = new StringWriter();
+		e.printStackTrace(new PrintWriter(writer));
+		return writer.toString();
+	}
+
+	public static Object getKey(Map map, Object value)
+	{
+		Iterator it = map.entrySet().iterator();
+		Map.Entry entry;
+		Object currentValue;
+		while (it.hasNext())
+		{
+			entry = (Map.Entry)it.next();
+			currentValue = entry.getValue();
+			if (currentValue == null && value == null)
+			{
+				return entry.getKey();
+			}
+			else if (currentValue != null && currentValue.equals(value))
+			{
+				return entry.getKey();
+			}
+		}
+		return null;
+	}
 }

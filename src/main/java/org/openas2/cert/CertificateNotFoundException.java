@@ -4,39 +4,46 @@ import java.security.cert.X509Certificate;
 
 import org.openas2.OpenAS2Exception;
 
-
-public class CertificateNotFoundException extends OpenAS2Exception {
-    /**
-	 * Version of serialization. 
+public class CertificateNotFoundException extends OpenAS2Exception
+{
+	/**
+	 * Version of serialization.
 	 */
 	private static final long serialVersionUID = 1L;
-	
+
 	private String alias;
-    private String partnershipType;
 
-    public CertificateNotFoundException(String partnershipType, String alias) {
-        super("Type: " + partnershipType + ", Alias: " + alias);
-        this.partnershipType = partnershipType;
-        this.alias = alias;
-    }
+	private String partnershipType;
 
-    public CertificateNotFoundException(X509Certificate cert) {
-        super("Certificate not in store: " + cert.toString());
-    }
+	public CertificateNotFoundException(String partnershipType, String alias)
+	{
+		super("Type: " + partnershipType + ", Alias: " + alias);
+		this.partnershipType = partnershipType;
+		this.alias = alias;
+	}
 
-    public void setAlias(String string) {
-        alias = string;
-    }
+	public CertificateNotFoundException(X509Certificate cert)
+	{
+		super("Certificate not in store: " + cert.toString());
+	}
 
-    public String getAlias() {
-        return alias;
-    }
+	public void setAlias(String string)
+	{
+		alias = string;
+	}
 
-    public void setPartnershipType(String string) {
-        partnershipType = string;
-    }
+	public String getAlias()
+	{
+		return alias;
+	}
 
-    public String getPartnershipType() {
-        return partnershipType;
-    }
+	public void setPartnershipType(String string)
+	{
+		partnershipType = string;
+	}
+
+	public String getPartnershipType()
+	{
+		return partnershipType;
+	}
 }

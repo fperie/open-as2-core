@@ -8,9 +8,14 @@ import java.util.StringTokenizer;
 import javax.annotation.Nonnull;
 
 import org.openas2.params.InvalidParameterException;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 public class BaseComponent implements Component
 {
+	/** Logger for the class. */
+	private static final Logger LOGGER = LoggerFactory.getLogger(BaseComponent.class);
+
 	@Nonnull
 	private Map<String, Serializable> parameters = new LinkedHashMap<>();
 
@@ -62,6 +67,8 @@ public class BaseComponent implements Component
 		}
 		catch (InvalidParameterException ipe)
 		{
+			LOGGER.debug("the parameter with key: " + key + " has not value. Default value used: " + defaultValue + ".",
+					ipe);
 			return defaultValue;
 		}
 	}

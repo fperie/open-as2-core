@@ -7,7 +7,8 @@ import org.openas2.WrappedException;
  * @author joseph mcverry
  *
  */
-public class CommandTokenizer {
+public class CommandTokenizer
+{
 
 	String workString;
 	int pos = 0;
@@ -16,7 +17,8 @@ public class CommandTokenizer {
 	 * constructor
 	 * @param inString
 	 */
-	public CommandTokenizer(String inString) {
+	public CommandTokenizer(String inString)
+	{
 		workString = inString;
 		len = workString.length();
 	}
@@ -26,16 +28,24 @@ public class CommandTokenizer {
 	 * @return true if there are any more tokens 
 	 * @throws WrappedException 
 	 */
-	public boolean hasMoreTokens() throws WrappedException {
-		try {
+	public boolean hasMoreTokens() throws WrappedException
+	{
+		try
+		{
 			while (pos < len - 1 && workString.charAt(pos) == ' ')
+			{
 				pos++;
+			}
 
 			if (pos < len)
+			{
 				return true;
+			}
 
 			return false;
-		} catch (Exception e) {
+		}
+		catch (Exception e)
+		{
 			throw new WrappedException(e);
 		}
 	}
@@ -46,19 +56,24 @@ public class CommandTokenizer {
 	 * @throws WrappedException 
 	 * 
 	 */
-	public String nextToken() throws WrappedException {
+	public String nextToken() throws WrappedException
+	{
 
-		try {
+		try
+		{
 			while (pos < len - 1 && workString.charAt(pos) == ' ')
+			{
 				pos++;
-
+			}
 			StringBuffer sb = new StringBuffer();
 
-			while (pos < len && workString.charAt(pos) != ' ') {
-
-				if (workString.charAt(pos) == '"') {
+			while (pos < len && workString.charAt(pos) != ' ')
+			{
+				if (workString.charAt(pos) == '"')
+				{
 					pos++;
-					while (pos < len && workString.charAt(pos) != '"') {
+					while (pos < len && workString.charAt(pos) != '"')
+					{
 						sb.append(workString.charAt(pos));
 						pos++;
 					}
@@ -70,9 +85,10 @@ public class CommandTokenizer {
 			}
 
 			return sb.toString();
-		} catch (Exception e) {
+		}
+		catch (Exception e)
+		{
 			throw new WrappedException(e);
 		}
-
 	}
 }

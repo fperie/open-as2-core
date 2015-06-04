@@ -18,96 +18,113 @@ import org.openas2.params.InvalidParameterException;
 import org.openas2.params.MessageParameters;
 import org.openas2.params.ParameterParser;
 import org.openas2.processor.receiver.AS2ReceiverModule;
-import org.openas2.processor.sender.AsynchMDNSenderModule;
 import org.openas2.util.DispositionType;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-public class MessageFileModule extends BaseStorageModule {
-    public static final String PARAM_HEADER = "header";
-    
-    /** Logger for the class. */
-    private static final Logger LOGGER = LoggerFactory.getLogger(MessageFileModule.class);
+public class MessageFileModule extends BaseStorageModule
+{
+	public static final String PARAM_HEADER = "header";
 
+	/** Logger for the class. */
+	private static final Logger LOGGER = LoggerFactory.getLogger(MessageFileModule.class);
 
-    public void handle(String action, Message msg, Map options) throws OpenAS2Exception {
-        // store message content
-        try {
-            File msgFile = getFile(msg, getParameter(PARAM_FILENAME, true), action);
-            InputStream in = msg.getData().getInputStream();
-            store(msgFile, in);
-            LOGGER.info("stored message to {}", msgFile.getAbsolutePath() + msg.getLoggingText());
-        } catch (Exception e) {
-            throw new DispositionException(new DispositionType("automatic-action", "MDN-sent-automatically",
-                    "processed", "Error", "Error storing transaction"), AS2ReceiverModule.DISP_STORAGE_FAILED, e);
-        }
+	@Override
+	public void handle(String action, Message msg, Map options) throws OpenAS2Exception
+	{
+		// store message content
+		try
+		{
+			File msgFile = getFile(msg, getParameter(PARAM_FILENAME, true), action);
+			InputStream in = msg.getData().getInputStream();
+			store(msgFile, in);
+			LOGGER.info("stored message to {}", msgFile.getAbsolutePath() + msg.getLoggingText());
+		}
+		catch (Exception e)
+		{
+			throw new DispositionException(new DispositionType("automatic-action", "MDN-sent-automatically",
+					"processed", "Error", "Error storing transaction"), AS2ReceiverModule.DISP_STORAGE_FAILED, e);
+		}
 
-        String headerFilename = getParameter(PARAM_HEADER, false);
+		String headerFilename = getParameter(PARAM_HEADER, false);
 
-        if (headerFilename != null) {
-            try {
-                File headerFile = getFile(msg, headerFilename, action);
-                InputStream in = getHeaderStream(msg);
-                store(headerFile, in);
-                LOGGER.info("stored headers to {}", headerFile.getAbsolutePath()+msg.getLoggingText());
-            } catch (IOException ioe) {
-                throw new WrappedException(ioe);
-            }
-        }
-    }
+		if (headerFilename != null)
+		{
+			try
+			{
+				File headerFile = getFile(msg, headerFilename, action);
+				InputStream in = getHeaderStream(msg);
+				store(headerFile, in);
+				LOGGER.info("stored headers to {}", headerFile.getAbsolutePath() + msg.getLoggingText());
+			}
+			catch (IOException ioe)
+			{
+				throw new WrappedException(ioe);
+			}
+		}
+	}
 
-    protected String getModuleAction() {
-        return DO_STORE;
-    }
+	@Override
+	protected String getModuleAction()
+	{
+		return DO_STORE;
+	}
 
-    /**
- 	* @deprecated 2007-06-01
- 	*/ 
-    @Deprecated
-    protected String getFilename(Message msg, String fileParam) throws InvalidParameterException {
+	/**
+	 * @deprecated 2007-06-01
+	 */
+	@Deprecated
+	@Override
+	protected String getFilename(Message msg, String fileParam) throws InvalidParameterException
+	{
 
-        return getFilename(msg, fileParam, "");
-    }
+		return getFilename(msg, fileParam, "");
+	}
 
-    /**
-     * @since 2007-06-01
-     */
-    protected String getFilename(Message msg, String fileParam, String action) throws InvalidParameterException {
-        CompositeParameters compParams = new CompositeParameters(false) .
-        	add ("date", new DateParameters()) .
-        	add ("msg", new MessageParameters(msg));
+	/**
+	 * @since 2007-06-01
+	 */
+	@Override
+	protected String getFilename(Message msg, String fileParam, String action) throws InvalidParameterException
+	{
+		CompositeParameters compParams = new CompositeParameters(false).
+				add("date", new DateParameters()).
+				add("msg", new MessageParameters(msg));
 
-        return ParameterParser.parse(fileParam, compParams);
-    }
+		return ParameterParser.parse(fileParam, compParams);
+	}
 
-    protected InputStream getHeaderStream(Message msg) throws IOException {
-        StringBuffer headerBuf = new StringBuffer();
+	protected InputStream getHeaderStream(Message msg) throws IOException
+	{
+		StringBuffer headerBuf = new StringBuffer();
 
-        // write headers to the string buffer
-        headerBuf.append("Headers:\r\n");
+		// write headers to the string buffer
+		headerBuf.append("Headers:\r\n");
 
-        Enumeration headers = msg.getHeaders().getAllHeaderLines();
-        String header;
+		Enumeration headers = msg.getHeaders().getAllHeaderLines();
+		String header;
 
-        while (headers.hasMoreElements()) {
-            header = (String) headers.nextElement();
-            headerBuf.append(header).append("\r\n");
-        }
+		while (headers.hasMoreElements())
+		{
+			header = (String)headers.nextElement();
+			headerBuf.append(header).append("\r\n");
+		}
 
-        headerBuf.append("\r\n");
+		headerBuf.append("\r\n");
 
-        // write attributes to the string buffer
-        headerBuf.append("Attributes:\r\n");
+		// write attributes to the string buffer
+		headerBuf.append("Attributes:\r\n");
 
-        Iterator attrIt = msg.getAttributes().entrySet().iterator();
-        Map.Entry attrEntry;
+		Iterator attrIt = msg.getAttributes().entrySet().iterator();
+		Map.Entry attrEntry;
 
-        while (attrIt.hasNext()) {
-            attrEntry = (Map.Entry) attrIt.next();
-            headerBuf.append(attrEntry.getKey()).append(": ");
-            headerBuf.append(attrEntry.getValue()).append("\r\n");
-        }
+		while (attrIt.hasNext())
+		{
+			attrEntry = (Map.Entry)attrIt.next();
+			headerBuf.append(attrEntry.getKey()).append(": ");
+			headerBuf.append(attrEntry.getValue()).append("\r\n");
+		}
 
-        return new ByteArrayInputStream(headerBuf.toString().getBytes());
-    }
+		return new ByteArrayInputStream(headerBuf.toString().getBytes());
+	}
 }

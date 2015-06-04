@@ -12,34 +12,46 @@ import org.openas2.partner.PartnershipFactory;
  * 
  * @author Joe McVerry
  */
-public class ViewPartnerCommand extends AliasedPartnershipsCommand {
-	public String getDefaultDescription() {
+public class ViewPartnerCommand extends AliasedPartnershipsCommand
+{
+	@Override
+	public String getDefaultDescription()
+	{
 		return "View the partner entry in the partnership store.";
 	}
 
-	public String getDefaultName() {
+	@Override
+	public String getDefaultName()
+	{
 		return "view";
 	}
 
-	public String getDefaultUsage() {
+	@Override
+	public String getDefaultUsage()
+	{
 		return "view <name>";
 	}
 
+	@Override
 	protected CommandResult execute(PartnershipFactory partFx, Object[] params)
-			throws OpenAS2Exception {
-		if (params.length < 1) {
+			throws OpenAS2Exception
+	{
+		if (params.length < 1)
+		{
 			return new CommandResult(CommandResult.TYPE_INVALID_PARAM_COUNT,
 					getUsage());
 		}
-		synchronized (partFx) {
 
+		synchronized (partFx)
+		{
 			String name = params[0].toString();
-
 			Iterator parts = partFx.getPartners().keySet().iterator();
 
-			while (parts.hasNext()) {
+			while (parts.hasNext())
+			{
 				String partName = parts.next().toString();
-				if (partName.equals(name)) {
+				if (partName.equals(name))
+				{
 					Map partDefs = (Map) partFx.getPartners().get(name);
 					String out = name + "\n" + partDefs.toString();
 					return new CommandResult(CommandResult.TYPE_OK, out);

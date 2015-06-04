@@ -14,28 +14,34 @@ import javax.mail.MessagingException;
 import javax.mail.internet.MimeBodyPart;
 import javax.mail.internet.MimeMultipart;
 
-public class DispositionDataContentHandler implements DataContentHandler {
+public class DispositionDataContentHandler implements DataContentHandler
+{
     private static final ActivationDataFlavor ADF1;
     private static final DataFlavor[] ADFs;
 
-    static {
+	static
+	{
         ADF1 = new ActivationDataFlavor(MimeBodyPart.class, "message/disposition-notification",
                 "Disposition Notification");
         ADFs = new DataFlavor[] { ADF1 };
     }
 
-    public DispositionDataContentHandler() {
+	public DispositionDataContentHandler()
+	{
         super();
     }
 
-    public Object getContent(DataSource ds) throws IOException {
+	@Override
+	public Object getContent(DataSource ds) throws IOException
+	{
         byte[] buf = new byte[4096];
         BufferedInputStream bIn = new BufferedInputStream(ds.getInputStream());
         ByteArrayOutputStream baOut = new ByteArrayOutputStream();
         BufferedOutputStream bOut = new BufferedOutputStream(baOut);
         int count = bIn.read(buf);
 
-        while (count > -1) {
+		while (count > -1)
+		{
             bOut.write(buf, 0, count);
             count = bIn.read(buf);
         }
@@ -46,35 +52,57 @@ public class DispositionDataContentHandler implements DataContentHandler {
         return baOut.toByteArray();
     }
 
-    public Object getTransferData(DataFlavor df, DataSource ds) throws IOException {
-        if (ADF1.equals(df)) {
+	@Override
+	public Object getTransferData(DataFlavor df, DataSource ds) throws IOException
+	{
+		if (ADF1.equals(df))
+		{
             return getContent(ds);
         }
         return null;
     }
 
-    public DataFlavor[] getTransferDataFlavors() {
+	@Override
+	public DataFlavor[] getTransferDataFlavors()
+	{
         return ADFs;
     }
 
-    public void writeTo(Object obj, String mimeType, OutputStream os) throws IOException {
-        if (obj instanceof MimeBodyPart) {
-            try {
+	@Override
+	public void writeTo(Object obj, String mimeType, OutputStream os) throws IOException
+	{
+		if (obj instanceof MimeBodyPart)
+		{
+			try
+			{
                 ((MimeBodyPart) obj).writeTo(os);
-            } catch (MessagingException me) {
+			}
+			catch (MessagingException me)
+			{
                 throw new IOException(me.getMessage());
             }
-        } else if (obj instanceof MimeMultipart) {
-            try {
+		}
+		else if (obj instanceof MimeMultipart)
+		{
+			try
+			{
                 ((MimeMultipart) obj).writeTo(os);
-            } catch (MessagingException me) {
+			}
+			catch (MessagingException me)
+			{
                 throw new IOException(me.getMessage());
             }
-        } else if (obj instanceof byte[]) {
+		}
+		else if (obj instanceof byte[])
+		{
             os.write((byte[]) obj);
-        } else if (obj instanceof String) {
+		}
+		else if (obj instanceof String)
+		{
             os.write(((String) obj).getBytes());
-        } else {
+		}
+		else
+		{
             throw new IOException("Unknown object type: " + obj.getClass().getName());
         }
     }

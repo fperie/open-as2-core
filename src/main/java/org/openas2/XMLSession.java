@@ -67,12 +67,14 @@ public class XMLSession extends BaseSession implements CommandRegistryFactory
 
 	
 	public XMLSession(InputStream in) throws OpenAS2Exception,
-			ParserConfigurationException, SAXException, IOException {
+			ParserConfigurationException, SAXException, IOException
+	{
 		this(in, null);
 	}
 
 	public XMLSession(InputStream in, String baseDirectory) throws OpenAS2Exception,
-		ParserConfigurationException, SAXException, IOException {
+			ParserConfigurationException, SAXException, IOException
+	{
 		super();
 
 		if (StringUtils.isNotEmpty(baseDirectory))
@@ -84,16 +86,20 @@ public class XMLSession extends BaseSession implements CommandRegistryFactory
 	}
 
 
-	public void setCommandRegistry(CommandRegistry registry) {
+	public void setCommandRegistry(CommandRegistry registry)
+	{
 		commandRegistry = registry;
 	}
 
-	public CommandRegistry getCommandRegistry() {
+	@Override
+	public CommandRegistry getCommandRegistry()
+	{
 		return commandRegistry;
 	}
 
 	protected void load(InputStream in) throws ParserConfigurationException,
-			SAXException, IOException, OpenAS2Exception {
+			SAXException, IOException, OpenAS2Exception
+	{
 		DocumentBuilderFactory factory = DocumentBuilderFactory.newInstance();
 
 		DocumentBuilder parser = factory.newDocumentBuilder();
@@ -104,71 +110,94 @@ public class XMLSession extends BaseSession implements CommandRegistryFactory
 		Node rootNode;
 		String nodeName;
 
-		for (int i = 0; i < rootNodes.getLength(); i++) {
+		for (int i = 0; i < rootNodes.getLength(); i++)
+		{
 			rootNode = rootNodes.item(i);
 
 			nodeName = rootNode.getNodeName();
 
-			if (nodeName.equals(EL_CERTIFICATES)) {
+			if (nodeName.equals(EL_CERTIFICATES))
+			{
 				loadCertificates(rootNode);
-			} else if (nodeName.equals(EL_PROCESSOR)) {
+			}
+			else if (nodeName.equals(EL_PROCESSOR))
+			{
 				loadProcessor(rootNode);
-			} else if (nodeName.equals(EL_CMDPROCESSOR)) {
+			}
+			else if (nodeName.equals(EL_CMDPROCESSOR))
+			{
 				loadCommandProcessors(rootNode);
-			} else if (nodeName.equals(EL_PARTNERSHIPS)) {
+			}
+			else if (nodeName.equals(EL_PARTNERSHIPS))
+			{
 				loadPartnerships(rootNode);
-			} else if (nodeName.equals(EL_COMMANDS)) {
+			}
+			else if (nodeName.equals(EL_COMMANDS))
+			{
 				loadCommands(rootNode);
-			} else if (nodeName.equals(EL_LOGGERS)) {
+			}
+			else if (nodeName.equals(EL_LOGGERS))
+			{
 				loadAppender(rootNode);
-			} else if (nodeName.equals("#text")) {
+			}
+			else if (nodeName.equals("#text") || nodeName.equals("#comment"))
+			{
 				// do nothing
-			} else if (nodeName.equals("#comment")) {
-				// do nothing
-			} else {
+			}
+			else
+			{
 				throw new OpenAS2Exception("Undefined tag: " + nodeName);
 			}
 		}
 	}
 
-	protected void loadCertificates(Node rootNode) throws OpenAS2Exception {
+	protected void loadCertificates(Node rootNode) throws OpenAS2Exception
+	{
 		CertificateFactory certFx = (CertificateFactory) XMLUtil.getComponent(
 				rootNode, this);
 		setComponent(CertificateFactory.COMPID_CERTIFICATE_FACTORY, certFx);
 	}
 
-	protected void loadCommands(Node rootNode) throws OpenAS2Exception {
+	protected void loadCommands(Node rootNode) throws OpenAS2Exception
+	{
 		CommandRegistry cmdReg = (CommandRegistry) XMLUtil.getComponent(
 				rootNode, this);
 		setCommandRegistry(cmdReg);
 	}
 
-	protected void loadCommandProcessors(Node rootNode) throws OpenAS2Exception {
+	protected void loadCommandProcessors(Node rootNode) throws OpenAS2Exception
+	{
 		cmdManager = CommandManager.getCmdManager();
 
 		NodeList cmdProcessor = rootNode.getChildNodes();
 		Node processor;
 
-		for (int i = 0; i < cmdProcessor.getLength(); i++) {
+		for (int i = 0; i < cmdProcessor.getLength(); i++)
+		{
 			processor = cmdProcessor.item(i);
 
-			if (processor.getNodeName().equals("commandProcessor")) {
+			if (processor.getNodeName().equals("commandProcessor"))
+			{
 				loadCommandProcessor(cmdManager, processor);
 			}
 		}
 	}
 
-	public CommandManager getCommandManager() {
+	public CommandManager getCommandManager()
+	{
 		return cmdManager;
 	}
 
 	protected void loadCommandProcessor(CommandManager manager,
-			Node cmdPrcessorNode) throws OpenAS2Exception {
+			Node cmdPrcessorNode) throws OpenAS2Exception
+	{
 		BaseCommandProcessor cmdProcesor = (BaseCommandProcessor) XMLUtil
 				.getComponent(cmdPrcessorNode, this);
 		manager.addProcessor(cmdProcesor);
 	}
-	protected void loadPartnerships(Node rootNode) throws OpenAS2Exception {
+
+	protected void loadPartnerships(Node rootNode) throws OpenAS2Exception
+	{
 		PartnershipFactory partnerFx = (PartnershipFactory) XMLUtil
 				.getComponent(rootNode, this);
 		setComponent(PartnershipFactory.COMPID_PARTNERSHIP_FACTORY, partnerFx);
@@ -188,42 +217,48 @@ public class XMLSession extends BaseSession implements CommandRegistryFactory
 				if (mapAttributes.containsKey("classname"))
 				{
 					LOGGER.warn(
-							"The appender with the class name: {} will be ignored. Please, use your logback configuration file to custom the logs...",
+							"The appender with the class name: {} will be ignored. "
+									+ "Please, use your logback configuration file to custom the logs...",
 							mapAttributes.get("classname"));
 				}
 			}
 		}
 	}
 
-	protected void loadProcessor(Node rootNode) throws OpenAS2Exception {
+	protected void loadProcessor(Node rootNode) throws OpenAS2Exception
+	{
 		Processor proc = (Processor) XMLUtil.getComponent(rootNode, this);
 		setComponent(Processor.COMPID_PROCESSOR, proc);
 
 		NodeList modules = rootNode.getChildNodes();
 		Node module;
 
-		for (int i = 0; i < modules.getLength(); i++) {
+		for (int i = 0; i < modules.getLength(); i++)
+		{
 			module = modules.item(i);
 
-			if (module.getNodeName().equals("module")) {
+			if (module.getNodeName().equals("module"))
+			{
 				loadProcessorModule(proc, module);
 			}
 		}
 	}
 
 	protected void loadProcessorModule(Processor proc, Node moduleNode)
-			throws OpenAS2Exception {
+			throws OpenAS2Exception
+	{
 		ProcessorModule procmod = (ProcessorModule) XMLUtil.getComponent(
 				moduleNode, this);
 		proc.getModules().add(procmod);
 	}
 
-	public String getBaseDirectory() {
+	public String getBaseDirectory()
+	{
 		return baseDirectory;
 	}
 
-	public void setBaseDirectory(String dir) {
+	public void setBaseDirectory(String dir)
+	{
 		baseDirectory = dir;
 	}
-
 }

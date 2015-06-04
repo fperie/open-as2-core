@@ -13,218 +13,295 @@ import javax.mail.internet.MimeBodyPart;
 
 import org.openas2.partner.Partnership;
 
+public abstract class BaseMessageMDN implements MessageMDN
+{
+	private DataHistory history;
 
-public abstract class BaseMessageMDN implements MessageMDN {
-    private DataHistory history;
-    private InternetHeaders headers;
-    private Partnership partnership;
-    private Map attributes;
-    private Message message;
-    private MimeBodyPart data;
-    private String text;
+	private InternetHeaders headers;
 
-    public BaseMessageMDN(Message msg) {
-        super();
-        this.message = msg;
-        msg.setMDN(this);
-    }
+	private Partnership partnership;
 
-    public void setAttribute(String key, String value) {
-        getAttributes().put(key, value);
-    }
+	private Map attributes;
 
-    public String getAttribute(String key) {
-        return (String) getAttributes().get(key);
-    }
+	private Message message;
 
-    public void setAttributes(Map attributes) {
-        this.attributes = attributes;
-    }
+	private MimeBodyPart data;
 
-    public Map getAttributes() {
-        if (attributes == null) {
-            attributes = new HashMap();
-        }
+	private String text;
 
-        return attributes;
-    }
+	public BaseMessageMDN(Message msg)
+	{
+		super();
+		this.message = msg;
+		msg.setMDN(this);
+	}
 
-    public void setData(MimeBodyPart data) {
-        this.data = data;
-    }
+	@Override
+	public void setAttribute(String key, String value)
+	{
+		getAttributes().put(key, value);
+	}
 
-    public MimeBodyPart getData() {
-        return data;
-    }
+	@Override
+	public String getAttribute(String key)
+	{
+		return (String)getAttributes().get(key);
+	}
 
-    public void setHeader(String key, String value) {
-        getHeaders().setHeader(key, value);
-    }
+	@Override
+	public void setAttributes(Map attributes)
+	{
+		this.attributes = attributes;
+	}
 
-    public String getHeader(String key) {
-        return getHeader(key, ", ");
-    }
+	@Override
+	public Map getAttributes()
+	{
+		if (attributes == null)
+		{
+			attributes = new HashMap();
+		}
 
-    public String getHeader(String key, String delimiter) {
-        return getHeaders().getHeader(key, delimiter);
-    }
+		return attributes;
+	}
 
-    public void setHeaders(InternetHeaders headers) {
-        this.headers = headers;
-    }
+	@Override
+	public void setData(MimeBodyPart data)
+	{
+		this.data = data;
+	}
 
-    public InternetHeaders getHeaders() {
-        if (headers == null) {
-            headers = new InternetHeaders();
-        }
+	@Override
+	public MimeBodyPart getData()
+	{
+		return data;
+	}
 
-        return headers;
-    }
+	@Override
+	public void setHeader(String key, String value)
+	{
+		getHeaders().setHeader(key, value);
+	}
 
-    public void setMessage(Message message) {
-        this.message = message;
-    }
+	@Override
+	public String getHeader(String key)
+	{
+		return getHeader(key, ", ");
+	}
 
-    public Message getMessage() {
-        return message;
-    }
+	@Override
+	public String getHeader(String key, String delimiter)
+	{
+		return getHeaders().getHeader(key, delimiter);
+	}
 
-    public void setMessageID(String messageID) {
-        setHeader("Message-ID", messageID);
-    }
+	@Override
+	public void setHeaders(InternetHeaders headers)
+	{
+		this.headers = headers;
+	}
 
-    public String getMessageID() {
-        return getHeader("Message-ID");
-    }
-    
-    public void setPartnership(Partnership partnership) {
-        this.partnership = partnership;
-    }
+	@Override
+	public InternetHeaders getHeaders()
+	{
+		if (headers == null)
+		{
+			headers = new InternetHeaders();
+		}
 
-    public Partnership getPartnership() {
-        if (partnership == null) {
-            partnership = new Partnership();
-        }
+		return headers;
+	}
 
-        return partnership;
-    }
-    
-    public void setText(String text) {
-        this.text = text;
-    }
+	@Override
+	public void setMessage(Message message)
+	{
+		this.message = message;
+	}
 
-    public String getText() {
-        return text;
-    }
+	@Override
+	public Message getMessage()
+	{
+		return message;
+	}
 
-    public void addHeader(String key, String value) {
-        getHeaders().addHeader(key, value);
-    }
+	@Override
+	public void setMessageID(String messageID)
+	{
+		setHeader("Message-ID", messageID);
+	}
 
-    public abstract String generateMessageID();
+	@Override
+	public String getMessageID()
+	{
+		return getHeader("Message-ID");
+	}
 
-    public void setHistory(DataHistory history) {
-        this.history = history;
-    }
+	@Override
+	public void setPartnership(Partnership partnership)
+	{
+		this.partnership = partnership;
+	}
 
-    public DataHistory getHistory() {
-        if (history == null) {
-            history = new DataHistory();
-        }
+	@Override
+	public Partnership getPartnership()
+	{
+		if (partnership == null)
+		{
+			partnership = new Partnership();
+		}
 
-        return history;
-    }
+		return partnership;
+	}
 
-    public String toString() {
-        StringBuffer buf = new StringBuffer();
-        buf.append("MDN From:").append(getPartnership().getSenderIDs());
-        buf.append("To:").append(getPartnership().getReceiverIDs());
-        
-        Enumeration headerEn = getHeaders().getAllHeaders();
-        buf.append("\r\nHeaders:{");
+	@Override
+	public void setText(String text)
+	{
+		this.text = text;
+	}
 
-        while (headerEn.hasMoreElements()) {
-            Header header = (Header) headerEn.nextElement();
-            buf.append(header.getName()).append("=").append(header.getValue());
+	@Override
+	public String getText()
+	{
+		return text;
+	}
 
-            if (headerEn.hasMoreElements()) {
-                buf.append(", ");
-            }
-        }
+	@Override
+	public void addHeader(String key, String value)
+	{
+		getHeaders().addHeader(key, value);
+	}
 
-        buf.append("}");
-        buf.append("\r\nAttributes:").append(getAttributes());
-        buf.append("\r\nText: \r\n");
-        buf.append(getText()).append("\r\n");
+	@Override
+	public abstract String generateMessageID();
 
-        return buf.toString();
-    }
+	@Override
+	public void setHistory(DataHistory history)
+	{
+		this.history = history;
+	}
 
-    public void updateMessageID() {
-        setMessageID(generateMessageID());
-    }
+	@Override
+	public DataHistory getHistory()
+	{
+		if (history == null)
+		{
+			history = new DataHistory();
+		}
 
-    private void readObject(java.io.ObjectInputStream in)
-        throws IOException, ClassNotFoundException {
-        // read in partnership
-        partnership = (Partnership) in.readObject();
-        
-        // read in attributes
-        attributes = (Map) in.readObject();
+		return history;
+	}
 
-        // read in text
-        text = (String) in.readObject();
+	@Override
+	public String toString()
+	{
+		StringBuffer buf = new StringBuffer();
+		buf.append("MDN From:").append(getPartnership().getSenderIDs());
+		buf.append("To:").append(getPartnership().getReceiverIDs());
 
-        try {
-            // read in message headers
-            headers = new InternetHeaders(in);
+		Enumeration headerEn = getHeaders().getAllHeaders();
+		buf.append("\r\nHeaders:{");
 
-            // read in mime body
-            if (in.read() == 1) {
-                data = new MimeBodyPart(in);
-            } else {
-                data = null;
-            }
-        } catch (MessagingException me) {
-            throw new IOException("Messaging exception: " + me.getMessage());
-        }
-    }
+		while (headerEn.hasMoreElements())
+		{
+			Header header = (Header)headerEn.nextElement();
+			buf.append(header.getName()).append("=").append(header.getValue());
 
-    private void writeObject(java.io.ObjectOutputStream out)
-        throws IOException {
-        // write partnership info
-        out.writeObject(partnership);
-        
-        // write attributes
-        out.writeObject(attributes);
+			if (headerEn.hasMoreElements())
+			{
+				buf.append(", ");
+			}
+		}
 
-        // write text
-        out.writeObject(text);
+		buf.append("}");
+		buf.append("\r\nAttributes:").append(getAttributes());
+		buf.append("\r\nText: \r\n");
+		buf.append(getText()).append("\r\n");
 
-        // write message headers
-        Enumeration en = headers.getAllHeaderLines();
+		return buf.toString();
+	}
 
-        while (en.hasMoreElements()) {
-            out.writeBytes(en.nextElement().toString() + "\r\n");
-        }
+	@Override
+	public void updateMessageID()
+	{
+		setMessageID(generateMessageID());
+	}
 
-        out.writeBytes(new String("\r\n"));
+	private void readObject(java.io.ObjectInputStream in)
+			throws IOException, ClassNotFoundException
+	{
+		// read in partnership
+		partnership = (Partnership)in.readObject();
 
-        // write the mime body
-        ByteArrayOutputStream baos = new ByteArrayOutputStream();
+		// read in attributes
+		attributes = (Map)in.readObject();
 
-        try {
-            if (data != null) {
-                baos.write(1);
-                data.writeTo(baos);
-            } else {
-                baos.write(0);
-            }
-        } catch (MessagingException e) {
-            throw new IOException("Messaging exception: " + e.getMessage());
-        }
+		// read in text
+		text = (String)in.readObject();
 
-        out.write(baos.toByteArray());
-        baos.close();
-    }
+		try
+		{
+			// read in message headers
+			headers = new InternetHeaders(in);
+
+			// read in mime body
+			if (in.read() == 1)
+			{
+				data = new MimeBodyPart(in);
+			}
+			else
+			{
+				data = null;
+			}
+		}
+		catch (MessagingException me)
+		{
+			throw new IOException("Messaging exception: " + me.getMessage());
+		}
+	}
+
+	private void writeObject(java.io.ObjectOutputStream out)
+			throws IOException
+	{
+		// write partnership info
+		out.writeObject(partnership);
+
+		// write attributes
+		out.writeObject(attributes);
+
+		// write text
+		out.writeObject(text);
+
+		// write message headers
+		Enumeration en = headers.getAllHeaderLines();
+
+		while (en.hasMoreElements())
+		{
+			out.writeBytes(en.nextElement().toString() + "\r\n");
+		}
+
+		out.writeBytes(new String("\r\n"));
+
+		// write the mime body
+		ByteArrayOutputStream baos = new ByteArrayOutputStream();
+
+		try
+		{
+			if (data != null)
+			{
+				baos.write(1);
+				data.writeTo(baos);
+			}
+			else
+			{
+				baos.write(0);
+			}
+		}
+		catch (MessagingException e)
+		{
+			throw new IOException("Messaging exception: " + e.getMessage());
+		}
+
+		out.write(baos.toByteArray());
+		baos.close();
+	}
 }

@@ -21,179 +21,225 @@ import org.openas2.lib.message.EDIINTMessageMDN;
 import org.openas2.lib.message.MDNData;
 import org.openas2.lib.partner.IPartnershipChooser;
 
-public class MDNEngine {
-    private EDIINTHelper ediintHelper;
-    private ICertificateChooser certificateChooser;
-    private IPartnershipChooser partnershipChooser;
+public class MDNEngine
+{
+	private EDIINTHelper ediintHelper;
 
-    public MDNEngine(EDIINTHelper ediintHelper, ICertificateChooser certificateChooser,
-            IPartnershipChooser partnershipChooser) {
-        super();
-        this.ediintHelper = ediintHelper;
-        this.certificateChooser = certificateChooser;
-        this.partnershipChooser = partnershipChooser;
-    }
+	private ICertificateChooser certificateChooser;
 
-    public EDIINTMessageMDN generateMDN(EDIINTMessage msg, EngineResults results)
-            throws MDNException {
-        if (msg instanceof AS1Message) {
-            return createAS1MDN((AS1Message) msg, results);
-        } else if (msg instanceof AS2Message) {
-            return createAS2MDN((AS2Message) msg, results);
-        } else {
-            throw new MDNException("Unsupported message type: " + msg.getClass().getName());
-        }
-    }
+	private IPartnershipChooser partnershipChooser;
 
-    public EDIINTHelper getEDIINTHelper() {
-        return ediintHelper;
-    }
+	public MDNEngine(EDIINTHelper ediintHelper, ICertificateChooser certificateChooser,
+			IPartnershipChooser partnershipChooser)
+	{
+		super();
+		this.ediintHelper = ediintHelper;
+		this.certificateChooser = certificateChooser;
+		this.partnershipChooser = partnershipChooser;
+	}
 
-    public void setEDIINTHelper(EDIINTHelper ediintHelper) {
-        this.ediintHelper = ediintHelper;
-    }
+	public EDIINTMessageMDN generateMDN(EDIINTMessage msg, EngineResults results)
+			throws MDNException
+	{
+		if (msg instanceof AS1Message)
+		{
+			return createAS1MDN((AS1Message)msg, results);
+		}
+		else if (msg instanceof AS2Message)
+		{
+			return createAS2MDN((AS2Message)msg, results);
+		}
+		else
+		{
+			throw new MDNException("Unsupported message type: " + msg.getClass().getName());
+		}
+	}
 
-    public ICryptoHelper getCryptoHelper() {
-        return getEDIINTHelper().getCryptoHelper();
-    }
+	public EDIINTHelper getEDIINTHelper()
+	{
+		return ediintHelper;
+	}
 
-    public ICertificateChooser getCertificateChooser() {
-        return certificateChooser;
-    }
+	public void setEDIINTHelper(EDIINTHelper ediintHelper)
+	{
+		this.ediintHelper = ediintHelper;
+	}
 
-    public void setCertificateChooser(ICertificateChooser certificateChooser) {
-        this.certificateChooser = certificateChooser;
-    }
+	public ICryptoHelper getCryptoHelper()
+	{
+		return getEDIINTHelper().getCryptoHelper();
+	}
 
-    public IPartnershipChooser getPartnershipChooser() {
-        return partnershipChooser;
-    }
+	public ICertificateChooser getCertificateChooser()
+	{
+		return certificateChooser;
+	}
 
-    public void setPartnershipChooser(IPartnershipChooser partnershipChooser) {
-        this.partnershipChooser = partnershipChooser;
-    }
+	public void setCertificateChooser(ICertificateChooser certificateChooser)
+	{
+		this.certificateChooser = certificateChooser;
+	}
 
-    protected AS1MessageMDN createAS1MDN(AS1Message msg, EngineResults results) {
-        throw new UnsupportedOperationException("Not Implemented");
-    }
+	public IPartnershipChooser getPartnershipChooser()
+	{
+		return partnershipChooser;
+	}
 
-    protected AS2MessageMDN createAS2MDN(AS2Message msg, EngineResults results) throws MDNException {
-        // create the mdn and copy over the header values
-        AS2MessageMDN mdn = new AS2MessageMDN();
-        mdn.setDefaults();
-        mdn.setAS2From(msg.getAS2To());
-        mdn.setAS2To(msg.getAS2From());
-        if (results.getPartnership() != null) {
-            mdn.setFrom(results.getPartnership().getSender().getContactEmail());
-        } else {
-            mdn.setFrom("unknown");
-        }
+	public void setPartnershipChooser(IPartnershipChooser partnershipChooser)
+	{
+		this.partnershipChooser = partnershipChooser;
+	}
 
-        // generate the MDN's subject
-        mdn.setSubject(generateMDNSubject(mdn, msg, results));
+	protected AS1MessageMDN createAS1MDN(AS1Message msg, EngineResults results)
+	{
+		throw new UnsupportedOperationException("Not Implemented");
+	}
 
-        // generate the MDN data
-        MDNData mdnData = mdn.getMDNData();
-        mdnData.setReportingUA(Info.NAME_VERSION);
-        mdnData.setOriginalRecipient("rfc822; " + msg.getAS2To());
-        if (results.getPartnership() != null) {
-            mdnData.setFinalRecipient("rfc822; "
-                    + results.getPartnership().getReceiver().getAs2Id());
-        } else {
-            mdnData.setFinalRecipient("rfc822; " + msg.getAS2To());
-        }
-        mdnData.setOriginalMessageID(msg.getMessageID());
-        mdnData.setDisposition(results.getDisposition());
+	protected AS2MessageMDN createAS2MDN(AS2Message msg, EngineResults results) throws MDNException
+	{
+		// create the mdn and copy over the header values
+		AS2MessageMDN mdn = new AS2MessageMDN();
+		mdn.setDefaults();
+		mdn.setAS2From(msg.getAS2To());
+		mdn.setAS2To(msg.getAS2From());
+		if (results.getPartnership() != null)
+		{
+			mdn.setFrom(results.getPartnership().getSender().getContactEmail());
+		}
+		else
+		{
+			mdn.setFrom("unknown");
+		}
 
-        // generate the MDN text
-        mdnData.setText(generateMDNText(mdn, msg, results));
+		// generate the MDN's subject
+		mdn.setSubject(generateMDNSubject(mdn, msg, results));
 
-        // check the message's disposition options
-        DispositionOptions dispOptions = null;
-        try {
-            dispOptions = new DispositionOptions(msg.getDispositionNotificationOptions());
-        } catch (OpenAS2Exception oae) {
-            throw new MDNException("Invalid disposition options", oae);
-        }
+		// generate the MDN data
+		MDNData mdnData = mdn.getMDNData();
+		mdnData.setReportingUA(Info.NAME_VERSION);
+		mdnData.setOriginalRecipient("rfc822; " + msg.getAS2To());
+		if (results.getPartnership() != null)
+		{
+			mdnData.setFinalRecipient("rfc822; "
+					+ results.getPartnership().getReceiver().getAs2Id());
+		}
+		else
+		{
+			mdnData.setFinalRecipient("rfc822; " + msg.getAS2To());
+		}
+		mdnData.setOriginalMessageID(msg.getMessageID());
+		mdnData.setDisposition(results.getDisposition());
 
-        // calculate the MIC if requested
-        try {
-            if (dispOptions.getMicAlgorithm() != null) {
-                // NOTE: data headers must be included in MIC if the original
-                // message was signed or encrypted
-                boolean includeHeaders = results.getEncryption() != EngineResults.STATUS_NONE
-                        && results.getSignature() != EngineResults.STATUS_NONE;
-                String mic = getCryptoHelper().calculateMIC(msg.getData(),
-                        dispOptions.getMicAlgorithm(), includeHeaders);
-                mdnData.setReceivedContentMIC(mic);
-            }
-        } catch (Exception e) {
-            throw new MDNException("Error calculating MIC", e);
-        }
+		// generate the MDN text
+		mdnData.setText(generateMDNText(mdn, msg, results));
 
-        // sign the MDN data if requested
-        try {
-            if (dispOptions.getProtocol() != null) {
-                ICertificateChooser certChooser = getCertificateChooser();
-                Certificate senderCert = certChooser.getSenderCertificate(mdn);
-                Key senderKey = certChooser.getSenderKey(mdn);
-                MimeBodyPart signedData = getCryptoHelper().sign(mdn.getData(), senderCert,
-                        senderKey, dispOptions.getMicAlgorithm());
-                mdn.setData(signedData);
-                mdn.setContentType(signedData.getContentType());
-            }
-        } catch (Exception e) {
-            throw new MDNException("Error signing MDN", e);
-        }
+		// check the message's disposition options
+		DispositionOptions dispOptions = null;
+		try
+		{
+			dispOptions = new DispositionOptions(msg.getDispositionNotificationOptions());
+		}
+		catch (OpenAS2Exception oae)
+		{
+			throw new MDNException("Invalid disposition options", oae);
+		}
 
-        // update the message ID to include the sender and receiver AS2 ID's
-        mdn.setMessageID(mdn.generateMessageID());
+		// calculate the MIC if requested
+		try
+		{
+			if (dispOptions.getMicAlgorithm() != null)
+			{
+				// NOTE: data headers must be included in MIC if the original
+				// message was signed or encrypted
+				boolean includeHeaders = results.getEncryption() != EngineResults.STATUS_NONE
+						&& results.getSignature() != EngineResults.STATUS_NONE;
+				String mic = getCryptoHelper().calculateMIC(msg.getData(),
+						dispOptions.getMicAlgorithm(), includeHeaders);
+				mdnData.setReceivedContentMIC(mic);
+			}
+		}
+		catch (Exception e)
+		{
+			throw new MDNException("Error calculating MIC", e);
+		}
 
-        return mdn;
-    }
+		// sign the MDN data if requested
+		try
+		{
+			if (dispOptions.getProtocol() != null)
+			{
+				ICertificateChooser certChooser = getCertificateChooser();
+				Certificate senderCert = certChooser.getSenderCertificate(mdn);
+				Key senderKey = certChooser.getSenderKey(mdn);
+				MimeBodyPart signedData = getCryptoHelper().sign(mdn.getData(), senderCert,
+						senderKey, dispOptions.getMicAlgorithm());
+				mdn.setData(signedData);
+				mdn.setContentType(signedData.getContentType());
+			}
+		}
+		catch (Exception e)
+		{
+			throw new MDNException("Error signing MDN", e);
+		}
 
-    protected String generateMDNText(EDIINTMessageMDN mdn, EDIINTMessage msg, EngineResults results)
-            throws MDNException {
-        // get the MDN's disposition
-        Disposition disposition = null;
-        try {
-            disposition = new Disposition(mdn.getMDNData().getDisposition());
-        } catch (DispositionException de) {
-            throw new MDNException("Error generating MDN text: " + de.getMessage(), de);
-        }
+		// update the message ID to include the sender and receiver AS2 ID's
+		mdn.setMessageID(mdn.generateMessageID());
 
-        // Append the sender and receiver ID's to the message
-        StringBuffer text = new StringBuffer();
-        text.append("Sender ID:    ").append(msg.getSenderID()).append(SystemUtils.LINE_SEPARATOR);
-        text.append("Receiver ID:  ").append(msg.getReceiverID())
-                .append(SystemUtils.LINE_SEPARATOR);
+		return mdn;
+	}
 
-        // Append true/false of whether the message was decrypted and/or
-        // verified
-        String decryption = results.getStatusDescription(results.getEncryption());
-        text.append("Decryption:   ").append(decryption).append(SystemUtils.LINE_SEPARATOR);
-        String verification = results.getStatusDescription(results.getSignature());
-        text.append("Verification: ").append(verification).append(SystemUtils.LINE_SEPARATOR);
+	protected String generateMDNText(EDIINTMessageMDN mdn, EDIINTMessage msg, EngineResults results)
+			throws MDNException
+	{
+		// get the MDN's disposition
+		Disposition disposition = null;
+		try
+		{
+			disposition = new Disposition(mdn.getMDNData().getDisposition());
+		}
+		catch (DispositionException de)
+		{
+			throw new MDNException("Error generating MDN text: " + de.getMessage(), de);
+		}
 
-        text.append(SystemUtils.LINE_SEPARATOR);
-        // If the message was not processed successfully
-        if (disposition.isError()) {
-            text.append("The message could not be processed: ");
-        } else if (disposition.isWarning()) {
-            text.append("The message was processed with a warning: ");
-        } else {
-            text.append("The message was processed successfully: ");
-        }
-        text.append(disposition);
+		// Append the sender and receiver ID's to the message
+		StringBuffer text = new StringBuffer();
+		text.append("Sender ID:    ").append(msg.getSenderID()).append(SystemUtils.LINE_SEPARATOR);
+		text.append("Receiver ID:  ").append(msg.getReceiverID())
+				.append(SystemUtils.LINE_SEPARATOR);
 
-        return text.toString();
-    }
+		// Append true/false of whether the message was decrypted and/or
+		// verified
+		String decryption = results.getStatusDescription(results.getEncryption());
+		text.append("Decryption:   ").append(decryption).append(SystemUtils.LINE_SEPARATOR);
+		String verification = results.getStatusDescription(results.getSignature());
+		text.append("Verification: ").append(verification).append(SystemUtils.LINE_SEPARATOR);
 
-    protected String generateMDNSubject(EDIINTMessageMDN mdn, EDIINTMessage msg,
-            EngineResults results) throws MDNException {
-        StringBuffer buf = new StringBuffer();
-        buf.append(msg.getSenderID()).append(" -> ").append(msg.getReceiverID());
-        buf.append(" - ").append(msg.getMessageID());
-        return buf.toString();
-    }
+		text.append(SystemUtils.LINE_SEPARATOR);
+		// If the message was not processed successfully
+		if (disposition.isError())
+		{
+			text.append("The message could not be processed: ");
+		}
+		else if (disposition.isWarning())
+		{
+			text.append("The message was processed with a warning: ");
+		}
+		else
+		{
+			text.append("The message was processed successfully: ");
+		}
+		text.append(disposition);
+
+		return text.toString();
+	}
+
+	protected String generateMDNSubject(EDIINTMessageMDN mdn, EDIINTMessage msg,
+			EngineResults results) throws MDNException
+	{
+		StringBuffer buf = new StringBuffer();
+		buf.append(msg.getSenderID()).append(" -> ").append(msg.getReceiverID());
+		buf.append(" - ").append(msg.getMessageID());
+		return buf.toString();
+	}
 }

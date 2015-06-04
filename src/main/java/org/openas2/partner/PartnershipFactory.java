@@ -12,24 +12,26 @@ import org.openas2.message.MessageMDN;
  * original author unknown
  * 
  * added getPartners method
+ * 
  * @author joseph mcverry
  *
  */
-public interface PartnershipFactory extends Component {
-    public static final String COMPID_PARTNERSHIP_FACTORY = "partnershipfactory";
+public interface PartnershipFactory extends Component
+{
+	public static final String COMPID_PARTNERSHIP_FACTORY = "partnershipfactory";
 
-    // throws an exception if the partnership doesn't exist
-    public Partnership getPartnership(Partnership p) throws OpenAS2Exception;
+	// throws an exception if the partnership doesn't exist
+	public Partnership getPartnership(Partnership p) throws OpenAS2Exception;
 
-    // looks up and fills in any header info for a specific msg's partnership
-    public void updatePartnership(Message msg, boolean overwrite) throws OpenAS2Exception;
+	// looks up and fills in any header info for a specific msg's partnership
+	public void updatePartnership(Message msg, boolean overwrite) throws OpenAS2Exception;
 
-    // looks up and fills in any header info for a specific msg's partnership
-    public void updatePartnership(MessageMDN mdn, boolean overwrite) throws OpenAS2Exception;
+	// looks up and fills in any header info for a specific msg's partnership
+	public void updatePartnership(MessageMDN mdn, boolean overwrite) throws OpenAS2Exception;
 
-    public void setPartnerships(List list);
+	public void setPartnerships(List list);
 
-    public List getPartnerships();
-    
-    public Map getPartners();
+	public List getPartnerships();
+
+	public Map getPartners();
 }

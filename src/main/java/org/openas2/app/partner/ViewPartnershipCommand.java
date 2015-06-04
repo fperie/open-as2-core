@@ -12,42 +12,54 @@ import org.openas2.partner.PartnershipFactory;
  * 
  * @author Don Hillsberry
  */
-public class ViewPartnershipCommand extends AliasedPartnershipsCommand {
-	public String getDefaultDescription() {
+public class ViewPartnershipCommand extends AliasedPartnershipsCommand
+{
+
+	@Override
+	public String getDefaultDescription()
+	{
 		return "View the partnership entry in partnership store.";
 	}
 
-	public String getDefaultName() {
+	@Override
+	public String getDefaultName()
+	{
 		return "view";
 	}
 
-	public String getDefaultUsage() {
+	@Override
+	public String getDefaultUsage()
+	{
 		return "view <name>";
 	}
 
+	@Override
 	protected CommandResult execute(PartnershipFactory partFx, Object[] params)
-			throws OpenAS2Exception {
-		if (params.length < 1) {
+			throws OpenAS2Exception
+	{
+		if (params.length < 1)
+		{
 			return new CommandResult(CommandResult.TYPE_INVALID_PARAM_COUNT,
 					getUsage());
 		}
 
-		synchronized (partFx) {
-
+		synchronized (partFx)
+		{
 			String name = params[0].toString();
-
 			Iterator parts = partFx.getPartnerships().iterator();
 
-			while (parts.hasNext()) {
+			while (parts.hasNext())
+			{
 				Partnership part = (Partnership) parts.next();
 				if (part.getName().equals(name))
+				{
 					return new CommandResult(CommandResult.TYPE_OK, part
 							.toString());
+				}
 			}
 
 			return new CommandResult(CommandResult.TYPE_ERROR,
 					"Unknown partnership name");
 		}
-
 	}
 }

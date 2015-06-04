@@ -26,11 +26,14 @@ import org.openas2.partner.AS2Partnership;
 import org.openas2.partner.ASXPartnership;
 import org.openas2.partner.Partnership;
 
-public class AS2UtilOld {
+public class AS2UtilOld
+{
     private static ICryptoHelper ch;
 
-    public static ICryptoHelper getCryptoHelper() throws Exception {
-        if (ch == null) {
+	public static ICryptoHelper getCryptoHelper() throws Exception
+	{
+		if (ch == null)
+		{
             ch = new BCCryptoHelper();
             ch.initialize();
         }
@@ -39,7 +42,8 @@ public class AS2UtilOld {
     }
 
     public static MessageMDN createMDN(Session session, AS2Message msg,
-            DispositionType disposition, String text) throws Exception {
+			DispositionType disposition, String text) throws Exception
+	{
         AS2MessageMDN mdn = new AS2MessageMDN(msg);
         mdn.setHeader("AS2-Version", "1.1");
         // RFC2822 format: Wed, 04 Mar 2009 10:59:17 +0100
@@ -57,9 +61,12 @@ public class AS2UtilOld {
         mdn.setHeader("From", msg.getPartnership().getReceiverID(Partnership.PID_EMAIL));
         String subject = mdn.getPartnership().getAttribute(ASXPartnership.PA_MDN_SUBJECT);
 
-        if (subject != null) {
+		if (subject != null)
+		{
             mdn.setHeader("Subject", ParameterParser.parse(subject, new MessageParameters(msg)));
-        } else {
+		}
+		else
+		{
             mdn.setHeader("Subject", "Your Requested MDN Response");
         }
         mdn.setText(ParameterParser.parse(text, new MessageParameters(msg)));
@@ -76,7 +83,8 @@ public class AS2UtilOld {
                 .getHeader("Disposition-Notification-Options"));
         String mic = null;
 
-        if (dispOptions.getMicalg() != null) {
+		if (dispOptions.getMicalg() != null)
+		{
             mic = getCryptoHelper().calculateMIC(msg.getData(), dispOptions.getMicalg(),
                     msg.getHistory().getItems().size() > 1);
         }
@@ -93,7 +101,8 @@ public class AS2UtilOld {
     }
 
     public static void createMDNData(Session session, MessageMDN mdn, String micAlg,
-            String signatureProtocol) throws Exception {
+			String signatureProtocol) throws Exception
+	{
         // Create the report and sub-body parts
         MimeMultipart reportParts = new MimeMultipart();
 
@@ -120,7 +129,8 @@ public class AS2UtilOld {
         Enumeration reportEn = reportValues.getAllHeaderLines();
         StringBuffer reportData = new StringBuffer();
 
-        while (reportEn.hasMoreElements()) {
+		while (reportEn.hasMoreElements())
+		{
             reportData.append((String) reportEn.nextElement()).append("\r\n");
         }
 
@@ -138,59 +148,72 @@ public class AS2UtilOld {
         report.setHeader("Content-Type", reportParts.getContentType());
 
         // Sign the data if needed
-        if (signatureProtocol != null) {            
+		if (signatureProtocol != null)
+		{
             CertificateFactory certFx = session.getCertificateFactory();
 
-            try {
+			try
+			{
                 X509Certificate senderCert = certFx.getCertificate(mdn,
                         Partnership.PTYPE_SENDER);                
                 PrivateKey senderKey = certFx.getPrivateKey(mdn, senderCert);
                 MimeBodyPart signedReport = getCryptoHelper().sign(report, senderCert,
                         senderKey, micAlg);
                 mdn.setData(signedReport);
-            } catch (CertificateNotFoundException cnfe) {
+			}
+			catch (CertificateNotFoundException cnfe)
+			{
                 cnfe.terminate();
                 mdn.setData(report);
-            } catch (KeyNotFoundException knfe) {
+			}
+			catch (KeyNotFoundException knfe)
+			{
                 knfe.terminate();
                 mdn.setData(report);
             }
-        } else {
+		}
+		else
+		{
             mdn.setData(report);
         }
 
         // Update the MDN headers with content information
         MimeBodyPart data = mdn.getData();
         mdn.setHeader("Content-Type", data.getContentType());
-
-        //int size = getSize(data);
-        //mdn.setHeader("Content-Length", Integer.toString(size));
     }
 
-    public static void parseMDN(Message msg, X509Certificate receiver) throws Exception {
+	public static void parseMDN(Message msg, X509Certificate receiver) throws Exception
+	{
         MessageMDN mdn = msg.getMDN();
         MimeBodyPart mainPart = mdn.getData();
         ICryptoHelper ch = getCryptoHelper();
 
-        if (ch.isSigned(mainPart)) {
+		if (ch.isSigned(mainPart))
+		{
             mainPart = getCryptoHelper().verify(mainPart, receiver);
         }
 
         MimeMultipart reportParts = new MimeMultipart(mainPart.getDataHandler().getDataSource());
 
-        if (reportParts != null) {
+		if (reportParts != null)
+		{
             ContentType reportType = new ContentType(reportParts.getContentType());
             
-            if (reportType.getBaseType().equalsIgnoreCase("multipart/report")) {
+			if (reportType.getBaseType().equalsIgnoreCase("multipart/report"))
+			{
                 int reportCount = reportParts.getCount();
                 MimeBodyPart reportPart;
 
-                for (int j = 0; j < reportCount; j++) {
+				for (int j = 0; j < reportCount; j++)
+				{
                     reportPart = (MimeBodyPart) reportParts.getBodyPart(j);
 
-                    if (reportPart.isMimeType("text/plain")) {
+					if (reportPart.isMimeType("text/plain"))
+					{
                         mdn.setText(reportPart.getContent().toString());
-                    } else if (reportPart.isMimeType("message/disposition-notification")) {
+					}
+					else if (reportPart.isMimeType("message/disposition-notification"))
+					{
                         InternetHeaders disposition = new InternetHeaders(reportPart
                                 .getInputStream());
                         mdn.setAttribute(AS2MessageMDN.MDNA_REPORTING_UA, disposition.getHeader(

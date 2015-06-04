@@ -1,28 +1,28 @@
 package org.openas2.lib.partner;
 
+public interface IPartnerStore
+{
+	IPartner createPartner();
 
-public interface IPartnerStore {
-    IPartner createPartner();
-    
-    IPartnership createPartnership();
-    
-    String[] getPartners();
+	IPartnership createPartnership();
 
-    IPartner getPartner(String alias);
+	String[] getPartners();
 
-    void setPartner(String alias, IPartner partner);
+	IPartner getPartner(String alias);
 
-    String getAlias(IPartner partner);
+	void setPartner(String alias, IPartner partner);
 
-    void removePartner(String alias);
+	String getAlias(IPartner partner);
 
-    String[] getPartnerships();
+	void removePartner(String alias);
 
-    IPartnership getPartnership(String alias);
+	String[] getPartnerships();
 
-    void setPartnership(String alias, IPartnership partnership);
+	IPartnership getPartnership(String alias);
 
-    String getAlias(IPartnership partnership);
+	void setPartnership(String alias, IPartnership partnership);
 
-    void removePartnership(String alias);
+	String getAlias(IPartnership partnership);
+
+	void removePartnership(String alias);
 }

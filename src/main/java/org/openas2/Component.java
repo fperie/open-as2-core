@@ -19,7 +19,8 @@ import javax.annotation.Nonnull;
  * @see BaseComponent
  * @see Session
  */
-public interface Component {
+public interface Component
+{
     /**
      * Returns a name for the component. These names are not guaranteed to  be unique, and are
      * intended for display and logging. Generally this is the class name of the

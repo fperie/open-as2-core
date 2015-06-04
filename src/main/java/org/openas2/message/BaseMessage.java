@@ -15,285 +15,383 @@ import org.openas2.OpenAS2Exception;
 import org.openas2.WrappedException;
 import org.openas2.partner.Partnership;
 
+public abstract class BaseMessage implements Message
+{
+	private DataHistory history;
 
-public abstract class BaseMessage implements Message {
-    private DataHistory history;
-    private InternetHeaders headers;
-    private Map attributes;
-    private MessageMDN MDN;
-    private MimeBodyPart data;
-    private Partnership partnership;
+	private InternetHeaders headers;
 
-    public BaseMessage() {
-        super();
-    }
+	private Map attributes;
 
-    public void setAttribute(String key, String value) {
-        getAttributes().put(key, value);
-    }
+	private MessageMDN MDN;
 
-    public String getAttribute(String key) {
-        return (String) getAttributes().get(key);
-    }
+	private MimeBodyPart data;
 
-    public void setAttributes(Map attributes) {
-        this.attributes = attributes;
-    }
+	private Partnership partnership;
 
-    public Map getAttributes() {
-        if (attributes == null) {
-            attributes = new HashMap();
-        }
+	public BaseMessage()
+	{
+		super();
+	}
 
-        return attributes;
-    }
+	@Override
+	public void setAttribute(String key, String value)
+	{
+		getAttributes().put(key, value);
+	}
 
-    public void setContentType(String contentType) {
-        setHeader("Content-Type", contentType);
-    }
+	@Override
+	public String getAttribute(String key)
+	{
+		return (String)getAttributes().get(key);
+	}
 
-    public String getContentType() {
-        return getHeader("Content-Type");
-    }
+	@Override
+	public void setAttributes(Map attributes)
+	{
+		this.attributes = attributes;
+	}
 
-    /**
-     * @since 2007-06-01
-     * @param contentDisposition
-     */
-    public void setContentDisposition(String contentDisposition) {
-        setHeader("Content-Disposition", contentDisposition);
-    }
+	@Override
+	public Map getAttributes()
+	{
+		if (attributes == null)
+		{
+			attributes = new HashMap();
+		}
 
-    /**
-     * @since 2007-06-01
-     * @return
-     */
-    public String getContentDisposition() {
-        return getHeader("Content-Disposition");
-    }
-    
-    public void setData(MimeBodyPart data, DataHistoryItem historyItem) {
-        this.data = data;
+		return attributes;
+	}
 
-        if (data != null) {
-            try {
-                setContentType(data.getContentType());
-            } catch (MessagingException e) {
-                setContentType(null);
-            }
-            try { 
-            	setContentDisposition(data.getHeader("Content-Disposition", null)); 
-            }
-            catch (MessagingException e) { 
-            	setContentDisposition(null); 
-            } 
-        }
+	@Override
+	public void setContentType(String contentType)
+	{
+		setHeader("Content-Type", contentType);
+	}
 
-        if (historyItem != null) {
-            getHistory().getItems().add(historyItem);
-        }
-    }
+	@Override
+	public String getContentType()
+	{
+		return getHeader("Content-Type");
+	}
 
-    public DataHistoryItem setData(MimeBodyPart data) throws OpenAS2Exception {
-        try {
-            DataHistoryItem historyItem = new DataHistoryItem(data.getContentType());
-            setData(data, historyItem);
+	/**
+	 * @since 2007-06-01
+	 * @param contentDisposition
+	 */
+	@Override
+	public void setContentDisposition(String contentDisposition)
+	{
+		setHeader("Content-Disposition", contentDisposition);
+	}
 
-            return historyItem;
-        } catch (Exception e) {
-            throw new WrappedException(e);
-        }
-    }
+	/**
+	 * @since 2007-06-01
+	 * @return
+	 */
+	@Override
+	public String getContentDisposition()
+	{
+		return getHeader("Content-Disposition");
+	}
 
-    public MimeBodyPart getData() {
-        return data;
-    }
+	@Override
+	public void setData(MimeBodyPart data, DataHistoryItem historyItem)
+	{
+		this.data = data;
 
-    public void setHeader(String key, String value) {
-        getHeaders().setHeader(key, value);
-    }
+		if (data != null)
+		{
+			try
+			{
+				setContentType(data.getContentType());
+			}
+			catch (MessagingException e)
+			{
+				setContentType(null);
+			}
+			try
+			{
+				setContentDisposition(data.getHeader("Content-Disposition", null));
+			}
+			catch (MessagingException e)
+			{
+				setContentDisposition(null);
+			}
+		}
 
-    public String getHeader(String key) {
-        return getHeader(key, ", ");
-    }
+		if (historyItem != null)
+		{
+			getHistory().getItems().add(historyItem);
+		}
+	}
 
-    public String getHeader(String key, String delimiter) {
-        return getHeaders().getHeader(key, delimiter);
-    }
+	@Override
+	public DataHistoryItem setData(MimeBodyPart data) throws OpenAS2Exception
+	{
+		try
+		{
+			DataHistoryItem historyItem = new DataHistoryItem(data.getContentType());
+			setData(data, historyItem);
 
-    public void setHeaders(InternetHeaders headers) {
-        this.headers = headers;
-    }
+			return historyItem;
+		}
+		catch (Exception e)
+		{
+			throw new WrappedException(e);
+		}
+	}
 
-    public InternetHeaders getHeaders() {
-        if (headers == null) {
-            headers = new InternetHeaders();
-        }
+	@Override
+	public MimeBodyPart getData()
+	{
+		return data;
+	}
 
-        return headers;
-    }
+	@Override
+	public void setHeader(String key, String value)
+	{
+		getHeaders().setHeader(key, value);
+	}
 
-    public void setHistory(DataHistory history) {
-        this.history = history;
-    }
+	@Override
+	public String getHeader(String key)
+	{
+		return getHeader(key, ", ");
+	}
 
-    public DataHistory getHistory() {
-        if (history == null) {
-            history = new DataHistory();
-        }
+	@Override
+	public String getHeader(String key, String delimiter)
+	{
+		return getHeaders().getHeader(key, delimiter);
+	}
 
-        return history;
-    }
+	@Override
+	public void setHeaders(InternetHeaders headers)
+	{
+		this.headers = headers;
+	}
 
-    public void setMDN(MessageMDN mdn) {
-        this.MDN = mdn;
-    }
+	@Override
+	public InternetHeaders getHeaders()
+	{
+		if (headers == null)
+		{
+			headers = new InternetHeaders();
+		}
 
-    public MessageMDN getMDN() {
-        return MDN;
-    }
+		return headers;
+	}
 
-    public void setMessageID(String messageID) {
-        setHeader("Message-ID", messageID);
-    }
+	@Override
+	public void setHistory(DataHistory history)
+	{
+		this.history = history;
+	}
 
-    public String getMessageID() {
-        return getHeader("Message-ID");
-    }
+	@Override
+	public DataHistory getHistory()
+	{
+		if (history == null)
+		{
+			history = new DataHistory();
+		}
 
-    public void setPartnership(Partnership partnership) {
-        this.partnership = partnership;
-    }
+		return history;
+	}
 
-    public Partnership getPartnership() {
-        if (partnership == null) {
-            partnership = new Partnership();
-        }
+	@Override
+	public void setMDN(MessageMDN mdn)
+	{
+		this.MDN = mdn;
+	}
 
-        return partnership;
-    }
+	@Override
+	public MessageMDN getMDN()
+	{
+		return MDN;
+	}
 
-    public abstract String generateMessageID();
+	@Override
+	public void setMessageID(String messageID)
+	{
+		setHeader("Message-ID", messageID);
+	}
 
-    public void setSubject(String subject) {
-        setHeader("Subject", subject);
-    }
+	@Override
+	public String getMessageID()
+	{
+		return getHeader("Message-ID");
+	}
 
-    public String getSubject() {
-        return getHeader("Subject");
-    }
+	@Override
+	public void setPartnership(Partnership partnership)
+	{
+		this.partnership = partnership;
+	}
 
-    public void addHeader(String key, String value) {
-        getHeaders().addHeader(key, value);
-    }
+	@Override
+	public Partnership getPartnership()
+	{
+		if (partnership == null)
+		{
+			partnership = new Partnership();
+		}
 
-    public String toString() {
-        StringBuffer buf = new StringBuffer();
-        buf.append("Message From:").append(getPartnership().getSenderIDs());
-        buf.append("To:").append(getPartnership().getReceiverIDs());
+		return partnership;
+	}
 
-        Enumeration headerEn = getHeaders().getAllHeaders();
-        buf.append("\r\nHeaders:{");
+	@Override
+	public abstract String generateMessageID();
 
-        while (headerEn.hasMoreElements()) {
-            Header header = (Header) headerEn.nextElement();
-            buf.append(header.getName()).append("=").append(header.getValue());
+	@Override
+	public void setSubject(String subject)
+	{
+		setHeader("Subject", subject);
+	}
 
-            if (headerEn.hasMoreElements()) {
-                buf.append(", ");
-            }
-        }
+	@Override
+	public String getSubject()
+	{
+		return getHeader("Subject");
+	}
 
-        buf.append("}");
-        buf.append("\r\nAttributes:").append(getAttributes());
+	@Override
+	public void addHeader(String key, String value)
+	{
+		getHeaders().addHeader(key, value);
+	}
 
-        MessageMDN mdn = getMDN();
+	@Override
+	public String toString()
+	{
+		StringBuffer buf = new StringBuffer();
+		buf.append("Message From:").append(getPartnership().getSenderIDs());
+		buf.append("To:").append(getPartnership().getReceiverIDs());
 
-        if (mdn != null) {
-            buf.append("\r\nMDN:");
-            buf.append(mdn.toString());
-        }
+		Enumeration headerEn = getHeaders().getAllHeaders();
+		buf.append("\r\nHeaders:{");
 
-        return buf.toString();
-    }
+		while (headerEn.hasMoreElements())
+		{
+			Header header = (Header)headerEn.nextElement();
+			buf.append(header.getName()).append("=").append(header.getValue());
 
-    public void updateMessageID() {
-        setMessageID(generateMessageID());
-    }
+			if (headerEn.hasMoreElements())
+			{
+				buf.append(", ");
+			}
+		}
 
-    private void readObject(java.io.ObjectInputStream in)
-        throws IOException, ClassNotFoundException {
-        // read in partnership
-        partnership = (Partnership) in.readObject();
+		buf.append("}");
+		buf.append("\r\nAttributes:").append(getAttributes());
 
-        // read in attributes
-        attributes = (Map) in.readObject();
-		
+		MessageMDN mdn = getMDN();
+
+		if (mdn != null)
+		{
+			buf.append("\r\nMDN:");
+			buf.append(mdn.toString());
+		}
+
+		return buf.toString();
+	}
+
+	@Override
+	public void updateMessageID()
+	{
+		setMessageID(generateMessageID());
+	}
+
+	private void readObject(java.io.ObjectInputStream in)
+			throws IOException, ClassNotFoundException
+	{
+		// read in partnership
+		partnership = (Partnership)in.readObject();
+
+		// read in attributes
+		attributes = (Map)in.readObject();
+
 		// read in data history
-		history = (DataHistory) in.readObject();
-		
-        try {
-            // read in message headers
-            headers = new InternetHeaders(in);
+		history = (DataHistory)in.readObject();
 
-            // read in mime body 
-            if (in.read() == 1) {
-                data = new MimeBodyPart(in);
-            }
-        } catch (MessagingException me) {
-            throw new IOException("Messaging exception: " + me.getMessage());
-        }
+		try
+		{
+			// read in message headers
+			headers = new InternetHeaders(in);
 
-        // read in MDN
-        MDN = (MessageMDN) in.readObject();
+			// read in mime body
+			if (in.read() == 1)
+			{
+				data = new MimeBodyPart(in);
+			}
+		}
+		catch (MessagingException me)
+		{
+			throw new IOException("Messaging exception: " + me.getMessage());
+		}
 
-        if (MDN != null) {
-            MDN.setMessage(this);
-        }
-    }
+		// read in MDN
+		MDN = (MessageMDN)in.readObject();
 
-    private void writeObject(java.io.ObjectOutputStream out)
-        throws IOException {
-        // write partnership info
-        out.writeObject(partnership);
+		if (MDN != null)
+		{
+			MDN.setMessage(this);
+		}
+	}
 
-        // write attributes
-        out.writeObject(attributes);
-		
+	private void writeObject(java.io.ObjectOutputStream out)
+			throws IOException
+	{
+		// write partnership info
+		out.writeObject(partnership);
+
+		// write attributes
+		out.writeObject(attributes);
+
 		// write data history
 		out.writeObject(history);
-		
-        // write message headers
-        Enumeration en = headers.getAllHeaderLines();
 
-        while (en.hasMoreElements()) {
-            out.writeBytes(en.nextElement().toString() + "\r\n");
-        }
+		// write message headers
+		Enumeration en = headers.getAllHeaderLines();
 
-        out.writeBytes(new String("\r\n"));
+		while (en.hasMoreElements())
+		{
+			out.writeBytes(en.nextElement().toString() + "\r\n");
+		}
 
-        // write the mime body
-        ByteArrayOutputStream baos = new ByteArrayOutputStream();
+		out.writeBytes(new String("\r\n"));
 
-        try {
-            if (data != null) {
-                baos.write(1);
-                data.writeTo(baos);
-            } else {
-                baos.write(0);
-            }
-        } catch (MessagingException e) {
-            throw new IOException("Messaging exception: " + e.getMessage());
-        }
+		// write the mime body
+		ByteArrayOutputStream baos = new ByteArrayOutputStream();
 
-        out.write(baos.toByteArray());
-        baos.close();
+		try
+		{
+			if (data != null)
+			{
+				baos.write(1);
+				data.writeTo(baos);
+			}
+			else
+			{
+				baos.write(0);
+			}
+		}
+		catch (MessagingException e)
+		{
+			throw new IOException("Messaging exception: " + e.getMessage());
+		}
 
-        // write the message's MDN
-        out.writeObject(MDN);
-    }
-    
-    public String getLoggingText() {
-    	return " [" + getMessageID() + "]";
-    }
+		out.write(baos.toByteArray());
+		baos.close();
+
+		// write the message's MDN
+		out.writeObject(MDN);
+	}
+
+	@Override
+	public String getLoggingText()
+	{
+		return " [" + getMessageID() + "]";
+	}
 }

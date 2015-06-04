@@ -20,79 +20,100 @@ import org.openas2.cmd.CommandResult;
 import org.openas2.util.CommandTokenizer;
 import org.xml.sax.SAXException;
 
-/** actual socket command processor
- *  takes commands from socket/port and passes them to the OpenAS2Server
- * message format 
- *   <command userid="abc" pasword="xyz"> the actual command </command>
+/**
+ * actual socket command processor takes commands from socket/port and passes them to the OpenAS2Server message format
+ * <command userid="abc" pasword="xyz"> the actual command </command>
  * 
- * when inited the valid userid and password is passed, then as each
- * command is processed the processCommand method verifies the two fields correctness
- *  
+ * when inited the valid userid and password is passed, then as each command is processed the processCommand method
+ * verifies the two fields correctness
+ * 
  * @author joseph mcverry
  *
  */
 public class SocketCommandProcessor extends BaseCommandProcessor
-		implements
-			Runnable {
+		implements Runnable
+{
 
 	private BufferedReader rdr = null;
+
 	private BufferedWriter wrtr = null;
+
 	private SSLServerSocket sslserversocket = null;
 
 	private String userid, password;
 
-	public SocketCommandProcessor() {
+	public SocketCommandProcessor()
+	{
 	}
 
-	public void deInit() throws OpenAS2Exception {
+	@Override
+	public void deInit() throws OpenAS2Exception
+	{
 	}
 
 	SocketCommandParser parser;
 
-	public void init() throws OpenAS2Exception {
+	@Override
+	public void init() throws OpenAS2Exception
+	{
 	}
 
-	public void init(Session session, Map parameters) throws OpenAS2Exception {
-		String p = (String) parameters.get("portid");
-		try {
+	@Override
+	public void init(Session session, Map parameters) throws OpenAS2Exception
+	{
+		String p = (String)parameters.get("portid");
+		try
+		{
 			int port = Integer.parseInt(p);
-			
+
 			SSLServerSocketFactory sslserversocketfactory =
-                (SSLServerSocketFactory) SSLServerSocketFactory.getDefault();
-			 sslserversocket =
-                (SSLServerSocket) sslserversocketfactory.createServerSocket(port);
+					(SSLServerSocketFactory)SSLServerSocketFactory.getDefault();
+			sslserversocket =
+					(SSLServerSocket)sslserversocketfactory.createServerSocket(port);
 			final String[] enabledCipherSuites = { "SSL_DH_anon_WITH_RC4_128_MD5" };
 			sslserversocket.setEnabledCipherSuites(enabledCipherSuites);
 
-			
-		} catch (IOException e) {
+		}
+		catch (IOException e)
+		{
 			e.printStackTrace();
 			throw new OpenAS2Exception(e);
-		} catch (NumberFormatException e) {
+		}
+		catch (NumberFormatException e)
+		{
 			e.printStackTrace();
 			throw new OpenAS2Exception("error converting portid parameter " + e);
 		}
-		userid = (String) parameters.get("userid");
+		userid = (String)parameters.get("userid");
 		if (userid == null || userid.length() < 1)
+		{
 			throw new OpenAS2Exception("missing userid parameter");
+		}
 
-		password = (String) parameters.get("password");
+		password = (String)parameters.get("password");
 		if (password == null || password.length() < 1)
+		{
 			throw new OpenAS2Exception("missing password parameter");
+		}
 
-		try {
+		try
+		{
 			parser = new SocketCommandParser();
-		} catch (Exception e) {
-			// TODO Auto-generated catch block
+		}
+		catch (Exception e)
+		{
 			new OpenAS2Exception(e);
 		}
 	}
 
-	public void processCommand() throws OpenAS2Exception {
+	@Override
+	public void processCommand() throws OpenAS2Exception
+	{
 
 		SSLSocket socket = null;
-		try {
-			socket = (SSLSocket) sslserversocket.accept();
+		try
+		{
+			socket = (SSLSocket)sslserversocket.accept();
 			socket.setSoTimeout(2000);
 			rdr = new BufferedReader(new InputStreamReader(socket.getInputStream()));
 			wrtr = new BufferedWriter(new OutputStreamWriter(socket.getOutputStream()));
@@ -102,95 +123,130 @@ public class SocketCommandProcessor extends BaseCommandProcessor
 
 			parser.parse(line);
 
-			if (parser.getUserid().equals(userid) == false) {
+			if (parser.getUserid().equals(userid) == false)
+			{
 				wrtr.write("Bad userid/password");
 				throw new OpenAS2Exception("Bad userid");
 			}
 
-			if (parser.getPassword().equals(password) == false) {
+			if (parser.getPassword().equals(password) == false)
+			{
 				wrtr.write("Bad userid/password");
 				throw new OpenAS2Exception("Bad password");
 			}
 
 			String str = parser.getCommandText();
-			if (str != null && str.length() > 0) {
+			if (str != null && str.length() > 0)
+			{
 				CommandTokenizer cmdTkn = new CommandTokenizer(str);
-				
-				if (cmdTkn.hasMoreTokens()) {
+
+				if (cmdTkn.hasMoreTokens())
+				{
 					String commandName = cmdTkn.nextToken().toLowerCase();
 
-					if (commandName.equals(StreamCommandProcessor.EXIT_COMMAND)) {
+					if (commandName.equals(StreamCommandProcessor.EXIT_COMMAND))
+					{
 						terminate();
-					} else {
+					}
+					else
+					{
 						List params = new ArrayList();
 
-						while (cmdTkn.hasMoreTokens()) {
+						while (cmdTkn.hasMoreTokens())
+						{
 							params.add(cmdTkn.nextToken());
 						}
 
 						Command cmd = getCommand(commandName);
 
-						if (cmd != null) {
+						if (cmd != null)
+						{
 							CommandResult result = cmd.execute(params.toArray());
 
-							if (result.getType() == CommandResult.TYPE_OK) {
+							if (result.getType() == CommandResult.TYPE_OK)
+							{
 								wrtr.write(result.toXML());
-							} else {
-								wrtr.write("\r\n" +StreamCommandProcessor.COMMAND_ERROR + "\r\n");
+							}
+							else
+							{
+								wrtr.write("\r\n" + StreamCommandProcessor.COMMAND_ERROR + "\r\n");
 								wrtr.write(result.getResult());
 							}
-						} else {
+						}
+						else
+						{
 							wrtr.write(StreamCommandProcessor.COMMAND_NOT_FOUND
 									+ "> " + commandName + "\r\n");
 							List l = getCommands();
 							wrtr.write("List of commands:" + "\r\n");
-							for (int i = 0; i < l.size(); i++) {
-								cmd = (Command) l.get(i);
+							for (int i = 0; i < l.size(); i++)
+							{
+								cmd = (Command)l.get(i);
 								wrtr.write(cmd.getName() + "\r\n");
 							}
 						}
 					}
 				}
 
-				
 			}
 			wrtr.flush();
-		} catch (IOException ioe) {
+		}
+		catch (IOException ioe)
+		{
 			ioe.printStackTrace();
-		} catch (SAXException e) {
-			try {
+		}
+		catch (SAXException e)
+		{
+			try
+			{
 				if (socket != null)
+				{
 					socket.close();
-			} catch (IOException e1) {
+				}
+			}
+			catch (IOException e1)
+			{
 			}
 			new OpenAS2Exception(e);
-		} catch (Exception e) {
-		  new OpenAS2Exception(e);	
 		}
-		finally {
+		catch (Exception e)
+		{
+			new OpenAS2Exception(e);
+		}
+		finally
+		{
 			if (socket != null)
-				try {
+			{
+				try
+				{
 					socket.close();
-				} catch (IOException e) {
+				}
+				catch (IOException e)
+				{
 					;
 				}
-
+			}
 		}
 
 	}
 
-	/* (non-Javadoc)
+	/*
+	 * (non-Javadoc)
+	 * 
 	 * @see java.lang.Runnable#run()
 	 */
-	public void run() {
-		try {
-			while (true) {
+	public void run()
+	{
+		try
+		{
+			while (true)
+			{
 				processCommand();
 			}
-		} catch (OpenAS2Exception e) {
+		}
+		catch (OpenAS2Exception e)
+		{
 			e.printStackTrace();
 		}
-
 	}
-
 }

@@ -40,27 +40,28 @@ import org.openas2.util.IOUtilOld;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-public class AS2MDNReceiverHandler implements NetModuleHandler 
+public class AS2MDNReceiverHandler implements NetModuleHandler
 {
-    /** Logger for the class. */
-    private static final Logger LOGGER = LoggerFactory.getLogger(AS2MDNReceiverHandler.class);
+	/** Logger for the class. */
+	private static final Logger LOGGER = LoggerFactory.getLogger(AS2MDNReceiverHandler.class);
 
-    private AS2MDNReceiverModule module;
+	private AS2MDNReceiverModule module;
 
-    
-    public AS2MDNReceiverHandler(AS2MDNReceiverModule module) {
-        super();
-        this.module = module;
-    }
+	public AS2MDNReceiverHandler(AS2MDNReceiverModule module)
+	{
+		super();
+		this.module = module;
+	}
 
 	public String getClientInfo(InetAddress remoteIp, int remotePort)
 	{
 		return " " + remoteIp.getHostAddress() + " " + remotePort;
 	}
 
-    public AS2MDNReceiverModule getModule() {
-        return module;
-    }
+	public AS2MDNReceiverModule getModule()
+	{
+		return module;
+	}
 
 	@Override
 	public void handle(NetModule owner, Socket s)
@@ -88,7 +89,7 @@ public class AS2MDNReceiverHandler implements NetModuleHandler
 		}
 
 		handle(s.getInetAddress(), s.getPort(), s.getLocalAddress(), s.getLocalPort(), inputStream, outputStream);
-    }
+	}
 
 	@Override
 	public void handle(final InetAddress remoteIp, final int remotePort, final InetAddress localIp,
@@ -118,7 +119,6 @@ public class AS2MDNReceiverHandler implements NetModuleHandler
 
 			receivedContentType = new ContentType(msg.getHeader("Content-Type"));
 
-			// MimeBodyPart receivedPart = new MimeBodyPart();
 			receivedPart.setDataHandler(new DataHandler(new ByteArrayDataSource(data, receivedContentType
 					.toString(), null)));
 			receivedPart.setHeader("Content-Type", receivedContentType.toString());
@@ -141,42 +141,42 @@ public class AS2MDNReceiverHandler implements NetModuleHandler
 		return HTTPUtil.readData(inputStream, outputStream, msg);
 	}
 
- 
- //Asynch MDN 2007-03-12
-/**
- * method for receiving & processing Async MDN sent from receiver.
- */ 
+	// Asynch MDN 2007-03-12
+	/**
+	 * method for receiving & processing Async MDN sent from receiver.
+	 */
 	protected void receiveMDN(AS2Message msg, byte[] data, OutputStream out)
-			throws OpenAS2Exception, IOException {
-		try {
+			throws OpenAS2Exception, IOException
+	{
+		try
+		{
 			// create a MessageMDN and copy HTTP headers
-			MessageMDN mdn = new AS2MessageMDN(msg); 
+			MessageMDN mdn = new AS2MessageMDN(msg);
 			// copy headers from msg to MDN from msg
-			mdn.setHeaders(msg.getHeaders()); 
-			MimeBodyPart part = new MimeBodyPart(mdn.getHeaders(), data); 
-			msg.getMDN().setData(part); 
-			 
+			mdn.setHeaders(msg.getHeaders());
+			MimeBodyPart part = new MimeBodyPart(mdn.getHeaders(), data);
+			msg.getMDN().setData(part);
+
 			// get the MDN partnership info
-			mdn.getPartnership().setSenderID(AS2Partnership.PID_AS2, mdn.getHeader("AS2-From")); 
-			mdn.getPartnership().setReceiverID(AS2Partnership.PID_AS2, mdn.getHeader("AS2-To")); 
-			getModule().getSession().getPartnershipFactory().updatePartnership(mdn, false); 
-			 
-			CertificateFactory cFx = getModule().getSession().getCertificateFactory(); 
-			X509Certificate senderCert = cFx.getCertificate(mdn, Partnership.PTYPE_SENDER); 
-			 
-			AS2UtilOld.parseMDN(msg, senderCert); 
-			 
+			mdn.getPartnership().setSenderID(AS2Partnership.PID_AS2, mdn.getHeader("AS2-From"));
+			mdn.getPartnership().setReceiverID(AS2Partnership.PID_AS2, mdn.getHeader("AS2-To"));
+			getModule().getSession().getPartnershipFactory().updatePartnership(mdn, false);
+
+			CertificateFactory cFx = getModule().getSession().getCertificateFactory();
+			X509Certificate senderCert = cFx.getCertificate(mdn, Partnership.PTYPE_SENDER);
+
+			AS2UtilOld.parseMDN(msg, senderCert);
+
 			// in order to name & save the mdn with the original AS2-From + AS2-To + Message id.,
 			// the 3 msg attributes have to be reset before calling MDNFileModule
-			msg.getPartnership().setReceiverID(AS2Partnership.PID_AS2, mdn.getHeader("AS2-From")); 
-			msg.getPartnership().setSenderID(AS2Partnership.PID_AS2, mdn.getHeader("AS2-To")); 
-			getModule().getSession().getPartnershipFactory().updatePartnership(msg, false); 
-			msg.setMessageID(msg.getMDN().getAttribute(AS2MessageMDN.MDNA_ORIG_MESSAGEID)); 
-			getModule().getSession().getProcessor().handle(StorageModule.DO_STOREMDN, msg, null); 
-			 
-			
+			msg.getPartnership().setReceiverID(AS2Partnership.PID_AS2, mdn.getHeader("AS2-From"));
+			msg.getPartnership().setSenderID(AS2Partnership.PID_AS2, mdn.getHeader("AS2-To"));
+			getModule().getSession().getPartnershipFactory().updatePartnership(msg, false);
+			msg.setMessageID(msg.getMDN().getAttribute(AS2MessageMDN.MDNA_ORIG_MESSAGEID));
+			getModule().getSession().getProcessor().handle(StorageModule.DO_STOREMDN, msg, null);
+
 			// check if the mic (message integrity check) is correct
-			if (checkAsyncMDN(msg) == true)
+			if (checkAsyncMDN(msg))
 			{
 				HTTPUtil.sendHTTPResponse(out, HttpURLConnection.HTTP_OK, false);
 			}
@@ -187,42 +187,52 @@ public class AS2MDNReceiverHandler implements NetModuleHandler
 
 			String disposition = msg.getMDN().getAttribute(
 					AS2MessageMDN.MDNA_DISPOSITION);
-			try {
+			try
+			{
 				new DispositionType(disposition).validate();
-			} catch (DispositionException de) {
+			}
+			catch (DispositionException de)
+			{
 				de.setText(msg.getMDN().getText());
 
-				if ((de.getDisposition() != null)
-						&& de.getDisposition().isWarning()) {
+				if ((de.getDisposition() != null) && de.getDisposition().isWarning())
+				{
 					de.addSource(OpenAS2Exception.SOURCE_MESSAGE, msg);
 					de.terminate();
-				} else {
+				}
+				else
+				{
 					throw de;
 				}
 			}
-		} catch (Exception e) {
+		}
+		catch (Exception e)
+		{
 			HTTPUtil.sendHTTPResponse(out, HttpURLConnection.HTTP_BAD_REQUEST, false);
-			if (e instanceof IOException) {
-				throw (IOException) e;
+			if (e instanceof IOException)
+			{
+				throw (IOException)e;
 			}
 			WrappedException we = new WrappedException(e);
 			we.addSource(OpenAS2Exception.SOURCE_MESSAGE, msg);
 			throw we;
 		}
-	} 
- 
- 
- //Asynch MDN 2007-03-12
-/**
- *  verify if the mic is matched.
- *  @param msg
- *  @return true if mdn processed  
- */
-	public boolean checkAsyncMDN(AS2Message msg) {
-		try {
+	}
+
+	// Asynch MDN 2007-03-12
+	/**
+	 * verify if the mic is matched.
+	 * 
+	 * @param msg
+	 * @return true if mdn processed
+	 */
+	public boolean checkAsyncMDN(AS2Message msg)
+	{
+		try
+		{
 
 			// get the returned mic from mdn object
-			
+
 			String returnmic = msg.getMDN().getAttribute(AS2MessageMDN.MDNA_MIC);
 
 			// use original message id. to open the pending information file
@@ -230,7 +240,8 @@ public class AS2MDNReceiverHandler implements NetModuleHandler
 			// folder.
 			String ORIG_MESSAGEID = msg.getMDN().getAttribute(
 					AS2MessageMDN.MDNA_ORIG_MESSAGEID);
-			String pendinginfofile = (String) this.getModule().getSession().getComponent("processor").getParameters().get("pendingmdninfo")
+			String pendinginfofile = (String)this.getModule().getSession().getComponent("processor").getParameters()
+					.get("pendingmdninfo")
 					+ "/"
 					+ ORIG_MESSAGEID.substring(1, ORIG_MESSAGEID.length() - 1);
 			BufferedReader pendinginfo = new BufferedReader(new FileReader(
@@ -247,14 +258,16 @@ public class AS2MDNReceiverHandler implements NetModuleHandler
 
 			String disposition = msg.getMDN().getAttribute(
 					AS2MessageMDN.MDNA_DISPOSITION);
-			
+
 			LOGGER.info("received MDN [{}] {}", disposition, msg.getLoggingText());
-			// original code just did string compare - returnmic.equals(originalmic).  Sadly this is
+			// original code just did string compare - returnmic.equals(originalmic). Sadly this is
 			// not good enough as the mic fields are "base64string, algorith" taken from a rfc822 style
 			// Returned-Content-MIC header and rfc822 headers can contain spaces all over the place.
-			// (not to mention comments!).  Simple fix - delete all spaces.
-			if (!returnmic.replaceAll("\\s+", "").equals(originalmic.replaceAll("\\s+", ""))) {
-			 	LOGGER.info("mic not matched, original mic: {} return mic: {}{}", originalmic, returnmic, msg.getLoggingText());
+			// (not to mention comments!). Simple fix - delete all spaces.
+			if (!returnmic.replaceAll("\\s+", "").equals(originalmic.replaceAll("\\s+", "")))
+			{
+				LOGGER.info("mic not matched, original mic: {} return mic: {}{}", originalmic, returnmic,
+						msg.getLoggingText());
 				return false;
 			}
 
@@ -262,96 +275,114 @@ public class AS2MDNReceiverHandler implements NetModuleHandler
 			LOGGER.info("mic is matched, mic: {}{}", returnmic, msg.getLoggingText());
 			File fpendinginfofile = new File(pendinginfofile);
 			LOGGER.info("delete pendinginfo file : {} from pending folder : {}{}", fpendinginfofile.getName(),
-				(String) this.getModule().getSession().getComponent("processor").getParameters().get("pendingmdn"), msg.getLoggingText());
+					(String)this.getModule().getSession().getComponent("processor")
+							.getParameters().get("pendingmdn"), msg.getLoggingText());
 
 			fpendinginfofile.delete();
 
 			LOGGER.info("delete pending file : {} from pending folder : {}{}", fpendingfile.getName(),
-				fpendingfile.getParent(), msg.getLoggingText());
+					fpendingfile.getParent(), msg.getLoggingText());
 			fpendingfile.delete();
-		} catch (Exception e) {
+		}
+		catch (Exception e)
+		{
 			LOGGER.error(e.getMessage(), e);
 			return false;
 		}
-		
+
 		return true;
-	} 
-	
-	
-	   // Copy headers from an Http connection to an InternetHeaders object
-    protected void copyHttpHeaders(HttpURLConnection conn, InternetHeaders headers) {
-        Iterator connHeadersIt = conn.getHeaderFields().entrySet().iterator();
-        Iterator connValuesIt;
-        Map.Entry connHeader;
-        String headerName;
-
-        while (connHeadersIt.hasNext()) {
-            connHeader = (Map.Entry) connHeadersIt.next();
-            headerName = (String) connHeader.getKey();
-
-            if (headerName != null) {
-                connValuesIt = ((Collection) connHeader.getValue()).iterator();
-
-                while (connValuesIt.hasNext()) {
-                    String value = (String) connValuesIt.next();
-
-                    if (headers.getHeader(headerName) == null) {
-                        headers.setHeader(headerName, value);
-                    } else {
-                        headers.addHeader(headerName, value);
-                    }
-                }
-            }
-        }
-    }
-    public void reparse(AS2Message msg, HttpURLConnection conn)
-    {
-    // Create a MessageMDN and copy HTTP headers
-    MessageMDN mdn = new AS2MessageMDN(msg);
-    copyHttpHeaders(conn, mdn.getHeaders());
-
-    // Receive the MDN data
-    ByteArrayOutputStream mdnStream = null;
-    try {
-    InputStream connIn = conn.getInputStream();
-     mdnStream = new ByteArrayOutputStream();
-
-        //			Retrieve the message content
-        if (mdn.getHeader("Content-Length") != null) {
-            try {
-                int contentSize = Integer.parseInt(mdn.getHeader("Content-Length"));
-
-                IOUtilOld.copy(connIn, mdnStream, contentSize);
-            } catch (NumberFormatException nfe) {
-                IOUtilOld.copy(connIn, mdnStream);
-            }
-        } else {
-            IOUtilOld.copy(connIn, mdnStream);
-        }
-        connIn.close();
-       
-    }
-    catch (IOException ioe)
-    {
-    	LOGGER.error(ioe.getMessage(), ioe);
-    }
-    finally {
-    }
-
-    MimeBodyPart part = null;
-	try {
-		part = new MimeBodyPart(mdn.getHeaders(), mdnStream == null ? new byte[0] : mdnStream.toByteArray());
-	} catch (MessagingException e) {
-		e.printStackTrace();
 	}
 
-    msg.getMDN().setData(part);
+	// Copy headers from an Http connection to an InternetHeaders object
+	protected void copyHttpHeaders(HttpURLConnection conn, InternetHeaders headers)
+	{
+		Iterator connHeadersIt = conn.getHeaderFields().entrySet().iterator();
+		Iterator connValuesIt;
+		Map.Entry connHeader;
+		String headerName;
 
-    // get the MDN partnership info
-    mdn.getPartnership().setSenderID(AS2Partnership.PID_AS2, mdn.getHeader("AS2-From"));
-    mdn.getPartnership().setReceiverID(AS2Partnership.PID_AS2, mdn.getHeader("AS2-To"));
-    }
-    
+		while (connHeadersIt.hasNext())
+		{
+			connHeader = (Map.Entry)connHeadersIt.next();
+			headerName = (String)connHeader.getKey();
+
+			if (headerName != null)
+			{
+				connValuesIt = ((Collection)connHeader.getValue()).iterator();
+
+				while (connValuesIt.hasNext())
+				{
+					String value = (String)connValuesIt.next();
+
+					if (headers.getHeader(headerName) == null)
+					{
+						headers.setHeader(headerName, value);
+					}
+					else
+					{
+						headers.addHeader(headerName, value);
+					}
+				}
+			}
+		}
+	}
+
+	public void reparse(AS2Message msg, HttpURLConnection conn)
+	{
+		// Create a MessageMDN and copy HTTP headers
+		MessageMDN mdn = new AS2MessageMDN(msg);
+		copyHttpHeaders(conn, mdn.getHeaders());
+
+		// Receive the MDN data
+		ByteArrayOutputStream mdnStream = null;
+		try
+		{
+			InputStream connIn = conn.getInputStream();
+			mdnStream = new ByteArrayOutputStream();
+
+			// Retrieve the message content
+			if (mdn.getHeader("Content-Length") != null)
+			{
+				try
+				{
+					int contentSize = Integer.parseInt(mdn.getHeader("Content-Length"));
+
+					IOUtilOld.copy(connIn, mdnStream, contentSize);
+				}
+				catch (NumberFormatException nfe)
+				{
+					IOUtilOld.copy(connIn, mdnStream);
+				}
+			}
+			else
+			{
+				IOUtilOld.copy(connIn, mdnStream);
+			}
+			connIn.close();
+
+		}
+		catch (IOException ioe)
+		{
+			LOGGER.error(ioe.getMessage(), ioe);
+		}
+
+		MimeBodyPart part = null;
+		try
+		{
+			part = new MimeBodyPart(mdn.getHeaders(), mdnStream == null ? new byte[0] : mdnStream.toByteArray());
+		}
+		catch (MessagingException e)
+		{
+			e.printStackTrace();
+		}
+
+		msg.getMDN().setData(part);
+
+		// get the MDN partnership info
+		mdn.getPartnership().setSenderID(AS2Partnership.PID_AS2, mdn.getHeader("AS2-From"));
+		mdn.getPartnership().setReceiverID(AS2Partnership.PID_AS2, mdn.getHeader("AS2-To"));
+	}
+
 	// Create a new message and record the source ip and port
 	protected AS2Message createMessage(InetAddress remoteIp, int remotePort, InetAddress localIp, int localPort)
 	{
@@ -365,4 +396,4 @@ public class AS2MDNReceiverHandler implements NetModuleHandler
 		return msg;
 	}
 
- }
+}

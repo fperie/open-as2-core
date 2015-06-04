@@ -10,16 +10,17 @@ import javax.annotation.Nonnull;
 
 import org.openas2.OpenAS2Exception;
 
-
-public class ProcessorException extends OpenAS2Exception {
+public class ProcessorException extends OpenAS2Exception
+{
 	/** Version of serialization. */
 	private static final long serialVersionUID = 1L;
 
 	private Processor processor;
 
 	private List<Exception> causes = new ArrayList<>();
-	
-	public ProcessorException(Processor processor) {
+
+	public ProcessorException(Processor processor)
+	{
 		super();
 		this.processor = processor;
 	}
@@ -29,7 +30,8 @@ public class ProcessorException extends OpenAS2Exception {
 		return causes;
 	}
 
-	public Processor getProcessor() {
+	public Processor getProcessor()
+	{
 		return processor;
 	}
 
@@ -38,16 +40,18 @@ public class ProcessorException extends OpenAS2Exception {
 		causes = list;
 	}
 
-	public void setProcessor(Processor processor) {
+	public void setProcessor(Processor processor)
+	{
 		this.processor = processor;
 	}
 
 	@Override
-	public String getMessage() {
+	public String getMessage()
+	{
 		StringWriter strWriter = new StringWriter();
 		PrintWriter writer = new PrintWriter(strWriter);
 		writer.print(super.getMessage());
-		
+
 		Iterator<Exception> causesIt = getCauses().iterator();
 
 		while (causesIt.hasNext())
@@ -55,7 +59,7 @@ public class ProcessorException extends OpenAS2Exception {
 			Exception e = causesIt.next();
 			writer.println();
 			e.printStackTrace(writer);
-			
+
 		}
 		writer.flush();
 		return strWriter.toString();

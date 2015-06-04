@@ -9,7 +9,8 @@ import org.openas2.params.InvalidParameterException;
 
 
 
-public interface StorableCertificateFactory extends CertificateFactory {
+public interface StorableCertificateFactory extends CertificateFactory
+{
     public void setFilename(String filename);
 
     public String getFilename() throws InvalidParameterException;

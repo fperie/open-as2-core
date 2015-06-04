@@ -5,48 +5,60 @@ import java.util.Map;
 import org.openas2.OpenAS2Exception;
 import org.openas2.message.Message;
 
+public class NoModuleException extends OpenAS2Exception
+{
+	private Map options;
 
-public class NoModuleException extends OpenAS2Exception {
-    private Map options;
-    private Message msg;
-    private String action;
+	private Message msg;
 
-    public NoModuleException(String action, Message msg, Map options) {
-        super(toString(action, msg, options));
-        this.action = action;
-        this.msg = msg;
-        this.options = options;
-    }
+	private String action;
 
-    public void setAction(String string) {
-        action = string;
-    }
+	public NoModuleException(String action, Message msg, Map options)
+	{
+		super(toString(action, msg, options));
+		this.action = action;
+		this.msg = msg;
+		this.options = options;
+	}
 
-    public String getAction() {
-        return action;
-    }
+	public void setAction(String string)
+	{
+		action = string;
+	}
 
-    public void setMsg(Message message) {
-        msg = message;
-    }
+	public String getAction()
+	{
+		return action;
+	}
 
-    public Message getMsg() {
-        return msg;
-    }
+	public void setMsg(Message message)
+	{
+		msg = message;
+	}
 
-    public void setOptions(Map map) {
-        options = map;
-    }
+	public Message getMsg()
+	{
+		return msg;
+	}
 
-    public Map getOptions() {
-        return options;
-    }
+	public void setOptions(Map map)
+	{
+		options = map;
+	}
 
-    public String toString() {
-        return toString(getAction(), getMsg(), getOptions());
-    }
+	public Map getOptions()
+	{
+		return options;
+	}
 
-    protected static String toString(String action, Message msg, Map options) {
-        return "NoModuleException: Requested action: " + action + " Message: " + msg + " Options: " + options;
-    }
+	@Override
+	public String toString()
+	{
+		return toString(getAction(), getMsg(), getOptions());
+	}
+
+	protected static String toString(String action, Message msg, Map options)
+	{
+		return "NoModuleException: Requested action: " + action + " Message: " + msg + " Options: " + options;
+	}
 }

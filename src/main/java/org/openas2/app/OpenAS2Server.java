@@ -31,12 +31,14 @@ public class OpenAS2Server
 	protected BufferedWriter sysOut;
 
 	
-	public static void main(String[] args) {
+	public static void main(String[] args)
+	{
 		OpenAS2Server server = new OpenAS2Server();
 		server.start(args);
 	}
 
-	public void start(String[] args) {
+	public void start(String[] args)
+	{
 		BaseCommandProcessor cmd = null;
 		XMLSession session = null;
 
@@ -68,18 +70,23 @@ public class OpenAS2Server
 			
 			CommandManager cmdMgr = session.getCommandManager();
 			List processors = cmdMgr.getProcessors();
-			for (int i = 0; i < processors.size(); i++) {
+			for (int i = 0; i < processors.size(); i++)
+			{
 				LOGGER.info("Loading Command Processor..." + processors.toString());
 				cmd = (BaseCommandProcessor) processors.get(i);
 				cmd.init();
 				cmd.addCommands(reg);
 				cmd.start();
 			}
-			breakOut : while (true) {
-				for (int i = 0; i < processors.size(); i++) {
+			breakOut: while (true)
+			{
+				for (int i = 0; i < processors.size(); i++)
+				{
 					cmd = (BaseCommandProcessor) processors.get(i);
 					if (cmd.isTerminated())
+					{
 						break breakOut;
+					}
 					Thread.sleep(100); 
 				}
 			}
@@ -89,26 +96,29 @@ public class OpenAS2Server
 		{
 			LOGGER.error("Exception occurred during the getting started: ", e);
 		} 
-		catch (Error err) 
-		{
-			LOGGER.error("Error occurred during the getting started: ", err);
-		} 
 		finally 
 		{
 
 			if (session != null) 
 			{
-				try {
+				try
+				{
 					session.getProcessor().stopActiveModules();
-				} catch (OpenAS2Exception same) {
+				}
+				catch (OpenAS2Exception same)
+				{
 					same.terminate();
 				}
 			}
 
-			if (cmd != null) {
-				try {
+			if (cmd != null)
+			{
+				try
+				{
 					cmd.deInit();
-				} catch (OpenAS2Exception cdie) {
+				}
+				catch (OpenAS2Exception cdie)
+				{
 					cdie.terminate();
 				}
 			}

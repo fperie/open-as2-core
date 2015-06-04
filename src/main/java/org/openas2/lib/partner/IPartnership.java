@@ -2,49 +2,55 @@ package org.openas2.lib.partner;
 
 import java.util.Map;
 
-public interface IPartnership {
-    public static final String ATTRIBUTE_ENCRYPTION_ALGORITHM = "encrypt";
-    public static final String ATTRIBUTE_SIGNATURE_ALGORITHM = "sign";
-    public static final String ATTRIBUTE_SUBJECT = "subject";
-    public static final String ATTRIBUTE_SOURCE = "source";
-    public static final String ATTRIBUTE_DESTINATION = "destination";
-    public static final String ATTRIBUTE_MDN_OPTIONS = "mdnoptions";
+public interface IPartnership
+{
+	public static final String ATTRIBUTE_ENCRYPTION_ALGORITHM = "encrypt";
 
-    Map getAttributes();
+	public static final String ATTRIBUTE_SIGNATURE_ALGORITHM = "sign";
 
-    String getAttribute(String name);
+	public static final String ATTRIBUTE_SUBJECT = "subject";
 
-    void setAttribute(String name, String value);
+	public static final String ATTRIBUTE_SOURCE = "source";
 
-    IPartner getSender();
+	public static final String ATTRIBUTE_DESTINATION = "destination";
 
-    void setSender(IPartner sender);
+	public static final String ATTRIBUTE_MDN_OPTIONS = "mdnoptions";
 
-    IPartner getReceiver();
+	Map getAttributes();
 
-    void setReceiver(IPartner receiver);
+	String getAttribute(String name);
 
-    String getEncryptionAlgorithm();
+	void setAttribute(String name, String value);
 
-    void setEncryptionAlgorithm(String algorithm);
+	IPartner getSender();
 
-    String getSignatureAlgorithm();
+	void setSender(IPartner sender);
 
-    void setSignatureAlgorithm(String algorithm);
+	IPartner getReceiver();
 
-    String getSource();
+	void setReceiver(IPartner receiver);
 
-    void setSource(String url);
+	String getEncryptionAlgorithm();
 
-    String getDestination();
+	void setEncryptionAlgorithm(String algorithm);
 
-    void setDestination(String url);
+	String getSignatureAlgorithm();
 
-    String getSubject();
+	void setSignatureAlgorithm(String algorithm);
 
-    void setSubject(String subject);
+	String getSource();
 
-    String getMdnOptions();
+	void setSource(String url);
 
-    void setMdnOptions(String options);
+	String getDestination();
+
+	void setDestination(String url);
+
+	String getSubject();
+
+	void setSubject(String subject);
+
+	String getMdnOptions();
+
+	void setMdnOptions(String options);
 }

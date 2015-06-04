@@ -291,20 +291,27 @@ public class HTTPUtil
 						}
 						// Zero length is end of chunks
 						if (blocklen == 0)
+						{
 							break;
+						}
+
 						// Ok, now read new chunk
 						int newlen = length + blocklen;
 						byte[] newdata = new byte[newlen];
 						if (length > 0)
+						{
 							System.arraycopy(data, 0, newdata, 0, length);
+						}
 						dataIn.readFully(newdata, length, blocklen);
 						data = newdata;
 						length = newlen;
 						// And now the CRLF after the chunk;
 						while (dataIn.readByte() != '\n')
+						{
 							;
+						}
 					}
-					msg.setHeader("Content-Length", new Integer(length).toString());
+					msg.setHeader("Content-Length", Integer.toString(length));
 				}
 				else
 				{

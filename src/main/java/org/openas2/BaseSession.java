@@ -91,7 +91,8 @@ public abstract class BaseSession implements Session
         Map<String, Component> comps = getComponents();
         Component comp = (Component) comps.get(componentID);
 
-        if (comp == null) {
+		if (comp == null)
+		{
             throw new ComponentNotFoundException(componentID);
         }
 

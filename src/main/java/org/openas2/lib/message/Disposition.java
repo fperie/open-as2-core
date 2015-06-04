@@ -3,38 +3,52 @@ package org.openas2.lib.message;
 import java.util.NoSuchElementException;
 import java.util.StringTokenizer;
 
-public class Disposition {
+public class Disposition
+{
 	// The MDN has been automatically generated
 	public static final String DISP_AUTOMATIC_ACTION = "automatic-action/MDN-sent-automatically; ";
+
 	// The message has been processed successfully
 	public static final String DISP_PROCESSED = DISP_AUTOMATIC_ACTION + "processed";
+
 	// An error occurred during message processing
 	public static final String DISP_PROCESSED_ERROR = DISP_PROCESSED + "/Error: ";
+
 	// An unexpected error occurred during processing
 	public static final String DISP_UNEXPECTED_ERROR = DISP_PROCESSED_ERROR + "unexpected-processing-error";
+
 	// The message sender or receiver could not be authenticated
 	public static final String DISP_AUTHENTICATION_FAILED = DISP_PROCESSED_ERROR + "authentication-failed";
+
 	// The message could not be decrypted
 	public static final String DISP_DECRYPTION_FAILED = DISP_PROCESSED_ERROR + "decryption-failed";
+
 	// The message signature could not be verified
 	public static final String DISP_SIGNATURE_FAILED = DISP_PROCESSED_ERROR + "integrity-check-failed";
-	
+
 	private String action;
+
 	private String mdnAction;
+
 	private String status;
+
 	private String statusDescription;
+
 	private String statusModifier;
 
-	public Disposition(String disposition) throws DispositionException {
+	public Disposition(String disposition) throws DispositionException
+	{
 		super();
 
-		if (disposition != null) {
+		if (disposition != null)
+		{
 			parseDisposition(disposition);
 		}
 	}
 
 	public Disposition(String action, String mdnAction, String status,
-			String statusModifier, String statusDescription) {
+			String statusModifier, String statusDescription)
+	{
 		super();
 		this.action = action;
 		this.mdnAction = mdnAction;
@@ -43,7 +57,8 @@ public class Disposition {
 		this.statusDescription = statusDescription;
 	}
 
-	public Disposition(String action, String mdnAction, String status) {
+	public Disposition(String action, String mdnAction, String status)
+	{
 		super();
 		this.action = action;
 		this.mdnAction = mdnAction;
@@ -52,50 +67,62 @@ public class Disposition {
 		this.statusDescription = null;
 	}
 
-	public void setAction(String action) {
+	public void setAction(String action)
+	{
 		this.action = action;
 	}
 
-	public String getAction() {
+	public String getAction()
+	{
 		return action;
 	}
 
-	public void setMdnAction(String mdnAction) {
+	public void setMdnAction(String mdnAction)
+	{
 		this.mdnAction = mdnAction;
 	}
 
-	public String getMdnAction() {
+	public String getMdnAction()
+	{
 		return mdnAction;
 	}
 
-	public void setStatus(String status) {
+	public void setStatus(String status)
+	{
 		this.status = status;
 	}
 
-	public String getStatus() {
+	public String getStatus()
+	{
 		return status;
 	}
 
-	public void setStatusDescription(String statusDescription) {
+	public void setStatusDescription(String statusDescription)
+	{
 		this.statusDescription = statusDescription;
 	}
 
-	public String getStatusDescription() {
+	public String getStatusDescription()
+	{
 		return statusDescription;
 	}
 
-	public void setStatusModifier(String statusModifier) {
+	public void setStatusModifier(String statusModifier)
+	{
 		this.statusModifier = statusModifier;
 	}
 
-	public String getStatusModifier() {
+	public String getStatusModifier()
+	{
 		return statusModifier;
 	}
 
-	protected String makeDisposition() {
+	protected String makeDisposition()
+	{
 		if ((getAction() == null) && (getMdnAction() == null)
 				&& (getStatus() == null) && (getStatusModifier() == null)
-				&& (getStatusDescription() == null)) {
+				&& (getStatusDescription() == null))
+		{
 			return new String("");
 		}
 
@@ -103,10 +130,12 @@ public class Disposition {
 		dispBuf.append(getAction()).append("/").append(getMdnAction());
 		dispBuf.append("; ").append(getStatus());
 
-		if (getStatusModifier() != null) {
+		if (getStatusModifier() != null)
+		{
 			dispBuf.append("/").append(getStatusModifier()).append(": ");
 
-			if (getStatusDescription() != null) {
+			if (getStatusDescription() != null)
+			{
 				dispBuf.append(getStatusDescription());
 			}
 		}
@@ -114,45 +143,55 @@ public class Disposition {
 		return dispBuf.toString();
 	}
 
-	protected void parseDisposition(String disposition) throws DispositionException {
+	protected void parseDisposition(String disposition) throws DispositionException
+	{
 		StringTokenizer dispTokens = new StringTokenizer(disposition, "/;:",
 				false);
 
-		try {
+		try
+		{
 			setAction(dispTokens.nextToken().toLowerCase());
 			setMdnAction(dispTokens.nextToken().toLowerCase());
 			setStatus(dispTokens.nextToken().trim().toLowerCase());
 			setStatusModifier(null);
 			setStatusDescription(null);
 
-			if (dispTokens.hasMoreTokens()) {
+			if (dispTokens.hasMoreTokens())
+			{
 				setStatusModifier(dispTokens.nextToken().toLowerCase());
 
-				if (dispTokens.hasMoreTokens()) {
+				if (dispTokens.hasMoreTokens())
+				{
 					setStatusDescription(dispTokens.nextToken().trim()
 							.toLowerCase());
 				}
 			}
-		} catch (NoSuchElementException nsee) {
+		}
+		catch (NoSuchElementException nsee)
+		{
 			throw new DispositionException("Invalid disposition format: "
 					+ disposition);
 		}
 	}
 
-	public String toString() {
+	public String toString()
+	{
 		return makeDisposition();
 	}
 
-	public boolean isWarning() {
+	public boolean isWarning()
+	{
 		String statusMod = getStatusModifier();
 
 		return ((statusMod != null) && statusMod.equalsIgnoreCase("warning"));
 	}
 
-	public boolean isError() {
+	public boolean isError()
+	{
 		String status = getStatus();
 
-		if ((status != null) && !status.equalsIgnoreCase("processed")) {
+		if ((status != null) && !status.equalsIgnoreCase("processed"))
+		{
 			return true;
 		}
 

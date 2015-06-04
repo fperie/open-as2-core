@@ -14,7 +14,7 @@ public class WorkerRegistrer
 	private static final Logger LOGGER = LoggerFactory.getLogger(WorkerRegistrer.class);
 
 	@Nonnull
-	private static AtomicReference<IAs2Worker> WORKER = new AtomicReference<IAs2Worker>(null);
+	private static AtomicReference<IAs2Worker> arWorker = new AtomicReference<IAs2Worker>(null);
 
 	private WorkerRegistrer()
 	{
@@ -30,7 +30,7 @@ public class WorkerRegistrer
 	public static void registerWorker(@Nonnull final IAs2Worker worker)
 	{
 		LOGGER.info("Register of worker following: " + worker.getClass().getName());
-		WORKER.getAndSet(worker);
+		arWorker.getAndSet(worker);
 	}
 
 	/**
@@ -41,6 +41,6 @@ public class WorkerRegistrer
 	@Nullable
 	public static IAs2Worker getWorker()
 	{
-		return WORKER.get();
+		return arWorker.get();
 	}
 }
