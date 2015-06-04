@@ -6,6 +6,8 @@ import java.util.StringTokenizer;
 import javax.mail.internet.ContentDisposition;
 
 import org.openas2.message.Message;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 public class MessageParameters extends ParameterParser
 {
@@ -18,6 +20,9 @@ public class MessageParameters extends ParameterParser
 	public static final String KEY_HEADERS = "headers";
 
 	public static final String KEY_CONTENT_FILENAME = "content-disposition";
+
+	/** Logger for the class. */
+	private static final Logger LOGGER = LoggerFactory.getLogger(MessageParameters.class);
 
 	private Message target;
 
@@ -95,12 +100,17 @@ public class MessageParameters extends ParameterParser
 			String returnFilename = "noContentDispositionFilename";
 			String filename = target.getContentDisposition();
 			if (filename == null || filename.length() < 1)
+			{
 				return returnFilename;
+			}
+
 			try
 			{
 				int pos = filename.lastIndexOf(File.separator);
 				if (pos >= 0)
+				{
 					returnFilename = filename.substring(0, pos + 1);
+				}
 
 				ContentDisposition cd = new ContentDisposition(filename);
 
@@ -109,7 +119,7 @@ public class MessageParameters extends ParameterParser
 			}
 			catch (Exception e)
 			{
-				e.printStackTrace();
+				LOGGER.error("Error occured to get a parameter: ", e);
 			}
 			return returnFilename;
 		}

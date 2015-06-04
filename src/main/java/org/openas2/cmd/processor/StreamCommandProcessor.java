@@ -13,6 +13,8 @@ import org.openas2.WrappedException;
 import org.openas2.cmd.Command;
 import org.openas2.cmd.CommandResult;
 import org.openas2.util.CommandTokenizer;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 /**
  * original author unknown
@@ -33,6 +35,9 @@ public class StreamCommandProcessor extends BaseCommandProcessor
 	public static final String EXIT_COMMAND = "exit";
 
 	public static final String PROMPT = "#>";
+
+	/** Logger for the class. */
+	private static final Logger LOGGER = LoggerFactory.getLogger(StreamCommandProcessor.class);
 
 	private BufferedReader reader = null;
 
@@ -57,11 +62,13 @@ public class StreamCommandProcessor extends BaseCommandProcessor
 	@Override
 	public void deInit() throws OpenAS2Exception
 	{
+		// do nothing...
 	}
 
 	@Override
 	public void init() throws OpenAS2Exception
 	{
+		// do nothing...
 	}
 
 	/*
@@ -75,12 +82,13 @@ public class StreamCommandProcessor extends BaseCommandProcessor
 		try
 		{
 			while (true)
+			{
 				processCommand();
-
+			}
 		}
 		catch (OpenAS2Exception e)
 		{
-			e.printStackTrace();
+			LOGGER.error("Error occured in stream command processor: ", e);
 		}
 
 	}

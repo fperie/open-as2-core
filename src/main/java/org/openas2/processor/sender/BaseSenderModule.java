@@ -7,9 +7,14 @@ import org.openas2.OpenAS2Exception;
 import org.openas2.message.Message;
 import org.openas2.processor.BaseProcessorModule;
 import org.openas2.processor.resender.ResenderModule;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 public abstract class BaseSenderModule extends BaseProcessorModule implements SenderModule
 {
+	/** Logger for the class. */
+	private static final Logger LOGGER = LoggerFactory.getLogger(BaseSenderModule.class);
+
 	// How many times should this message be sent?
 	protected int retries(Map options)
 	{
@@ -25,10 +30,13 @@ public abstract class BaseSenderModule extends BaseProcessorModule implements Se
 				// Can't actualy happen, but try convincing Java of that.
 				// *FIXME* should have two versions of getParameter, one that can't throw.
 				left = null;
+				LOGGER.debug("One error occured, left variable has been assigned to null.", e);
 			}
 
 			if (left == null)
+			{
 				left = SenderModule.DEFAULT_RETRIES;
+			}
 		}
 
 		return Integer.parseInt(left);
@@ -37,7 +45,9 @@ public abstract class BaseSenderModule extends BaseProcessorModule implements Se
 	protected boolean resend(String how, Message msg, OpenAS2Exception cause, int tries) throws OpenAS2Exception
 	{
 		if (tries >= 0 && tries-- <= 0)
+		{
 			return false;
+		}
 		Map<String, Object> options = new HashMap<>();
 		options.put(ResenderModule.OPTION_CAUSE, cause);
 		options.put(ResenderModule.OPTION_INITIAL_SENDER, this);

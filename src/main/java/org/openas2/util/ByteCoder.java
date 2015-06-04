@@ -15,7 +15,7 @@ public class ByteCoder
 	public static String encode(String inStr)
 	{
 		StringBuffer sb = new StringBuffer();
-		byte me[] = inStr.getBytes();
+		byte[] me = inStr.getBytes();
 		int i;
 		for (i = 0; i < me.length; i++)
 		{
@@ -41,12 +41,15 @@ public class ByteCoder
 		return sb.toString();
 	}
 
-	public static void main(String args[])
+	public static void main(String[] args)
 	{
 	   StringBuffer sb = new StringBuffer();
-	   for (int i = 0; i < args.length; i++) {
+		for (int i = 0; i < args.length; i++)
+		{
 		   if (i > 0)
+			{
 			   sb.append('\n');
+			}
 		   sb.append(args[i]);
 	   }
 	   String in = encode(sb.toString());

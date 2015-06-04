@@ -13,105 +13,123 @@ import org.openas2.params.InvalidParameterException;
 import org.openas2.processor.BaseProcessorModule;
 import org.openas2.util.IOUtilOld;
 
-public abstract class BaseStorageModule extends BaseProcessorModule implements StorageModule {
-    public static final String PARAM_FILENAME = "filename";
-    public static final String PARAM_PROTOCOL = "protocol";
-    public static final String PARAM_TEMPDIR = "tempdir";
+public abstract class BaseStorageModule extends BaseProcessorModule implements StorageModule
+{
+	public static final String PARAM_FILENAME = "filename";
+
+	public static final String PARAM_PROTOCOL = "protocol";
+
+	public static final String PARAM_TEMPDIR = "tempdir";
 
 	@Override
-    public boolean canHandle(String action, Message msg, Map options) {
-        try {
-            if (!action.equals(getModuleAction())) {
-                return false;
-            }
+	public boolean canHandle(String action, Message msg, Map options)
+	{
+		try
+		{
+			if (!action.equals(getModuleAction()))
+			{
+				return false;
+			}
 
 			String modProtocol = getParameter(PARAM_PROTOCOL, false);
-            String msgProtocol = msg.getProtocol();
+			String msgProtocol = msg.getProtocol();
 
-            if (modProtocol != null) {
-                if ((msgProtocol != null) && msgProtocol.equals(modProtocol)) {
-                    return true;
-                }
+			if (modProtocol != null)
+			{
+				if ((msgProtocol != null) && msgProtocol.equals(modProtocol))
+				{
+					return true;
+				}
 
-                return false;
-            }
+				return false;
+			}
 
-            return true;
-        } catch (OpenAS2Exception oae) {
-            return false;
-        }
-    }
+			return true;
+		}
+		catch (OpenAS2Exception oae)
+		{
+			return false;
+		}
+	}
 
 	@Override
-    public void init(Session session, Map options) throws OpenAS2Exception {
-        super.init(session, options);
-        getParameter(PARAM_FILENAME, true);
-    }
+	public void init(Session session, Map options) throws OpenAS2Exception
+	{
+		super.init(session, options);
+		getParameter(PARAM_FILENAME, true);
+	}
 
-    protected abstract String getModuleAction();
+	protected abstract String getModuleAction();
 
-    
-/**
- *   Add one more method "getFile" to make no impact to all modules who call this method with
- *   only two parameter "Message msg" & "String fileParam"
- */ 
-  
-    
-    protected File getFile(Message msg, String fileParam) throws IOException,
-			OpenAS2Exception {
+	/**
+	 * Add one more method "getFile" to make no impact to all modules who call this method with only two parameter
+	 * "Message msg" & "String fileParam"
+	 */
+
+	protected File getFile(Message msg, String fileParam) throws IOException,
+			OpenAS2Exception
+	{
 		return getFile(msg, fileParam, "");
-	} 
- 
-    /**
-     * @since 2007-06-01
-     * @param msg
-     * @param fileParam
-     * @param action
-     * @return
-     * @throws IOException
-     * @throws OpenAS2Exception
-     */
-    protected File getFile(Message msg, String fileParam, String action) throws IOException, OpenAS2Exception {
-    	String filename = getFilename(msg, fileParam); 
-    	 
-// make sure the parent directories exist
-    	File file = new File(filename); 
-    	File parentDir = file.getParentFile(); 
-    	parentDir.mkdirs(); 
-// don't overwrite existing files
-    	return IOUtilOld.getUnique(parentDir, IOUtilOld.cleanFilename(file.getName())); 
-    
-    }
+	}
 
+	/**
+	 * @since 2007-06-01
+	 * @param msg
+	 * @param fileParam
+	 * @param action
+	 * @return
+	 * @throws IOException
+	 * @throws OpenAS2Exception
+	 */
+	protected File getFile(Message msg, String fileParam, String action) throws IOException, OpenAS2Exception
+	{
+		String filename = getFilename(msg, fileParam);
 
-    protected abstract String getFilename(Message msg, String fileParam) throws InvalidParameterException;
-    protected abstract String getFilename(Message msg, String fileParam, String action) throws InvalidParameterException;
+		// make sure the parent directories exist
+		File file = new File(filename);
+		File parentDir = file.getParentFile();
+		parentDir.mkdirs();
+		// don't overwrite existing files
+		return IOUtilOld.getUnique(parentDir, IOUtilOld.cleanFilename(file.getName()));
 
-    protected void store(File msgFile, InputStream in) throws IOException, OpenAS2Exception {
-        String tempDirname = getParameter(PARAM_TEMPDIR, false);        
-        if (tempDirname != null) {
-            // write the data to a temporary directory first
-            File tempDir = IOUtilOld.getDirectoryFile(tempDirname);
-            String tempFilename = msgFile.getName();            
-            File tempFile = IOUtilOld.getUnique(tempDir, tempFilename);
-            writeStream(in, tempFile);
-            
-            // copy the temp file over to the destination
-            tempFile.renameTo(msgFile);            
-        } else {
-            writeStream(in, msgFile);            
-        }
-    }
-    
-    protected void writeStream(InputStream in, File destination) throws IOException {
-        FileOutputStream out = new FileOutputStream(destination);
-        try {
-            IOUtilOld.copy(in, out);
-        } finally {
-            out.close();
-            in.close();
-        }
-    }
-    
-    
+	}
+
+	protected abstract String getFilename(Message msg, String fileParam) throws InvalidParameterException;
+
+	protected abstract String getFilename(Message msg, String fileParam, String action)
+			throws InvalidParameterException;
+
+	protected void store(File msgFile, InputStream in) throws IOException, OpenAS2Exception
+	{
+		String tempDirname = getParameter(PARAM_TEMPDIR, false);
+		if (tempDirname != null)
+		{
+			// write the data to a temporary directory first
+			File tempDir = IOUtilOld.getDirectoryFile(tempDirname);
+			String tempFilename = msgFile.getName();
+			File tempFile = IOUtilOld.getUnique(tempDir, tempFilename);
+			writeStream(in, tempFile);
+
+			// copy the temp file over to the destination
+			tempFile.renameTo(msgFile);
+		}
+		else
+		{
+			writeStream(in, msgFile);
+		}
+	}
+
+	protected void writeStream(InputStream in, File destination) throws IOException
+	{
+		FileOutputStream out = new FileOutputStream(destination);
+		try
+		{
+			IOUtilOld.copy(in, out);
+		}
+		finally
+		{
+			out.close();
+			in.close();
+		}
+	}
 }

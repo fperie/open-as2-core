@@ -82,7 +82,8 @@ public class ImportCertCommand extends AliasedCertCommand
 
 	protected CommandResult importCert(AliasedCertificateFactory certFx,
 			String alias, String filename) throws IOException,
-			CertificateException, OpenAS2Exception {
+			CertificateException, OpenAS2Exception
+	{
 		FileInputStream fis = new FileInputStream(filename);
 		BufferedInputStream bis = new BufferedInputStream(fis);
 
@@ -92,11 +93,13 @@ public class ImportCertCommand extends AliasedCertCommand
 		CommandResult cmdRes = new CommandResult(CommandResult.TYPE_OK,
 				"Certificate(s) imported successfully");
 
-		while (bis.available() > 0) {
+		while (bis.available() > 0)
+		{
 			Certificate cert = cf.generateCertificate(bis);
 
-			if (cert instanceof X509Certificate) {
-				certFx.addCertificate(alias, (X509Certificate) cert, true);
+			if (cert instanceof X509Certificate)
+			{
+				certFx.addCertificate(alias, (X509Certificate)cert, true);
 				cmdRes.getResults().add(
 						"Imported certificate: " + cert.toString());
 
@@ -109,18 +112,21 @@ public class ImportCertCommand extends AliasedCertCommand
 	}
 
 	protected CommandResult importPrivateKey(AliasedCertificateFactory certFx,
-			String alias, String filename, String password) throws Exception {
+			String alias, String filename, String password) throws Exception
+	{
 		KeyStore ks = AS2UtilOld.getCryptoHelper().getKeyStore();
 		ks.load(new FileInputStream(filename), password.toCharArray());
 
 		Enumeration aliases = ks.aliases();
 
-		while (aliases.hasMoreElements()) {
+		while (aliases.hasMoreElements())
+		{
 			String certAlias = aliases.nextElement().toString();
 			Certificate cert = ks.getCertificate(certAlias);
 
-			if (cert instanceof X509Certificate) {
-				certFx.addCertificate(alias, (X509Certificate) cert, true);
+			if (cert instanceof X509Certificate)
+			{
+				certFx.addCertificate(alias, (X509Certificate)cert, true);
 
 				Key certKey = ks.getKey(certAlias, password.toCharArray());
 				certFx.addPrivateKey(alias, certKey, password);

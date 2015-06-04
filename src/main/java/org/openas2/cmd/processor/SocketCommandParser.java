@@ -80,7 +80,7 @@ public class SocketCommandParser extends DefaultHandler
 	 *
 	 */
 	@Override
-	public void characters(char ch[], int start, int length)
+	public void characters(char[] ch, int start, int length)
 	{
 
 		contents.write(ch, start, length);
@@ -122,7 +122,9 @@ public class SocketCommandParser extends DefaultHandler
 			this.commandText = contents.toString();
 		}
 		else
+		{
 			contents.flush();
+		}
 	}
 
 }

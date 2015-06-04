@@ -55,10 +55,14 @@ public class DirectoryResenderModule extends BaseResenderModule
 			ObjectOutputStream oos = new ObjectOutputStream(new FileOutputStream(resendFile));
 			String method = (String)options.get(ResenderModule.OPTION_RESEND_METHOD);
 			if (method == null)
+			{
 				method = SenderModule.DO_SEND;
+			}
 			String retries = (String)options.get(ResenderModule.OPTION_RETRIES);
 			if (retries == null)
+			{
 				retries = "-1";
+			}
 			oos.writeObject(method);
 			oos.writeObject(retries);
 			oos.writeObject(msg);
@@ -140,6 +144,7 @@ public class DirectoryResenderModule extends BaseResenderModule
 		}
 		catch (Exception e)
 		{
+			LOGGER.debug("Error occured to define if it's time to send because : ", e);
 			return true;
 		}
 	}
@@ -184,11 +189,13 @@ public class DirectoryResenderModule extends BaseResenderModule
 				throw new WrappedException(cnfe);
 			}
 		}
-		catch (OpenAS2Exception oae)
+		catch (final OpenAS2Exception oae)
 		{
 			oae.addSource(OpenAS2Exception.SOURCE_MESSAGE, msg);
 			oae.addSource(OpenAS2Exception.SOURCE_FILE, file);
 			oae.terminate();
+
+			LOGGER.error("Error occured to process message: ", oae);
 			IOUtilOld.handleError(file, getParameter(PARAM_ERROR_DIRECTORY, true));
 		}
 	}
@@ -214,12 +221,9 @@ public class DirectoryResenderModule extends BaseResenderModule
 			{
 				currentFile = files[i];
 
-				if (currentFile.exists() && currentFile.isFile() && currentFile.canWrite())
+				if (currentFile.exists() && currentFile.isFile() && currentFile.canWrite() && isTimeToSend(currentFile))
 				{
-					if (isTimeToSend(currentFile))
-					{
 						sendFiles.add(currentFile);
-					}
 				}
 			}
 		}

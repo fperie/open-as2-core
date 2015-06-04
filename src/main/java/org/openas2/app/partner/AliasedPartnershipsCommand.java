@@ -34,5 +34,4 @@ public abstract class AliasedPartnershipsCommand extends BaseCommand
 
 	protected abstract CommandResult execute(PartnershipFactory partFx,
 			Object[] params) throws OpenAS2Exception;
-
 }

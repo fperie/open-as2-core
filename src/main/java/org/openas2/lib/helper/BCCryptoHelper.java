@@ -150,6 +150,7 @@ public class BCCryptoHelper implements ICryptoHelper
 	@Override
 	public void deinitialize()
 	{
+		// do nothing...
 	}
 
 	@Override
@@ -165,8 +166,6 @@ public class BCCryptoHelper implements ICryptoHelper
 
 		MimeBodyPart encData = gen.generate(part, encAlg, "BC");
 
-		System.gc();
-
 		return encData;
 	}
 
@@ -176,16 +175,16 @@ public class BCCryptoHelper implements ICryptoHelper
 		Security.addProvider(new BouncyCastleProvider());
 
 		MailcapCommandMap mc = (MailcapCommandMap)CommandMap.getDefaultCommandMap();
-		mc
-				.addMailcap("application/pkcs7-signature;; x-java-content-handler=org.bouncycastle.mail.smime.handlers.pkcs7_signature");
-		mc
-				.addMailcap("application/pkcs7-mime;; x-java-content-handler=org.bouncycastle.mail.smime.handlers.pkcs7_mime");
-		mc
-				.addMailcap("application/x-pkcs7-signature;; x-java-content-handler=org.bouncycastle.mail.smime.handlers.x_pkcs7_signature");
-		mc
-				.addMailcap("application/x-pkcs7-mime;; x-java-content-handler=org.bouncycastle.mail.smime.handlers.x_pkcs7_mime");
-		mc
-				.addMailcap("multipart/signed;; x-java-content-handler=org.bouncycastle.mail.smime.handlers.multipart_signed");
+		mc.addMailcap("application/pkcs7-signature;; "
+				+ "x-java-content-handler=org.bouncycastle.mail.smime.handlers.pkcs7_signature");
+		mc.addMailcap("application/pkcs7-mime;; "
+				+ "x-java-content-handler=org.bouncycastle.mail.smime.handlers.pkcs7_mime");
+		mc.addMailcap("application/x-pkcs7-signature;; "
+				+ "x-java-content-handler=org.bouncycastle.mail.smime.handlers.x_pkcs7_signature");
+		mc.addMailcap("application/x-pkcs7-mime;; "
+				+ "x-java-content-handler=org.bouncycastle.mail.smime.handlers.x_pkcs7_mime");
+		mc.addMailcap("multipart/signed;; "
+				+ "x-java-content-handler=org.bouncycastle.mail.smime.handlers.multipart_signed");
 		CommandMap.setDefaultCommandMap(mc);
 	}
 

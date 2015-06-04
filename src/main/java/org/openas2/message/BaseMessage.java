@@ -23,7 +23,7 @@ public abstract class BaseMessage implements Message
 
 	private Map attributes;
 
-	private MessageMDN MDN;
+	private MessageMDN mdn;
 
 	private MimeBodyPart data;
 
@@ -110,6 +110,7 @@ public abstract class BaseMessage implements Message
 			{
 				setContentType(null);
 			}
+
 			try
 			{
 				setContentDisposition(data.getHeader("Content-Disposition", null));
@@ -203,13 +204,13 @@ public abstract class BaseMessage implements Message
 	@Override
 	public void setMDN(MessageMDN mdn)
 	{
-		this.MDN = mdn;
+		this.mdn = mdn;
 	}
 
 	@Override
 	public MessageMDN getMDN()
 	{
-		return MDN;
+		return mdn;
 	}
 
 	@Override
@@ -328,15 +329,15 @@ public abstract class BaseMessage implements Message
 		}
 		catch (MessagingException me)
 		{
-			throw new IOException("Messaging exception: " + me.getMessage());
+			throw new IOException("Messaging exception: " + me.getMessage(), me);
 		}
 
 		// read in MDN
-		MDN = (MessageMDN)in.readObject();
+		mdn = (MessageMDN)in.readObject();
 
-		if (MDN != null)
+		if (mdn != null)
 		{
-			MDN.setMessage(this);
+			mdn.setMessage(this);
 		}
 	}
 
@@ -379,14 +380,14 @@ public abstract class BaseMessage implements Message
 		}
 		catch (MessagingException e)
 		{
-			throw new IOException("Messaging exception: " + e.getMessage());
+			throw new IOException("Messaging exception: " + e.getMessage(), e);
 		}
 
 		out.write(baos.toByteArray());
 		baos.close();
 
 		// write the message's MDN
-		out.writeObject(MDN);
+		out.writeObject(mdn);
 	}
 
 	@Override

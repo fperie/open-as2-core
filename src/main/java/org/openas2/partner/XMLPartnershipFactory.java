@@ -119,17 +119,7 @@ public class XMLPartnershipFactory extends BasePartnershipFactory
 		switch (eventID)
 		{
 			case FileMonitorListener.EVENT_MODIFIED:
-
-				try
-				{
-					refresh();
-					LOGGER.debug("- Partnerships Reloaded -");
-				}
-				catch (OpenAS2Exception oae)
-				{
-					oae.terminate();
-				}
-
+				handleEventModified();
 				break;
 		}
 	}
@@ -289,8 +279,10 @@ public class XMLPartnershipFactory extends BasePartnershipFactory
 		while (true)
 		{
 			f = new File(fn + '.' + df.format(l));
-			if (f.exists() == false)
+			if (!f.exists())
+			{
 				break;
+			}
 			l++;
 		}
 
@@ -317,7 +309,9 @@ public class XMLPartnershipFactory extends BasePartnershipFactory
 					Map.Entry attribute = (Map.Entry)attrIt.next();
 					pw.print(attribute.getKey() + "=\"" + attribute.getValue() + "\"");
 					if (attrIt.hasNext())
+					{
 						pw.print("\n           ");
+					}
 				}
 				pw.println("/>");
 			}
@@ -348,6 +342,19 @@ public class XMLPartnershipFactory extends BasePartnershipFactory
 		catch (FileNotFoundException e)
 		{
 			throw new WrappedException(e);
+		}
+	}
+
+	private void handleEventModified()
+	{
+		try
+		{
+			refresh();
+			LOGGER.debug("- Partnerships Reloaded -");
+		}
+		catch (OpenAS2Exception oae)
+		{
+			oae.terminate();
 		}
 	}
 }

@@ -14,7 +14,7 @@ import org.openas2.lib.util.javamail.ByteArrayDataSource;
 
 public class MimeUtil
 {
-	public static String HEADER_VALUE_SEPARATOR = ", ";
+	public static final String HEADER_VALUE_SEPARATOR = ", ";
 
 	public static int getContentLength(InternetHeaders headers)
 			throws IOException
