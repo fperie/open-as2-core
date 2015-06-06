@@ -15,3 +15,4 @@ Some code refactoring has been made to the original source code :
  - give the capability to implements it's own stream instead default socket (http request for example)
  - etc...
  
+The jar file will be available in central maven with: groupId: fr.fabienperie.open-as2, artifactId: dual-core-as2
