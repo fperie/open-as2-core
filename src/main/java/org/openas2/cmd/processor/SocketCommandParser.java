@@ -18,13 +18,11 @@ import org.xml.sax.SAXException;
 import org.xml.sax.helpers.DefaultHandler;
 
 /**
- * used to parse commands from the socket command processor message format <command userid="abc" pasword="xyz"> the
- * actual command </command>
+ * used to parse commands from the socket command processor message format &lt;command userid="abc" pasword="xyz"&gt;the
+ * actual command &lt;/command&gt;
  * 
  * @author joseph mcverry
- *
  */
-
 public class SocketCommandParser extends DefaultHandler
 		implements
 		EntityResolver,

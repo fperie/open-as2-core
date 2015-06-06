@@ -206,6 +206,8 @@ public class AS2SenderModule extends HttpSenderModule
 	 *        URLConnection
 	 * @param originalmic
 	 *        mic value from original msg
+	 * @throws OpenAS2Exception exception
+	 * @throws IOException io exception
 	 */
 	protected void receiveMDN(AS2Message msg, HttpURLConnection conn, String originalmic)
 			throws OpenAS2Exception, IOException
@@ -451,12 +453,12 @@ public class AS2SenderModule extends HttpSenderModule
 
 	// Asynch MDN 2007-03-12
 	/**
-	 * for storing original mic & outgoing file into pending information file
+	 * for storing original mic &amp; outgoing file into pending information file
 	 * 
 	 * @param msg
 	 *        AS2Message
-	 * @param mic
-	 * @throws WrappedException
+	 * @param mic original mic
+	 * @throws WrappedException exception.
 	 */
 	protected void storePendingInfo(AS2Message msg, String mic) throws WrappedException
 	{

@@ -62,8 +62,14 @@ public abstract class BaseStorageModule extends BaseProcessorModule implements S
 	protected abstract String getModuleAction();
 
 	/**
-	 * Add one more method "getFile" to make no impact to all modules who call this method with only two parameter
-	 * "Message msg" & "String fileParam"
+	 * Add one more method <strong>getFile</strong> to make no impact to all modules who call this method with only two parameter
+	 * <strong>Message msg</strong> &amp; <strong>String fileParam</strong>.
+	 * 
+	 * @param msg as2 message.
+	 * @param fileParam parameter file path.
+	 * @return the file.
+	 * @throws IOException exception occured to read the file.
+	 * @throws OpenAS2Exception exception.
 	 */
 
 	protected File getFile(Message msg, String fileParam) throws IOException,
@@ -74,12 +80,12 @@ public abstract class BaseStorageModule extends BaseProcessorModule implements S
 
 	/**
 	 * @since 2007-06-01
-	 * @param msg
-	 * @param fileParam
-	 * @param action
-	 * @return
-	 * @throws IOException
-	 * @throws OpenAS2Exception
+	 * @param msg as2 message.
+	 * @param fileParam parameter file path.
+	 * @param action action name.
+	 * @return the file.
+	 * @throws IOException IO exception.
+	 * @throws OpenAS2Exception exception.
 	 */
 	protected File getFile(Message msg, String fileParam, String action) throws IOException, OpenAS2Exception
 	{

@@ -19,7 +19,8 @@ public abstract class ParameterParser
 	 * 
 	 * @param encodedParams
 	 *        string to parse
-	 * @throws InvalidParameterException
+	 *        
+	 * @throws InvalidParameterException error occured to define many parameters with the value. 
 	 */
 	public void setParameters(String encodedParams) throws InvalidParameterException
 	{
@@ -51,7 +52,7 @@ public abstract class ParameterParser
 	 *        delimiters in string to parse, like "-."
 	 * @param value
 	 *        string to parse, like <code>"NORINCO-WALMART.application/X12"</code>
-	 * @throws OpenAS2Exception
+	 * @throws OpenAS2Exception error occured to define many parameters with the value.
 	 */
 	public void setParameters(String format, String delimiters, String value)
 			throws OpenAS2Exception
@@ -86,7 +87,8 @@ public abstract class ParameterParser
 	 * @param parser
 	 *        the place to get the parsed info
 	 * @return the filled in format
-	 * @throws InvalidParameterException
+	 * 
+	 * @throws InvalidParameterException error occured to parse a parameter ?
 	 */
 	public static String parse(String format, ParameterParser parser)
 			throws InvalidParameterException
@@ -100,7 +102,7 @@ public abstract class ParameterParser
 	 * @param format
 	 *        the format string to fill in
 	 * @return the filled in format string.
-	 * @throws InvalidParameterException
+	 * @throws InvalidParameterException error occured to parse a parameter ?
 	 */
 	public String format(String format) throws InvalidParameterException
 	{

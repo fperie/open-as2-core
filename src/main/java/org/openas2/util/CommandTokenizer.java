@@ -2,20 +2,21 @@ package org.openas2.util;
 
 import org.openas2.WrappedException;
 
-/** emulates StringTokenizer 
+/**  
+ * Emulates StringTokenizer.
  * 
  * @author joseph mcverry
- *
  */
 public class CommandTokenizer
 {
-
 	String workString;
+
 	int pos = 0;
 	int len = -1;
+	
 	/**
-	 * constructor
-	 * @param inString
+	 * Constructor
+	 * @param inString work string.
 	 */
 	public CommandTokenizer(String inString)
 	{
@@ -26,7 +27,7 @@ public class CommandTokenizer
 	/**
 	 * any more tokens in String
 	 * @return true if there are any more tokens 
-	 * @throws WrappedException 
+	 * @throws WrappedException exception occured during the execution method.
 	 */
 	public boolean hasMoreTokens() throws WrappedException
 	{
@@ -53,12 +54,10 @@ public class CommandTokenizer
 	/**
 	 * returns the next token, this handles spaces and quotes
 	 * @return a string
-	 * @throws WrappedException 
-	 * 
+	 * @throws WrappedException exception occured during the execution method.
 	 */
 	public String nextToken() throws WrappedException
 	{
-
 		try
 		{
 			while (pos < len - 1 && workString.charAt(pos) == ' ')

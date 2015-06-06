@@ -49,8 +49,8 @@ public class URLParser
 	}
 
 	/**
-	 * @param args
-	 * @throws OpenAS2Exception 
+	 * @param args list of arguments.
+	 * @throws OpenAS2Exception exception occurred.
 	 */
 	public static void main(String[] args) throws OpenAS2Exception
 	{

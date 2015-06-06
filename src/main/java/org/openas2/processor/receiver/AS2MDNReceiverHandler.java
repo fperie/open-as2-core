@@ -143,7 +143,13 @@ public class AS2MDNReceiverHandler implements NetModuleHandler
 
 	// Asynch MDN 2007-03-12
 	/**
-	 * method for receiving & processing Async MDN sent from receiver.
+	 * Method for receiving &amp; processing Async MDN sent from receiver.
+	 * 
+	 * @param msg as2 message.
+	 * @param data byte array received.
+	 * @param out stream to send response.
+	 * @throws OpenAS2Exception exception
+	 * @throws IOException exception
 	 */
 	protected void receiveMDN(AS2Message msg, byte[] data, OutputStream out)
 			throws OpenAS2Exception, IOException
@@ -223,16 +229,14 @@ public class AS2MDNReceiverHandler implements NetModuleHandler
 	/**
 	 * verify if the mic is matched.
 	 * 
-	 * @param msg
+	 * @param msg as2 message.
 	 * @return true if mdn processed
 	 */
 	public boolean checkAsyncMDN(AS2Message msg)
 	{
 		try
 		{
-
 			// get the returned mic from mdn object
-
 			String returnmic = msg.getMDN().getAttribute(AS2MessageMDN.MDNA_MIC);
 
 			// use original message id. to open the pending information file

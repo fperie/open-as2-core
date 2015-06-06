@@ -77,7 +77,7 @@ public abstract class BaseMessage implements Message
 
 	/**
 	 * @since 2007-06-01
-	 * @param contentDisposition
+	 * @param contentDisposition content disposition in header message.
 	 */
 	@Override
 	public void setContentDisposition(String contentDisposition)
@@ -87,7 +87,7 @@ public abstract class BaseMessage implements Message
 
 	/**
 	 * @since 2007-06-01
-	 * @return
+	 * @return content disposition in header message.
 	 */
 	@Override
 	public String getContentDisposition()

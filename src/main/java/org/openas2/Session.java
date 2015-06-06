@@ -17,7 +17,7 @@ import org.openas2.processor.Processor;
  *
  * @see Component
  * @see org.openas2.cert.CertificateFactory
- * @see org.openas2.partner.PartnerFactory
+ * @see org.openas2.partner.PartnershipFactory
  * @see org.openas2.processor.Processor 
  */
 public interface Session 
@@ -33,7 +33,7 @@ public interface Session
      *
      * @return the currently registered <code>CertificateFactory</code> component
      *
-     * @throws ComponentNotFound If a <code>CertificateFactory</code> component has not been
+     * @throws ComponentNotFoundException If a <code>CertificateFactory</code> component has not been
      *         registered
      *
      * @see CertificateFactory
@@ -59,7 +59,7 @@ public interface Session
      *
      * @return the component registered to the ID or null
      *
-     * @throws ComponentNotFound If a component is not registered with the ID
+     * @throws ComponentNotFoundException If a component is not registered with the ID
      */
     @Nonnull
     Component getComponent(@Nonnull final String componentID) throws ComponentNotFoundException;
@@ -77,7 +77,7 @@ public interface Session
      *
      * @return the currently registered <code>PartnerFactory</code> component
      *
-     * @throws ComponentNotFound If a <code>PartnerFactory</code> component has not been registered
+     * @throws ComponentNotFoundException If a <code>PartnerFactory</code> component has not been registered
      *
      * @see PartnershipFactory
      * @see Component
@@ -90,8 +90,7 @@ public interface Session
      *
      * @return the currently registered <code>Processor</code> component
      *
-     * @throws ComponentNotFound If a <code>Processor</code> component has not been registered
-     *
+     * @throws ComponentNotFoundException If a <code>Processor</code> component has not been registered
      * @see Processor
      * @see Component
      */

@@ -56,10 +56,6 @@ public interface Component
      * @param parameters configuration values for the component
      *
      * @throws OpenAS2Exception If an error occurs while initializing the component
-     * @throws InvalidParameterException If a required parameter is null in the parameters
-     *         Map
-     *
-     * @see #getParameter(String key, boolean required)
      * @see Session
      */
 	void init(Session session, Map parameters) throws OpenAS2Exception;

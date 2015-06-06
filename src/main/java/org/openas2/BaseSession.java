@@ -17,11 +17,10 @@ public abstract class BaseSession implements Session
     private Map<String, Component> components;
 
     /**
-     * Creates a <code>BaseSession</code> object, then calls the <code>init()</code> method.
+     * Creates a <code>BaseSession</code> object, then calls the <code>initJavaMail()</code> method.
      *
-     * @throws OpenAS2Exception
-     *
-     * @see #init()
+     * @throws OpenAS2Exception If an error occurs while initializing the session configuration.
+     * @see #initJavaMail()
      */
     public BaseSession() throws OpenAS2Exception 
     {
@@ -32,7 +31,7 @@ public abstract class BaseSession implements Session
      * Creates a <code>BaseSession</code> object, with a parameter to initialize or not java mail.
      *
      * @param initJavaMail true to initialize javamail, false to do nothing.
-     * @throws OpenAS2Exception
+     * @throws OpenAS2Exception If an error occurs while initializing the session configuration.
      */
     public BaseSession(boolean initJavaMail) throws OpenAS2Exception 
     {
@@ -47,7 +46,7 @@ public abstract class BaseSession implements Session
      *
      * @return the currently registered <code>CertificateFactory</code> component
      *
-     * @throws ComponentNotFound If a <code>CertificateFactory</code> component has not been
+     * @throws ComponentNotFoundException If a <code>CertificateFactory</code> component has not been
      *         registered
      *
      * @see CertificateFactory
@@ -79,10 +78,8 @@ public abstract class BaseSession implements Session
      * Gets the <code>Component</code> currently registered with an ID
      *
      * @param componentID ID to search for
-     *
      * @return the component registered to the ID or null
-     *
-     * @throws ComponentNotFound If a component is not registered with the ID
+     * @throws ComponentNotFoundException If a component is not registered with the ID
      */
     @Override
     @Nonnull
@@ -122,7 +119,7 @@ public abstract class BaseSession implements Session
      *
      * @return the currently registered <code>PartnerFactory</code> component
      *
-     * @throws ComponentNotFound If a <code>PartnerFactory</code> component has not been registered
+     * @throws ComponentNotFoundException If a <code>PartnerFactory</code> component has not been registered
      *
      * @see PartnershipFactory
      * @see Component
@@ -139,8 +136,7 @@ public abstract class BaseSession implements Session
      *
      * @return the currently registered <code>Processor</code> component
      *
-     * @throws ComponentNotFound If a <code>Processor</code> component has not been registered
-     *
+     * @throws ComponentNotFoundException If a <code>Processor</code> component has not been registered
      * @see Processor
      * @see Component
      */
