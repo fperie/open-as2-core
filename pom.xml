@@ -3,7 +3,7 @@
 
 	<groupId>fr.fabienperie.open-as2</groupId>
 	<artifactId>open-as2-core</artifactId>
-	<version>1.0</version>
+	<version>1.1-SNAPSHOT</version>
 	<packaging>jar</packaging>
 	<inceptionYear>2015</inceptionYear>
 
@@ -21,7 +21,7 @@
 		<url>https://github.com/fperie/open-as2-core</url>
 		<connection>scm:git:https://github.com/fperie/open-as2-core.git</connection>
 		<developerConnection>scm:git:https://github.com/fperie/open-as2-core.git</developerConnection>
-	  <tag>open-as2-core-1.0</tag>
+	  <tag>HEAD</tag>
   </scm>
 
 	<licenses>
