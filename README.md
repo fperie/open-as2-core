@@ -1,5 +1,5 @@
 # open-as2-core
-The open as2 project is an free BSD open source project, hosted by sourceforge, and available to the following link: http://sourceforge.net/projects/openas2/files/latest/download
+The open as2 core project is an free BSD open source project, hosted by sourceforge, and available to the following link: http://sourceforge.net/projects/openas2/files/latest/download
 
 The last update has been released the 2013-04-25.
 
@@ -15,4 +15,12 @@ Some code refactoring has been made to the original source code :
  - give the capability to implements it's own stream instead default socket (http request for example)
  - etc...
  
-The jar file will be available in central maven with: groupId: fr.fabienperie.open-as2, artifactId: dual-core-as2
+The jar file is available in maven central repository with the following GAV:
+
+```xml
+<dependency>
+   <groupId>fr.fabienperie.open-as2</groupId>
+   <artifactId>open-as2-core</artifactId>
+   <version>1.0</version>
+</dependency>
+```
