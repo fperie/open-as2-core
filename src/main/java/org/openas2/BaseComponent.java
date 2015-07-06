@@ -63,7 +63,7 @@ public class BaseComponent implements Component
 	{
 		try
 		{
-			return getParameter(key, false);
+			return getParameter(key, true);
 		}
 		catch (InvalidParameterException ipe)
 		{

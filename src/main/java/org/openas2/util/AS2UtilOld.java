@@ -25,9 +25,14 @@ import org.openas2.params.ParameterParser;
 import org.openas2.partner.AS2Partnership;
 import org.openas2.partner.ASXPartnership;
 import org.openas2.partner.Partnership;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 public class AS2UtilOld
 {
+	/** Logger for the class. */
+	private static final Logger LOGGER = LoggerFactory.getLogger(AS2UtilOld.class);
+
     private static ICryptoHelper ch;
 
 	public static ICryptoHelper getCryptoHelper() throws Exception
@@ -163,7 +168,8 @@ public class AS2UtilOld
 			}
 			catch (CertificateNotFoundException cnfe)
 			{
-                cnfe.terminate();
+				cnfe.terminate();
+				LOGGER.error("impossible to get certificate in pkcs12", cnfe);
                 mdn.setData(report);
 			}
 			catch (KeyNotFoundException knfe)

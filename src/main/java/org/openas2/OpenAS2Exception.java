@@ -62,6 +62,6 @@ public class OpenAS2Exception extends Exception
 
 	protected void log(boolean terminated)
 	{
-		// do nothing !!!
+		// do nothing...
 	}
 }

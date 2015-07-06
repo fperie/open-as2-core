@@ -120,6 +120,7 @@ public class AS2ReceiverHandler implements NetModuleHandler
 		{
 			NetException ne = new NetException(remoteIp, remotePort, e);
 			ne.terminate();
+			LOGGER.error("impossible to read ciphered message", ne);
 		}
 
 		Profiler.endProfile(transferStub);
@@ -351,6 +352,8 @@ public class AS2ReceiverHandler implements NetModuleHandler
 				WrappedException we = new WrappedException("Error sending MDN", e);
 				we.addSource(OpenAS2Exception.SOURCE_MESSAGE, msg);
 				we.terminate();
+
+				LOGGER.error(we.getMessage(), e);
 			}
 		}
 	}

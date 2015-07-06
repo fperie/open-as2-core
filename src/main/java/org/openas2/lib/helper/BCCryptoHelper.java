@@ -27,6 +27,7 @@ import javax.mail.internet.ContentType;
 import javax.mail.internet.MimeBodyPart;
 import javax.mail.internet.MimeMultipart;
 
+import org.apache.commons.lang3.StringUtils;
 import org.bouncycastle.cms.CMSException;
 import org.bouncycastle.cms.RecipientId;
 import org.bouncycastle.cms.RecipientInformation;
@@ -41,9 +42,14 @@ import org.bouncycastle.mail.smime.SMIMESignedGenerator;
 import org.bouncycastle.mail.smime.SMIMEUtil;
 import org.bouncycastle.util.encoders.Base64;
 import org.openas2.lib.util.IOUtil;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 public class BCCryptoHelper implements ICryptoHelper
 {
+	/** Logger for the class. */
+	private static final Logger LOGGER = LoggerFactory.getLogger(BCCryptoHelper.class);
+
 	@Override
 	public boolean isEncrypted(MimeBodyPart part) throws MessagingException
 	{
@@ -73,7 +79,7 @@ public class BCCryptoHelper implements ICryptoHelper
 	public String calculateMIC(MimeBodyPart part, String digest, boolean includeHeaders)
 			throws GeneralSecurityException, MessagingException, IOException
 	{
-		String micAlg = convertAlgorithm(digest, true);
+		String micAlg = convertAlgorithm(digest);
 
 		MessageDigest md = MessageDigest.getInstance(micAlg, "BC");
 
@@ -142,7 +148,23 @@ public class BCCryptoHelper implements ICryptoHelper
 		}
 
 		// try to decrypt the data
-		byte[] decryptedData = recipient.getContent(key, "BC");
+		final byte[] decryptedData;
+
+		try
+		{
+			decryptedData = recipient.getContent(key, "BC");
+		}
+		catch (CMSException cmse)
+		{
+			if (StringUtils.containsIgnoreCase(cmse.getMessage(), "key invalid in message"))
+			{
+				LOGGER.error(
+						"The following error occured during the decypher phase. JCE has been installed correctly in the JRE/JVM ? "
+								+ "Please, can you verify this configuration.",
+						cmse);
+			}
+			throw cmse;
+		}
 
 		return SMIMEUtil.toMimeBodyPart(decryptedData);
 	}
@@ -159,7 +181,7 @@ public class BCCryptoHelper implements ICryptoHelper
 	{
 		X509Certificate x509Cert = castCertificate(cert);
 
-		String encAlg = convertAlgorithm(algorithm, true);
+		String encAlg = convertAlgorithm(algorithm);
 
 		SMIMEEnvelopedGenerator gen = new SMIMEEnvelopedGenerator();
 		gen.addKeyTransRecipient(x509Cert);
@@ -192,7 +214,7 @@ public class BCCryptoHelper implements ICryptoHelper
 	public MimeBodyPart sign(MimeBodyPart part, Certificate cert, Key key, String digest)
 			throws GeneralSecurityException, SMIMEException, MessagingException
 	{
-		String signDigest = convertAlgorithm(digest, true);
+		String signDigest = convertAlgorithm(digest);
 		X509Certificate x509Cert = castCertificate(cert);
 		PrivateKey privKey = castKey(key);
 
@@ -266,7 +288,7 @@ public class BCCryptoHelper implements ICryptoHelper
 		return (PrivateKey)key;
 	}
 
-	protected String convertAlgorithm(String algorithm, boolean toBC)
+	protected String convertAlgorithm(String algorithm)
 			throws NoSuchAlgorithmException
 	{
 		if (algorithm == null)
@@ -274,66 +296,60 @@ public class BCCryptoHelper implements ICryptoHelper
 			throw new NoSuchAlgorithmException("Algorithm is null");
 		}
 
-		if (toBC)
+		final String response;
+		switch (StringUtils.lowerCase(algorithm))
 		{
-			if (algorithm.equalsIgnoreCase(DIGEST_MD5))
-			{
-				return SMIMESignedGenerator.DIGEST_MD5;
-			}
-			else if (algorithm.equalsIgnoreCase(DIGEST_SHA1))
-			{
-				return SMIMESignedGenerator.DIGEST_SHA1;
-			}
-			else if (algorithm.equalsIgnoreCase(CRYPT_3DES))
-			{
-				return SMIMEEnvelopedGenerator.DES_EDE3_CBC;
-			}
-			else if (algorithm.equalsIgnoreCase(CRYPT_CAST5))
-			{
-				return SMIMEEnvelopedGenerator.CAST5_CBC;
-			}
-			else if (algorithm.equalsIgnoreCase(CRYPT_IDEA))
-			{
-				return SMIMEEnvelopedGenerator.IDEA_CBC;
-			}
-			else if (algorithm.equalsIgnoreCase(CRYPT_RC2))
-			{
-				return SMIMEEnvelopedGenerator.RC2_CBC;
-			}
-			else
-			{
+			case "md5":
+				response = SMIMESignedGenerator.DIGEST_MD5;
+				break;
+
+			case "sha1":
+			case "sha-1":
+				response = SMIMESignedGenerator.DIGEST_SHA1;
+				break;
+
+			case "sha224":
+			case "sha-224":
+				response = SMIMESignedGenerator.DIGEST_SHA224;
+				break;
+
+			case "sha256":
+			case "sha-256":
+				response = SMIMESignedGenerator.DIGEST_SHA256;
+				break;
+
+			case "sha384":
+			case "sha-384":
+				response = SMIMESignedGenerator.DIGEST_SHA384;
+				break;
+
+			case "sha512":
+			case "sha-512":
+				response = SMIMESignedGenerator.DIGEST_SHA512;
+				break;
+
+			case "3des":
+				response = SMIMEEnvelopedGenerator.DES_EDE3_CBC;
+				break;
+
+			case "cast5":
+				response = SMIMEEnvelopedGenerator.CAST5_CBC;
+				break;
+
+			case "idea":
+				response = SMIMEEnvelopedGenerator.IDEA_CBC;
+				break;
+
+			case "rc2":
+			case "rc-2":
+				response = SMIMEEnvelopedGenerator.RC2_CBC;
+				break;
+
+			default:
 				throw new NoSuchAlgorithmException("Unknown algorithm: " + algorithm);
-			}
-		}
-		if (algorithm.equalsIgnoreCase(SMIMESignedGenerator.DIGEST_MD5))
-		{
-			return DIGEST_MD5;
-		}
-		else if (algorithm.equalsIgnoreCase(SMIMESignedGenerator.DIGEST_SHA1))
-		{
-			return DIGEST_SHA1;
-		}
-		else if (algorithm.equalsIgnoreCase(SMIMEEnvelopedGenerator.CAST5_CBC))
-		{
-			return CRYPT_CAST5;
-		}
-		else if (algorithm.equalsIgnoreCase(SMIMEEnvelopedGenerator.DES_EDE3_CBC))
-		{
-			return CRYPT_3DES;
-		}
-		else if (algorithm.equalsIgnoreCase(SMIMEEnvelopedGenerator.IDEA_CBC))
-		{
-			return CRYPT_IDEA;
-		}
-		else if (algorithm.equalsIgnoreCase(SMIMEEnvelopedGenerator.RC2_CBC))
-		{
-			return CRYPT_RC2;
-		}
-		else
-		{
-			throw new NoSuchAlgorithmException("Unknown algorithm: " + algorithm);
 		}
 
+		return response;
 	}
 
 	protected InputStream trimCRLFPrefix(byte[] data)
