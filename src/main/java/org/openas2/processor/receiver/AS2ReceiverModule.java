@@ -1,5 +1,6 @@
 package org.openas2.processor.receiver;
 
+import org.openas2.IOpenAs2;
 import org.openas2.message.NetAttribute;
 import org.openas2.params.MessageParameters;
 import org.openas2.partner.AS2Partnership;
@@ -16,7 +17,7 @@ public class AS2ReceiverModule extends NetModule
     public static final String MSG_SUBJECT = "$" + MessageParameters.KEY_HEADERS + ".subject" + "$";
     public static final String MSG_SOURCE_ADDRESS = "$" + MessageParameters.KEY_ATTRIBUTES + "." +
         NetAttribute.MA_SOURCE_IP + "$";
-    public static final String DP_HEADER = "The message sent to Recipient " + MSG_RECEIVER +
+    public static final String DP_HEADER = "[" + IOpenAs2.NAME + "] :: The message sent to Recipient " + MSG_RECEIVER +
         " on " + MSG_DATE + " with Subject " + MSG_SUBJECT + " has been received, ";
     public static final String DP_DECRYPTED = DP_HEADER +
         "the EDI Interchange was successfully decrypted and it's integrity was verified. ";

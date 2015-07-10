@@ -17,5 +17,5 @@ public interface IAs2Worker
 	 * @return mdn to return to the client.
 	 */
 	@Nonnull
-	String processMessage(final @Nonnull AS2Message msg);
+	void processMessage(final @Nonnull AS2Message msg);
 }

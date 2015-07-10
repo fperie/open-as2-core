@@ -173,23 +173,9 @@ public class AS2ReceiverHandler implements NetModuleHandler
 				decryptAndVerify(msg);
 
 				// Process the received message
-				final String response;
 				try
 				{
 					getModule().getSession().getProcessor().handle(StorageModule.DO_STORE, msg, null);
-
-					final IAs2Worker worker = WorkerRegistrer.getWorker();
-					if (worker == null)
-					{
-						LOGGER.debug("no specific worker, process by default");
-						response = AS2ReceiverModule.DISP_SUCCESS;
-					}
-					else
-					{
-						LOGGER.debug("a specific worker has been found...");
-						response = worker.processMessage(msg);
-					}
-
 				}
 				catch (OpenAS2Exception oae)
 				{
@@ -197,6 +183,28 @@ public class AS2ReceiverHandler implements NetModuleHandler
 							"processed", "Error", "unexpected-processing-error"),
 							AS2ReceiverModule.DISP_STORAGE_FAILED, oae);
 				}
+					
+				final IAs2Worker worker = WorkerRegistrer.getWorker();
+
+				if (worker == null)
+				{
+					LOGGER.debug("no specific worker, process by default");
+				}
+				else
+				{
+					LOGGER.debug("a specific worker has been found...");
+					
+					try
+					{
+						worker.processMessage(msg);
+					} 
+					catch (Exception e)
+					{
+						LOGGER.error("Error occured during the worker processing because : ", e);
+					}
+				}
+
+				
 
 				// Transmit a success MDN if requested
 				try
@@ -205,7 +213,7 @@ public class AS2ReceiverHandler implements NetModuleHandler
 					{
 						sendMDN(remoteIp, remotePort, outputStream, msg, new DispositionType("automatic-action",
 								"MDN-sent-automatically", "processed"),
-								response);
+								AS2ReceiverModule.DISP_SUCCESS);
 					}
 					else
 					{

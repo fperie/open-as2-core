@@ -1,5 +1,6 @@
 ## 1.2
  - use the templating maven plugin to indicate the version of project
+ - worker returns void value
 
 ## 1.1 (2015-07-06)
  - add loggers
