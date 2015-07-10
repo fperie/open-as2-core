@@ -22,11 +22,8 @@ import org.openas2.processor.Processor;
  */
 public interface Session 
 {
-    /** Official OpenAS2 release version */
-    public static final String VERSION = "0.9";
-
     /** Official OpenAS2 title */
-    public static final String TITLE = "OpenAS2 v" + VERSION;
+    public static final String TITLE = IOpenAs2.NAME + " v" + IOpenAs2.CURRENT_VERSION;
 
     /**
      * Short-cut method to retrieve a certificate factory.

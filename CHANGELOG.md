@@ -1,3 +1,6 @@
+## 1.2
+ - use the templating maven plugin to indicate the version of project
+
 ## 1.1 (2015-07-06)
  - add loggers
  - SHA-224, SHA-256, SHA-384 and SHA-512 are supported
