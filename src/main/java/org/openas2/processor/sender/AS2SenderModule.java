@@ -13,6 +13,7 @@ import java.util.Map;
 import javax.mail.internet.MimeBodyPart;
 
 import org.openas2.DispositionException;
+import org.openas2.IOpenAs2;
 import org.openas2.OpenAS2Exception;
 import org.openas2.WrappedException;
 import org.openas2.cert.CertificateFactory;
@@ -165,13 +166,11 @@ public class AS2SenderModule extends HttpSenderModule
 					oae2.addSource(OpenAS2Exception.SOURCE_MESSAGE, msg);
 					oae2.terminate();
 				}
-
 			}
 			finally
 			{
 				conn.disconnect();
 			}
-
 		}
 		catch (HttpResponseException hre)
 		{ // Resend if the HTTP Response
@@ -409,7 +408,7 @@ public class AS2SenderModule extends HttpSenderModule
 		Partnership partnership = msg.getPartnership();
 
 		conn.setRequestProperty("Connection", "close, TE");
-		conn.setRequestProperty("User-Agent", "OpenAS2 AS2Sender");
+		conn.setRequestProperty("User-Agent", IOpenAs2.NAME + " sender");
 
 		conn.setRequestProperty("Date", DateUtil.formatDate("EEE, dd MMM yyyy HH:mm:ss Z"));
 		conn.setRequestProperty("Message-ID", msg.getMessageID());

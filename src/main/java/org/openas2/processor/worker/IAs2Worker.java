@@ -14,8 +14,6 @@ public interface IAs2Worker
 	 * 
 	 * @param msg
 	 *        as2 message received.
-	 * @return mdn to return to the client.
 	 */
-	@Nonnull
 	void processMessage(final @Nonnull AS2Message msg);
 }

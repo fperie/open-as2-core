@@ -15,7 +15,7 @@ import org.openas2.params.ParameterParser;
 
 public abstract class BasePartnershipFactory extends BaseComponent implements PartnershipFactory
 {
-	private List partnerships;
+	private List<Partnership> partnerships;
 
 	public Partnership getPartnership(Partnership p) throws OpenAS2Exception
 	{
@@ -35,17 +35,17 @@ public abstract class BasePartnershipFactory extends BaseComponent implements Pa
 	}
 
 	@Override
-	public void setPartnerships(List list)
+	public void setPartnerships(List<Partnership> list)
 	{
 		partnerships = list;
 	}
 
 	@Override
-	public List getPartnerships()
+	public List<Partnership> getPartnerships()
 	{
 		if (partnerships == null)
 		{
-			partnerships = new ArrayList();
+			partnerships = new ArrayList<Partnership>();
 		}
 
 		return partnerships;
@@ -99,7 +99,7 @@ public abstract class BasePartnershipFactory extends BaseComponent implements Pa
 		return null;
 	}
 
-	protected Partnership getPartnership(List partnerships, String name)
+	protected Partnership getPartnership(List<Partnership> partnerships, String name)
 	{
 		Iterator psIt = partnerships.iterator();
 		Partnership currentPs;

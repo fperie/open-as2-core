@@ -29,9 +29,9 @@ public interface PartnershipFactory extends Component
 	// looks up and fills in any header info for a specific msg's partnership
 	public void updatePartnership(MessageMDN mdn, boolean overwrite) throws OpenAS2Exception;
 
-	public void setPartnerships(List list);
+	public void setPartnerships(List<Partnership> list);
 
-	public List getPartnerships();
+	public List<Partnership> getPartnerships();
 
 	public Map getPartners();
 }
