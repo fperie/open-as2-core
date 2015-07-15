@@ -196,7 +196,7 @@ public class AS2ReceiverHandler implements NetModuleHandler
 					
 					try
 					{
-						worker.processMessage(msg);
+						worker.processMessage(getModule().getSession(), msg);
 					} 
 					catch (Exception e)
 					{

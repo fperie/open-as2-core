@@ -1,3 +1,6 @@
+## 1.3 (2015-07-16)
+ - inject as2 session in worker
+
 ## 1.2 (2015-07-15)
  - use the templating maven plugin to indicate the version of project
  - worker returns void value
