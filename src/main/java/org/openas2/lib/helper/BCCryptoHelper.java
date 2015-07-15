@@ -329,6 +329,7 @@ public class BCCryptoHelper implements ICryptoHelper
 				break;
 
 			case "3des":
+			case "3-des":
 				response = SMIMEEnvelopedGenerator.DES_EDE3_CBC;
 				break;
 
@@ -343,6 +344,21 @@ public class BCCryptoHelper implements ICryptoHelper
 			case "rc2":
 			case "rc-2":
 				response = SMIMEEnvelopedGenerator.RC2_CBC;
+				break;
+
+			case "aes128":
+			case "aes-128":
+				response = SMIMEEnvelopedGenerator.AES128_CBC;
+				break;
+
+			case "aes192":
+			case "aes-192":
+				response = SMIMEEnvelopedGenerator.AES192_CBC;
+				break;
+
+			case "aes256":
+			case "aes-256":
+				response = SMIMEEnvelopedGenerator.AES256_CBC;
 				break;
 
 			default:
