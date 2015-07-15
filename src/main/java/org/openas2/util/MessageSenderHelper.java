@@ -1,5 +1,9 @@
 package org.openas2.util;
 
+import java.io.Serializable;
+import java.util.HashMap;
+import java.util.Map;
+
 import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
 import javax.mail.internet.MimeBodyPart;
@@ -54,7 +58,9 @@ public class MessageSenderHelper
 		as2.setData(body);
 		
 		final AS2SenderModule senderModule = new AS2SenderModule();
-		senderModule.init(session, null);
+		Map<String, Serializable> parameters = new HashMap<String, Serializable>();
+		parameters.put(SenderModule.SOPT_RETRIES, "3");
+		senderModule.init(session, parameters);
 		senderModule.handle(SenderModule.DO_SEND, as2, null);
 	}
 	
@@ -73,7 +79,6 @@ public class MessageSenderHelper
 		final String encoding = "UTF-8";
         final MimeBodyPart body = new MimeBodyPart();
         body.setText(strMessage, encoding, StringUtils.defaultIfBlank(subContentType, "plain"));
-        body.setHeader("Content-Transfer-Encoding", encoding);
 		return body;
 	}
 }

@@ -8,7 +8,9 @@ import java.io.OutputStream;
 import java.net.HttpURLConnection;
 import java.security.PrivateKey;
 import java.security.cert.X509Certificate;
+import java.util.List;
 import java.util.Map;
+import java.util.Map.Entry;
 
 import javax.mail.internet.MimeBodyPart;
 
@@ -122,6 +124,9 @@ public class AS2SenderModule extends HttpSenderModule
 				{
 					messageIn.close();
 				}
+
+				getSession().getProcessor().handle(StorageModule.DO_ARCHIVE, msg, null);
+
 				// Check the HTTP Response code
 				if ((conn.getResponseCode() != HttpURLConnection.HTTP_OK)
 						&& (conn.getResponseCode() != HttpURLConnection.HTTP_CREATED)
@@ -409,7 +414,6 @@ public class AS2SenderModule extends HttpSenderModule
 
 		conn.setRequestProperty("Connection", "close, TE");
 		conn.setRequestProperty("User-Agent", IOpenAs2.NAME + " sender");
-
 		conn.setRequestProperty("Date", DateUtil.formatDate("EEE, dd MMM yyyy HH:mm:ss Z"));
 		conn.setRequestProperty("Message-ID", msg.getMessageID());
 		conn.setRequestProperty("Mime-Version", "1.0"); // make sure this is the encoding used in the msg, run TBF1
@@ -447,6 +451,26 @@ public class AS2SenderModule extends HttpSenderModule
 		if (contentDisp != null)
 		{
 			conn.setRequestProperty("Content-Disposition", contentDisp);
+		}
+
+		for (Entry<String, List<String>> entry : conn.getRequestProperties().entrySet())
+		{
+			if (msg.getHeader(entry.getKey()) == null)
+			{
+				String value = "";
+
+				for (int i = 0; i < entry.getValue().size(); i++)
+				{
+					if (i > 0)
+					{
+						value += ", ";
+					}
+
+					value += entry.getValue().get(i);
+				}
+
+				msg.addHeader(entry.getKey(), value);
+			}
 		}
 	}
 

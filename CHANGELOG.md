@@ -1,8 +1,10 @@
-## 1.2
+## 1.2 (2015-07-15)
  - use the templating maven plugin to indicate the version of project
  - worker returns void value
  - create a new class: MessageSenderHelper to send easily a message in as2
- - supports AES-128, AES-192 and AES-256 algorithms.
+ - supports AES-128, AES-192 and AES-256 algorithms
+ - create an archive module to store output message
+ - as2 sender module can call the archive module
 
 ## 1.1 (2015-07-06)
  - add loggers
