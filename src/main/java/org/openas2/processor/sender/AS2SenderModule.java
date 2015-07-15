@@ -46,6 +46,7 @@ public class AS2SenderModule extends HttpSenderModule
 	/** Logger for the class. */
 	private static final Logger LOGGER = LoggerFactory.getLogger(AS2SenderModule.class);
 
+	@Override
 	public boolean canHandle(String action, Message msg, Map options)
 	{
 		if (!action.equals(SenderModule.DO_SEND))
@@ -56,6 +57,7 @@ public class AS2SenderModule extends HttpSenderModule
 		return (msg instanceof AS2Message);
 	}
 
+	@Override
 	public void handle(String action, Message msg, Map options) throws OpenAS2Exception
 	{
 		LOGGER.info("message submitted {}", msg.getLoggingText());
@@ -413,7 +415,7 @@ public class AS2SenderModule extends HttpSenderModule
 		Partnership partnership = msg.getPartnership();
 
 		conn.setRequestProperty("Connection", "close, TE");
-		conn.setRequestProperty("User-Agent", IOpenAs2.NAME + " sender");
+		conn.setRequestProperty("User-Agent", IOpenAs2.NAME + ":" + IOpenAs2.CURRENT_VERSION + " sender");
 		conn.setRequestProperty("Date", DateUtil.formatDate("EEE, dd MMM yyyy HH:mm:ss Z"));
 		conn.setRequestProperty("Message-ID", msg.getMessageID());
 		conn.setRequestProperty("Mime-Version", "1.0"); // make sure this is the encoding used in the msg, run TBF1
