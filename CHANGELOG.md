@@ -1,5 +1,6 @@
 ## 1.3 (2015-07-16)
  - inject as2 session in worker
+ - add logger in as2 sender module
 
 ## 1.2 (2015-07-15)
  - use the templating maven plugin to indicate the version of project

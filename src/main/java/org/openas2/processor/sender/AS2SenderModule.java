@@ -161,7 +161,7 @@ public class AS2SenderModule extends HttpSenderModule
 					// was not successful
 					throw de;
 				}
-				catch (OpenAS2Exception oae)
+				catch (final OpenAS2Exception oae)
 				{ // Don't resend or fail,
 					// just log an error if one
 					// occurs while
@@ -172,6 +172,9 @@ public class AS2SenderModule extends HttpSenderModule
 					oae2.initCause(oae);
 					oae2.addSource(OpenAS2Exception.SOURCE_MESSAGE, msg);
 					oae2.terminate();
+
+					LOGGER.error("Message (id = " + msg.getMessageID()
+							+ ") was sent but an error occured while receiving the MDN", oae);
 				}
 			}
 			finally
@@ -355,7 +358,7 @@ public class AS2SenderModule extends HttpSenderModule
 		}
 		// Oh dear, we've run out of reetries, do something interesting.
 		// TODO create a fake failure MDN
-		LOGGER.info("Message abandoned {}", msg.getLoggingText());
+		LOGGER.error("After " + tries + " tries, the following message is abandoned: " + msg.getLoggingText(), cause);
 	}
 
 	// Returns a MimeBodyPart or MimeMultipart object
