@@ -1,3 +1,6 @@
+## 1.3.1 (2015-07-16)
+ - fix major alert on storage archive module
+
 ## 1.3 (2015-07-16)
  - inject as2 session in worker
  - add logger in as2 sender module

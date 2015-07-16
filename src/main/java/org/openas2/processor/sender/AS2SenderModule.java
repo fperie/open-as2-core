@@ -8,10 +8,13 @@ import java.io.OutputStream;
 import java.net.HttpURLConnection;
 import java.security.PrivateKey;
 import java.security.cert.X509Certificate;
+import java.util.Enumeration;
 import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
 
+import javax.mail.Header;
+import javax.mail.internet.InternetHeaders;
 import javax.mail.internet.MimeBodyPart;
 
 import org.openas2.DispositionException;
@@ -107,6 +110,8 @@ public class AS2SenderModule extends HttpSenderModule
 
 				LOGGER.info("connecting to {}", url + msg.getLoggingText());
 
+				Message msgArchive = merge(msg, conn);
+
 				// Note: closing this stream causes connection abort errors on some AS2 servers
 				OutputStream messageOut = conn.getOutputStream();
 
@@ -127,7 +132,8 @@ public class AS2SenderModule extends HttpSenderModule
 					messageIn.close();
 				}
 
-				getSession().getProcessor().handle(StorageModule.DO_ARCHIVE, msg, null);
+
+				getSession().getProcessor().handle(StorageModule.DO_ARCHIVE, msgArchive, null);
 
 				// Check the HTTP Response code
 				if ((conn.getResponseCode() != HttpURLConnection.HTTP_OK)
@@ -270,7 +276,6 @@ public class AS2SenderModule extends HttpSenderModule
 			X509Certificate senderCert = cFx.getCertificate(mdn, Partnership.PTYPE_SENDER);
 
 			AS2UtilOld.parseMDN(msg, senderCert);
-
 			getSession().getProcessor().handle(StorageModule.DO_STOREMDN, msg, null);
 
 			String disposition = msg.getMDN().getAttribute(AS2MessageMDN.MDNA_DISPOSITION);
@@ -458,25 +463,6 @@ public class AS2SenderModule extends HttpSenderModule
 			conn.setRequestProperty("Content-Disposition", contentDisp);
 		}
 
-		for (Entry<String, List<String>> entry : conn.getRequestProperties().entrySet())
-		{
-			if (msg.getHeader(entry.getKey()) == null)
-			{
-				String value = "";
-
-				for (int i = 0; i < entry.getValue().size(); i++)
-				{
-					if (i > 0)
-					{
-						value += ", ";
-					}
-
-					value += entry.getValue().get(i);
-				}
-
-				msg.addHeader(entry.getKey(), value);
-			}
-		}
 	}
 
 	// Asynch MDN 2007-03-12
@@ -521,5 +507,56 @@ public class AS2SenderModule extends HttpSenderModule
 			we.addSource(OpenAS2Exception.SOURCE_MESSAGE, msg);
 			throw we;
 		}
+	}
+
+	private Message merge(Message msg, HttpURLConnection conn)
+	{
+		final AS2Message msgArchive = new AS2Message();
+		InternetHeaders headers = msg.getHeaders();
+		Enumeration<Header> enumHeaders = headers.getAllHeaders();
+		while (enumHeaders.hasMoreElements())
+		{
+			Header header = enumHeaders.nextElement();
+			msgArchive.addHeader(header.getName(), header.getValue());
+		}
+		
+		for (Entry<String, String> e : ((Map<String, String>)msg.getAttributes()).entrySet())
+		{
+			msgArchive.setAttribute(e.getKey(), e.getValue());
+		}
+
+		msgArchive.getPartnership().copy(msg.getPartnership());
+
+		try
+		{
+			msgArchive.setData(msg.getData());
+			msgArchive.setMDN(msg.getMDN());
+		}
+		catch (OpenAS2Exception e)
+		{
+			LOGGER.warn("Impossible to clone the data of message", e);
+		}
+		
+		for (Entry<String, List<String>> entry : conn.getRequestProperties().entrySet())
+		{
+			if (msg.getHeader(entry.getKey()) == null)
+			{
+				String value = "";
+
+				for (int i = 0; i < entry.getValue().size(); i++)
+				{
+					if (i > 0)
+					{
+						value += ", ";
+					}
+
+					value += entry.getValue().get(i);
+				}
+
+				msgArchive.addHeader(entry.getKey(), value);
+			}
+		}
+
+		return msgArchive;
 	}
 }
