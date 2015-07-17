@@ -1,3 +1,7 @@
+## 1.3.2
+ - add loggers on as2 sender module and the MessageSenderHelper class.
+ 
+
 ## 1.3.1 (2015-07-16)
  - fix major alert on storage archive module
 

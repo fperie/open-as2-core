@@ -14,6 +14,8 @@ import org.openas2.message.AS2Message;
 import org.openas2.partner.AS2Partnership;
 import org.openas2.processor.sender.AS2SenderModule;
 import org.openas2.processor.sender.SenderModule;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 /**
  * Utility class to send easy a message in as2.
@@ -22,6 +24,8 @@ import org.openas2.processor.sender.SenderModule;
  */
 public class MessageSenderHelper 
 {
+	/** Logger for the class. */
+	private static final Logger LOGGER = LoggerFactory.getLogger(MessageSenderHelper.class);
 	
 	/**
 	 * Default constructor.
@@ -57,6 +61,13 @@ public class MessageSenderHelper
 		as2.setSubject(subject);
 		as2.setData(body);
 		
+		LOGGER.debug("Try to send a message from: {} to {} with id: {} and subject: {}",
+				as2.getPartnership().getSenderID(AS2Partnership.PID_AS2),
+				as2.getPartnership().getReceiverID(AS2Partnership.PID_AS2),
+				messageId,
+				subject
+				);
+
 		final AS2SenderModule senderModule = new AS2SenderModule();
 		Map<String, Serializable> parameters = new HashMap<String, Serializable>();
 		parameters.put(SenderModule.SOPT_RETRIES, "3");

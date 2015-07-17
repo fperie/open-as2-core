@@ -191,7 +191,7 @@ public class AS2SenderModule extends HttpSenderModule
 		catch (HttpResponseException hre)
 		{ // Resend if the HTTP Response
 			// has an error code
-			LOGGER.error("error hre {}", hre.getMessage());
+			LOGGER.error("one error has been returned by the remote http server called", hre);
 			hre.terminate();
 			resend(msg, hre, retries);
 		}
@@ -202,10 +202,13 @@ public class AS2SenderModule extends HttpSenderModule
 			wioe.addSource(OpenAS2Exception.SOURCE_MESSAGE, msg);
 			wioe.terminate();
 
+			LOGGER.error("error has been detected during the transmission", ioe);
+			LOGGER.info("Try to resend the message...");
 			resend(msg, wioe, retries);
 		}
 		catch (Exception e)
-		{ // Propagate error if it can't be handled by a
+		{
+			// Propagate error if it can't be handled by a
 			// resend
 			throw new WrappedException(e);
 		}
