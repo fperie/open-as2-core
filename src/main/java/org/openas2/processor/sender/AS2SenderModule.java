@@ -74,6 +74,7 @@ public class AS2SenderModule extends HttpSenderModule
 		checkRequired(msg);
 
 		int retries = retries(options);
+		Message msgArchive = null;
 
 		try
 		{
@@ -110,7 +111,7 @@ public class AS2SenderModule extends HttpSenderModule
 
 				LOGGER.info("connecting to {}", url + msg.getLoggingText());
 
-				Message msgArchive = merge(msg, conn);
+				msgArchive = merge(msg, conn);
 
 				// Note: closing this stream causes connection abort errors on some AS2 servers
 				OutputStream messageOut = conn.getOutputStream();
@@ -133,7 +134,6 @@ public class AS2SenderModule extends HttpSenderModule
 				}
 
 
-				getSession().getProcessor().handle(StorageModule.DO_ARCHIVE, msgArchive, null);
 
 				// Check the HTTP Response code
 				if ((conn.getResponseCode() != HttpURLConnection.HTTP_OK)
@@ -187,13 +187,15 @@ public class AS2SenderModule extends HttpSenderModule
 			{
 				conn.disconnect();
 			}
+
+			getSession().getProcessor().handle(StorageModule.DO_ARCHIVE, msgArchive, null);
 		}
 		catch (HttpResponseException hre)
 		{ // Resend if the HTTP Response
 			// has an error code
 			LOGGER.error("one error has been returned by the remote http server called", hre);
 			hre.terminate();
-			resend(msg, hre, retries);
+			resend(msg, hre, retries, msgArchive);
 		}
 		catch (IOException ioe)
 		{ // Resend if a network error occurs during
@@ -204,7 +206,7 @@ public class AS2SenderModule extends HttpSenderModule
 
 			LOGGER.error("error has been detected during the transmission", ioe);
 			LOGGER.info("Try to resend the message...");
-			resend(msg, wioe, retries);
+			resend(msg, wioe, retries, msgArchive);
 		}
 		catch (Exception e)
 		{
@@ -358,7 +360,7 @@ public class AS2SenderModule extends HttpSenderModule
 		}
 	}
 
-	private void resend(Message msg, OpenAS2Exception cause, int tries) throws OpenAS2Exception
+	private void resend(Message msg, OpenAS2Exception cause, int tries, Message msgArchive) throws OpenAS2Exception
 	{
 		if (resend(SenderModule.DO_SEND, msg, cause, tries))
 		{
@@ -367,6 +369,7 @@ public class AS2SenderModule extends HttpSenderModule
 		// Oh dear, we've run out of reetries, do something interesting.
 		// TODO create a fake failure MDN
 		LOGGER.error("After " + tries + " tries, the following message is abandoned: " + msg.getLoggingText(), cause);
+		getSession().getProcessor().handle(StorageModule.DO_STORE_ERROR, msgArchive, null);
 	}
 
 	// Returns a MimeBodyPart or MimeMultipart object

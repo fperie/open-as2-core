@@ -1,6 +1,8 @@
-## 1.3.2
+## 1.3.2 (2015-07-23)
  - add loggers on as2 sender module and the MessageSenderHelper class.
- 
+ - add an AS2ResenderModule and an ErrorStorageModule.
+ - fix resend problem on AS2SenderModule.
+ - fix store on "errordir" on AS2SenderModule.
 
 ## 1.3.1 (2015-07-16)
  - fix major alert on storage archive module

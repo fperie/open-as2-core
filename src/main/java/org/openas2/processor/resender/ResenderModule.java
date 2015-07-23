@@ -15,4 +15,8 @@ public interface ResenderModule extends ProcessorModule
 	public static final String OPTION_RESEND_METHOD = "resend_method";
 
 	public static final String OPTION_RETRIES = "retries";
+
+	public static final String OPTION_SLEEP_DURATION = "sleep_duration";
+
+	public static final int OPTION_MAX_SLEEP_DURATION = 7000;
 }

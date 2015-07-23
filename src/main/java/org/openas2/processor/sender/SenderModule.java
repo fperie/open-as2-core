@@ -11,4 +11,5 @@ public interface SenderModule extends ProcessorModule
 	public static final String SOPT_RETRIES = "retries";
 
 	public static final String DEFAULT_RETRIES = "-1"; // Infinite
+
 }

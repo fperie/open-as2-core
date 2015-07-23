@@ -21,6 +21,6 @@ The jar file is available in maven central repository with the following GAV:
 <dependency>
    <groupId>fr.fabienperie.open-as2</groupId>
    <artifactId>open-as2-core</artifactId>
-   <version>1.3.1</version>
+   <version>1.3.2</version>
 </dependency>
 ```
