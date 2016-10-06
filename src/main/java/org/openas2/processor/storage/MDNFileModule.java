@@ -29,15 +29,18 @@ public class MDNFileModule extends BaseStorageModule
 			throw new OpenAS2Exception("Message has no MDN");
 		}
 
-		try
+		String paramFileName = getParameter(PARAM_FILENAME, false);
+		if (paramFileName != null)
 		{
-			File mdnFile = getFile(msg, getParameter(PARAM_FILENAME, true), "");
-			InputStream in = getMDNStream(msg.getMDN());
-			store(mdnFile, in);
-		}
-		catch (IOException ioe)
-		{
-			throw new WrappedException(ioe);
+			try (InputStream in = getMDNStream(msg.getMDN()))
+			{
+				File mdnFile = getFile(msg, paramFileName, "");
+				store(mdnFile, in);
+			}
+			catch (IOException ioe)
+			{
+				throw new WrappedException(ioe);
+			}
 		}
 	}
 

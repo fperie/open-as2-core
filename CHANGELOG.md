@@ -1,3 +1,6 @@
+## 1.3.3 (2016-10-06)
+ - set param file name optional to give choice to store as2 files or not
+
 ## 1.3.2 (2015-07-23)
  - add loggers on as2 sender module and the MessageSenderHelper class.
  - add an AS2ResenderModule and an ErrorStorageModule.
