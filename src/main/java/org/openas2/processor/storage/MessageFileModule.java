@@ -32,28 +32,30 @@ public class MessageFileModule extends BaseStorageModule
 	@Override
 	public void handle(String action, Message msg, Map options) throws OpenAS2Exception
 	{
-		// store message content
-		try
+		String paramFileName = getParameter(PARAM_FILENAME, false);
+		if (paramFileName != null)
 		{
-			File msgFile = getFile(msg, getParameter(PARAM_FILENAME, true), action);
-			InputStream in = msg.getData().getInputStream();
-			store(msgFile, in);
-			LOGGER.info("stored message to {}", msgFile.getAbsolutePath() + msg.getLoggingText());
-		}
-		catch (Exception e)
-		{
-			throw new DispositionException(new DispositionType("automatic-action", "MDN-sent-automatically",
-					"processed", "Error", "Error storing transaction"), AS2ReceiverModule.DISP_STORAGE_FAILED, e);
+			// store message content
+			try (InputStream in = msg.getData().getInputStream())
+			{
+				File msgFile = getFile(msg, paramFileName, action);
+				store(msgFile, in);
+				LOGGER.info("stored message to {}", msgFile.getAbsolutePath() + msg.getLoggingText());
+			}
+			catch (Exception e)
+			{
+				throw new DispositionException(new DispositionType("automatic-action", "MDN-sent-automatically",
+						"processed", "Error", "Error storing transaction"), AS2ReceiverModule.DISP_STORAGE_FAILED, e);
+			}
 		}
 
 		String headerFilename = getParameter(PARAM_HEADER, false);
 
 		if (headerFilename != null)
 		{
-			try
+			try (InputStream in = getHeaderStream(msg))
 			{
 				File headerFile = getFile(msg, headerFilename, action);
-				InputStream in = getHeaderStream(msg);
 				store(headerFile, in);
 				LOGGER.info("stored headers to {}", headerFile.getAbsolutePath() + msg.getLoggingText());
 			}

@@ -12,6 +12,7 @@ Some code refactoring has been made to the original source code :
  - use classpath: and ${} in as2 config file
  - use the last version (1.46) bcmail api
  - create a worker interface to execute a custom action to process as2 message,
+ - give the choice to store as2 files or not
  - give the capability to implements it's own stream instead default socket (http request for example)
  - etc...
  
@@ -21,6 +22,6 @@ The jar file is available in maven central repository with the following GAV:
 <dependency>
    <groupId>fr.fabienperie.open-as2</groupId>
    <artifactId>open-as2-core</artifactId>
-   <version>1.3.2</version>
+   <version>1.3.3</version>
 </dependency>
 ```

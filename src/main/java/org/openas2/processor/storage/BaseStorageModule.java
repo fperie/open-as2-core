@@ -56,7 +56,6 @@ public abstract class BaseStorageModule extends BaseProcessorModule implements S
 	public void init(Session session, Map options) throws OpenAS2Exception
 	{
 		super.init(session, options);
-		getParameter(PARAM_FILENAME, true);
 	}
 
 	protected abstract String getModuleAction();
